@@ -74,8 +74,11 @@ Travo is a minimalistic trip planning application that allows users to view and 
 - Device orientation change handling
 
 **Visual Design System**
-- Clean, minimalist interface using ShadCN UI components
-- Consistent color scheme and typography
+- Clean, minimalist interface with enhanced ShadCN UI components
+- Custom design system with reusable tokens and components
+- Enhanced Card components with gradient backgrounds and animations
+- Typography hierarchy system with responsive scaling
+- Consistent color scheme and spacing using design tokens
 - Card-based layout for information hierarchy
 - Proper contrast and accessibility considerations
 
@@ -191,8 +194,17 @@ Travo is a minimalistic trip planning application that allows users to view and 
 - Nested routing support for future features
 - Browser history integration
 
+### Design System
+- **Component Library**: Enhanced ShadCN UI components with custom variants
+- **Design Tokens**: Centralized spacing, typography, and color systems
+- **Theme Integration**: Consistent theming across all components
+- **Typography Hierarchy**: Responsive text scaling with semantic styling
+- **Enhanced Components**: Cards with gradients, animations, and interactive states
+- **Reusability**: Components designed for cross-application usage
+
 ### Styling System
-- Tailwind CSS utility-first approach
-- ShadCN UI component library integration
-- Custom CSS for component-specific styles
+- Tailwind CSS utility-first approach with design system tokens
+- ShadCN UI component library integration with custom enhancements
+- CSS custom properties for design token management
+- Component-specific styles with animations and transitions
 - Responsive design with mobile-first methodology

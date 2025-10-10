@@ -12,9 +12,10 @@ Travo is a minimalistic trip planning frontend built with React 18, TypeScript 5
 - **Vite**: 7.1.7 (Build tool and dev server)
 
 ### UI & Styling
-- **ShadCN UI**: Component library built on Radix UI primitives
-- **Tailwind CSS**: 4.1.14 (Utility-first styling)
+- **ShadCN UI**: Component library built on Radix UI primitives (enhanced with design system)
+- **Tailwind CSS**: 4.1.14 (Utility-first styling + design system tokens)
 - **Radix UI**: Headless UI components (@radix-ui/react-slot)
+- **Design System**: Custom reusable component library with theme integration
 
 ### Routing & State
 - **React Router DOM**: 7.9.4 (Client-side routing)
@@ -32,9 +33,15 @@ travo-frontend/
 ├── public/                          # Static assets
 ├── src/
 │   ├── components/                  # Reusable UI components
-│   │   ├── ui/                     # ShadCN base components
-│   │   │   ├── button.tsx          # Button primitive
-│   │   │   └── card.tsx            # Card primitive
+│   │   ├── ui/                     # Enhanced ShadCN components
+│   │   │   ├── button.tsx          # Enhanced button with design system
+│   │   │   ├── card.tsx            # Enhanced card with gradients & animations
+│   │   │   ├── typography.tsx      # Typography hierarchy component
+│   │   │   └── index.ts            # UI component exports
+│   │   ├── design-system/          # Design system components
+│   │   │   ├── TripCard.tsx       # Enhanced trip card implementation
+│   │   │   ├── types.ts           # Design system type definitions
+│   │   │   └── index.ts           # Design system exports
 │   │   ├── ErrorBoundary.tsx       # Error handling wrapper
 │   │   ├── Navigation.tsx          # Page header component
 │   │   ├── PlaceCard.tsx          # Individual place display
@@ -45,10 +52,29 @@ travo-frontend/
 │   │   └── trips.json             # Hardcoded trip data
 │   ├── hooks/                     # Custom React hooks (empty)
 │   ├── lib/
-│   │   └── utils.ts               # Utility functions
+│   │   ├── utils.ts                # ShadCN utilities
+│   │   └── design-system/          # Design system core utilities
+│   │       ├── tokens.ts           # Design tokens & constants
+│   │       ├── theme.tsx           # Theme provider & context
+│   │       └── utils.ts            # Design system helpers
 │   ├── pages/
 │   │   ├── HomePage.tsx           # Trip list page
 │   │   └── TripPage.tsx           # Trip detail page
+│   ├── styles/
+│   │   ├── current-theme.css       # Active theme CSS
+│   │   ├── design-system/          # Design system CSS
+│   │   │   ├── tokens.css          # CSS custom properties & tokens
+│   │   │   ├── components.css      # Component-specific styles
+│   │   │   └── animations.css      # Animation definitions
+│   │   └── themes/                 # Theme management system
+│   │       ├── index.ts            # Theme exports
+│   │       ├── types.ts            # Theme type definitions
+│   │       └── themes/             # Individual theme files
+│   │           ├── default.css     # Default light theme
+│   │           ├── blue.css        # Blue color theme
+│   │           ├── green.css       # Green color theme
+│   │           ├── red.css         # Red color theme
+│   │           └── violet.css      # Violet color theme
 │   ├── types/
 │   │   └── index.ts               # TypeScript type definitions
 │   ├── App.tsx                    # Root application component

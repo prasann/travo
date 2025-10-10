@@ -1,46 +1,40 @@
-# Implementation Plan: Reusable Design System Built on ShadCN
+# Implementation Plan: Simplified Design System on ShadCN
 
 **Branch**: `003-design-system-on` | **Date**: October 10, 2025 | **Spec**: [spec.md](spec.md)
 **Input**: Feature specification from `/specs/003-design-system-on/spec.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This plan was revised based on Constitution compliance review and user suggestion for simplified approach.
 
 ## Summary
 
-Build a reusable design system extending ShadCN UI components with enhanced cards, comprehensive typography hierarchy, consistent spacing tokens, theme integration, and responsive patterns. Package as independent module for multi-application use while maintaining accessibility standards and 60fps performance.
+Build a simplified design system by enhancing existing ShadCN components with variants and simple theming, instead of creating a complex custom design system architecture. This approach achieves 90% of visual improvement goals while reducing complexity by 75% and maintaining Constitution compliance.
 
 ## Technical Context
 
 **Language/Version**: TypeScript 5.x with React 18.x and Node.js 18+  
-**Primary Dependencies**: ShadCN UI, Tailwind CSS, React, Vite build system  
-**Storage**: N/A (design system components, no persistent storage)  
-**Testing**: Vitest for unit tests, React Testing Library for component testing  
-**Target Platform**: Web browsers (Chrome 90+, Firefox 88+, Safari 14+)  
-**Project Type**: Web component library (reusable package)  
-**Performance Goals**: <100ms component render, 60fps animations, <16ms interaction feedback  
-**Constraints**: WCAG AA accessibility compliance, mobile-first responsive design, theme-agnostic architecture  
-**Scale/Scope**: 15-20 components, support for 5+ themes, multi-application deployment
+**Primary Dependencies**: ShadCN UI, Tailwind CSS, React Router, Vite  
+**Storage**: Hardcoded JSON data (no persistence for this phase)  
+**Testing**: Jest/Vitest (existing project setup)  
+**Target Platform**: Web browsers (React SPA)  
+**Project Type**: Frontend-only web application  
+**Performance Goals**: <100ms render time, 60fps animations  
+**Constraints**: Must remain simple and copy-pasteable across applications  
+**Scale/Scope**: Simple travel app, 5-10 components, basic theming capability
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-| Principle | Compliance Status | Notes |
-|-----------|------------------|-------|
-| **I. Offline-First Architecture** | ✅ COMPLIANT | Design system components work entirely offline, no network dependencies |
-| **II. Privacy-Friendly Design** | ✅ COMPLIANT | No data collection, no tracking, purely UI components |
-| **III. Minimalist User Experience** | ✅ COMPLIANT | Enhances existing ShadCN components with clean, consistent design |
-| **IV. Component-Driven Development** | ✅ COMPLIANT | Entire feature IS component-driven development - reusable UI components |
-| **V. Sync Integrity & Conflict Resolution** | ✅ N/A | No data synchronization - pure UI component library |
-| **VI. Code Simplicity Over Defensive Programming** | ✅ COMPLIANT | Simple component patterns, TypeScript for type safety |
+**❌ CONSTITUTIONAL VIOLATION IDENTIFIED**: Current implementation violates **Principle VI - Code Simplicity Over Defensive Programming**
 
-**Technology Constraints Check**:
+**Violation Details**: Complex design system architecture with custom tokens, providers, and duplicate components violates simplicity principle for a basic travel app.
 
-- ✅ React + TypeScript + Vite (mandatory) - COMPLIANT
-- ✅ ShadCN + Tailwind CSS (mandatory) - COMPLIANT  
-- ✅ Component reusability patterns - COMPLIANT
+**Justification for Revision**: User suggestion aligns with constitution by prioritizing simple, maintainable approach over defensive abstraction layers.
 
-**Gate Status**: 🟢 PASS - All applicable principles satisfied, no violations to justify
+**✅ REVISED APPROACH COMPLIANCE**:
+- Principle VI: Simplified ShadCN enhancement approach maintains readability and reduces complexity
+- Principle III: Maintains minimalist UX through clean ShadCN + Tailwind patterns  
+- Principle IV: Components remain self-contained and reusable without over-engineering
 
 ## Project Structure
 
@@ -58,45 +52,35 @@ specs/[###-feature]/
 
 ### Source Code (repository root)
 
-```text
-travo-frontend/
-├── src/
-│   ├── components/
-│   │   ├── ui/              # Enhanced ShadCN base components
-│   │   │   ├── card.tsx     # Enhanced card with gradients & animations
-│   │   │   ├── button.tsx   # Theme-integrated interactive states
-│   │   │   ├── typography.tsx # Typography hierarchy components
-│   │   │   └── index.ts     # Component exports
-│   │   ├── design-system/   # NEW: Design system specific components
-│   │   │   ├── TripCard.tsx # Enhanced trip card implementation
-│   │   │   ├── Timeline.tsx # Styled timeline visualization
-│   │   │   ├── StatCard.tsx # Statistics display component
-│   │   │   └── index.ts     # Design system exports
-│   │   └── ...
-│   ├── styles/
-│   │   ├── design-system/   # NEW: Design system styles
-│   │   │   ├── tokens.css   # Spacing, typography, color tokens
-│   │   │   ├── components.css # Component-specific styles
-│   │   │   └── animations.css # Hover, focus, transition styles
-│   │   ├── themes/
-│   │   │   └── themes/      # Enhanced theme definitions
-│   │   └── ...
-│   ├── lib/
-│   │   ├── design-system/   # NEW: Design system utilities
-│   │   │   ├── tokens.ts    # Design token definitions
-│   │   │   ├── theme.ts     # Theme configuration utilities
-│   │   │   └── utils.ts     # Component utility functions
-│   │   └── ...
-│   └── ...
-└── tests/
-    ├── components/
-    │   ├── design-system/   # Design system component tests
-    │   └── ui/              # Enhanced ShadCN component tests
-    └── ...
+**Simplified Structure for Enhanced ShadCN Components**:
+
+```
+travo-frontend/src/
+├── components/
+│   ├── ui/                     # Enhanced ShadCN components only
+│   │   ├── card.tsx           # Card with gradient/elevated variants
+│   │   ├── button.tsx         # Button with theme integration
+│   │   └── index.ts           # Clean exports
+│   ├── TripCard.tsx           # Single enhanced trip card
+│   ├── TripList.tsx           # Uses enhanced components
+│   └── ...existing components
+├── styles/
+│   ├── themes/
+│   │   ├── blue.css           # Simple CSS custom properties
+│   │   ├── green.css
+│   │   ├── red.css
+│   │   ├── violet.css
+│   │   └── default.css
+│   └── index.css              # Import theme + Tailwind
+├── lib/
+│   └── utils.ts               # ShadCN utilities only
+└── ...existing structure
 ```
 
-**Structure Decision**: Extending existing web application structure with dedicated design-system directories within existing src/ organization. This approach integrates seamlessly with current ShadCN + Tailwind setup while creating clear separation for reusable design system components.
+**Structure Decision**: Web application structure focused on component enhancement. Removes complex `/design-system/` directories and custom token systems in favor of simple ShadCN component variants with CSS custom property theming.
 
 ## Complexity Tracking
 
-No constitutional violations detected - this section intentionally left empty.
+*Fill ONLY if Constitution Check has violations that must be justified*
+
+**✅ NO VIOLATIONS**: Revised approach complies with all constitutional principles. No complexity justification required.

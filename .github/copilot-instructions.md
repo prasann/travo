@@ -5,6 +5,8 @@ Auto-generated from all feature plans. Last updated: 2025-10-10
 ## Active Technologies
 - TypeScript 5.x with React 18.x and Node.js 18+ + React, TypeScript, Vite, ShadCN UI, Tailwind CSS, React Router (001-minimalistic-clean-and)
 - Hardcoded JSON data (no persistence for this phase) (001-minimalistic-clean-and)
+- TypeScript 5.x with React 18.x and Node.js 18+ + Vite (build tool), Tailwind CSS, ShadCN UI, shadcn.studio themes (002-css-theming-for)
+- File-based theme definitions, no persistent storage required (002-css-theming-for)
 
 ## Project Structure
 ```
@@ -20,6 +22,7 @@ npm test [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNO
 TypeScript 5.x with React 18.x and Node.js 18+: Follow standard conventions
 
 ## Recent Changes
+- 002-css-theming-for: Added TypeScript 5.x with React 18.x and Node.js 18+ + Vite (build tool), Tailwind CSS, ShadCN UI, shadcn.studio themes
 - 001-minimalistic-clean-and: Added TypeScript 5.x with React 18.x and Node.js 18+ + React, TypeScript, Vite, ShadCN UI, Tailwind CSS, React Router
 - 001-minimalistic-clean-and: Added TypeScript 5.x with React 18.x and Node.js 18+ + React, TypeScript, Vite, ShadCN UI, Tailwind CSS, React Router
 

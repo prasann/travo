@@ -60,49 +60,81 @@
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Ensure minimum tap targets on mobile */
+    -webkit-tap-highlight-color: transparent;
   }
   
-  /* Responsive typography */
+  /* Enhanced responsive typography with smooth scaling */
   html {
-    font-size: 16px;
+    font-size: clamp(13px, 2.5vw, 16px);
   }
   
-  @media (max-width: 768px) {
+  /* Improved readability adjustments */
+  @media (max-width: 480px) {
     html {
-      font-size: 14px;
+      font-size: 14px; /* Slightly larger for better mobile readability */
+    }
+    
+    body {
+      line-height: 1.5; /* Better line spacing on small screens */
     }
   }
   
-  @media (max-width: 480px) {
+  @media (max-width: 320px) {
     html {
-      font-size: 13px;
+      font-size: 13px; /* Minimum readable size */
     }
   }
 }
 
 @layer components {
-  /* Travo-specific component styles */
+  /* Enhanced responsive component styles */
   .trip-card {
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
     padding: 1rem;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease, transform 0.1s ease;
     cursor: pointer;
+    /* Ensure proper touch targets on mobile */
+    min-height: 120px;
   }
   
   .trip-card:hover {
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   }
   
+  .trip-card:active {
+    transform: scale(0.98);
+  }
+  
+  /* Enhanced mobile spacing for trip cards */
+  @media (max-width: 640px) {
+    .trip-card {
+      padding: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+  
   .place-card {
     border-left: 4px solid hsl(var(--primary));
     padding-left: 1rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-right: 1rem;
     background-color: hsl(var(--muted) / 0.5);
     border-top-right-radius: var(--radius);
     border-bottom-right-radius: var(--radius);
+    /* Better mobile spacing */
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Enhanced mobile place cards */
+  @media (max-width: 640px) {
+    .place-card {
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
   }
   
   .nav-header {
@@ -113,39 +145,122 @@
     border-bottom: 1px solid hsl(var(--border));
     background-color: hsl(var(--background) / 0.95);
     backdrop-filter: blur(8px);
+    /* Sticky positioning for consistent access */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    /* Enhanced mobile touch targets */
+    min-height: 60px;
+  }
+  
+  /* Enhanced mobile navigation */
+  @media (max-width: 640px) {
+    .nav-header {
+      padding: 0.75rem 1rem;
+      min-height: 56px;
+    }
   }
   
   .page-container {
     max-width: 56rem;
     margin: 0 auto;
     padding: 1.5rem 1rem;
+    /* Enhanced responsive padding */
+    width: 100%;
   }
   
+  /* Mobile-first responsive container */
+  @media (max-width: 640px) {
+    .page-container {
+      padding: 1rem 0.75rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .page-container {
+      padding: 0.75rem 0.5rem;
+    }
+  }
+  
+  /* Enhanced responsive grid system */
   .trip-grid {
     display: grid;
     gap: 1rem;
     grid-template-columns: 1fr;
+    /* Better mobile spacing */
+    width: 100%;
+  }
+  
+  /* Responsive breakpoints with smooth transitions */
+  @media (min-width: 640px) {
+    .trip-grid {
+      gap: 1.25rem;
+      grid-template-columns: 1fr;
+    }
   }
   
   @media (min-width: 768px) {
     .trip-grid {
+      gap: 1.5rem;
       grid-template-columns: repeat(2, 1fr);
     }
   }
   
   @media (min-width: 1024px) {
     .trip-grid {
+      gap: 1.5rem;
       grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .trip-grid {
+      gap: 2rem;
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  /* Large desktop optimization */
+  @media (min-width: 1920px) {
+    .trip-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .page-container {
+      max-width: 80rem;
     }
   }
 }
 
 @layer utilities {
-  /* Custom utility classes */
+  /* Enhanced responsive utility classes */
   .text-balance {
     text-wrap: balance;
   }
   
+  /* Responsive line clamping */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Mobile-optimized line clamping */
+  @media (max-width: 640px) {
+    .line-clamp-2 {
+      -webkit-line-clamp: 3; /* More generous on mobile */
+    }
+  }
+  
+  /* Enhanced scrollbar for better mobile experience */
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted-foreground)) transparent;
@@ -155,6 +270,12 @@
     width: 6px;
   }
   
+  @media (max-width: 640px) {
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 4px; /* Thinner on mobile */
+    }
+  }
+  
   .scrollbar-thin::-webkit-scrollbar-track {
     background: transparent;
   }
@@ -162,5 +283,55 @@
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background-color: hsl(var(--muted-foreground));
     border-radius: 3px;
+  }
+  
+  /* Touch-friendly focus states */
+  .focus-visible-ring {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+  
+  /* Better mobile tap targets */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Responsive safe areas for notched devices */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Device orientation handling */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .nav-header {
+      min-height: 48px;
+    }
+    
+    .page-container {
+      padding-top: 0.5rem;
+    }
+  }
+  
+  /* High DPI display optimization */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .trip-card, .place-card {
+      border-width: 0.5px;
+    }
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .trip-card {
+      transition: none;
+    }
+    
+    .trip-card:active {
+      transform: none;
+    }
   }
 }

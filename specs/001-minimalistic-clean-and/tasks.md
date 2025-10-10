@@ -78,15 +78,15 @@
 
 ### Implementation for User Story 2
 
-- [ ] T022 [P] [US2] Create PlaceCard component in `src/components/PlaceCard.tsx` for individual place display
-- [ ] T023 [P] [US2] Create TripDetails component in `src/components/TripDetails.tsx` for trip detail view
-- [ ] T024 [US2] Create TripPage component in `src/pages/TripPage.tsx` that loads specific trip data
-- [ ] T025 [US2] Add trip detail route `/trip/:tripId` to App.tsx routing configuration
-- [ ] T026 [US2] Implement click handler in TripCard to navigate to trip details using React Router
-- [ ] T027 [US2] Style TripDetails with ShadCN components showing trip info and places list
-- [ ] T028 [US2] Style PlaceCard to display place name, Plus Code, and notes cleanly
-- [ ] T029 [US2] Ensure places display in correct order using order_index field
-- [ ] T030 [US2] Handle edge case when trip has no places (display appropriate message)
+- [x] T022 [P] [US2] Create PlaceCard component in `src/components/PlaceCard.tsx` for individual place display
+- [x] T023 [P] [US2] Create TripDetails component in `src/components/TripDetails.tsx` for trip detail view
+- [x] T024 [US2] Create TripPage component in `src/pages/TripPage.tsx` that loads specific trip data
+- [x] T025 [US2] Add trip detail route `/trip/:tripId` to App.tsx routing configuration
+- [x] T026 [US2] Implement click handler in TripCard to navigate to trip details using React Router
+- [x] T027 [US2] Style TripDetails with ShadCN components showing trip info and places list
+- [x] T028 [US2] Style PlaceCard to display place name, Plus Code, and notes cleanly
+- [x] T029 [US2] Ensure places display in correct order using order_index field
+- [x] T030 [US2] Handle edge case when trip has no places (display appropriate message)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - can navigate from list to details and back
 

@@ -1,8 +1,8 @@
 <!--
 Sync Impact Report:
-- Version change: Template → 1.0.0
-- Modified principles: All 5 principles newly defined from template placeholders
-- Added sections: Technology Constraints, Development Standards
+- Version change: 1.0.0 → 1.1.0
+- Modified principles: None
+- Added sections: Principle VI - Code Simplicity Over Defensive Programming
 - Removed sections: None
 - Templates requiring updates: ✅ All templates validated for consistency
 - Follow-up TODOs: None - all placeholders filled
@@ -41,6 +41,12 @@ Frontend MUST use reusable, self-contained components. Each component requires T
 Data synchronization MUST handle conflicts gracefully using timestamps (updated_at). Each record requires UUID for cross-device consistency. Local changes take precedence over cloud in conflicts. Sync failures cannot corrupt local data.
 
 **Rationale**: Multi-device usage requires reliable data consistency without risking user data loss or corruption.
+
+### VI. Code Simplicity Over Defensive Programming
+
+Code MUST prioritize readability and simplicity over excessive error handling and defensive checks. Implement necessary validation only, not exhaustive edge case protection. Trust TypeScript's type system. Avoid over-engineering solutions. When choosing between simple and robust approaches, choose simple unless specific reliability risks are documented.
+
+**Rationale**: Over-defensive programming creates code bloat, reduces maintainability, and slows development. Simple, readable code with targeted validation is more maintainable and delivers faster iteration cycles.
 
 ## Technology Constraints
 
@@ -125,4 +131,4 @@ Any deviation from these principles requires explicit documentation of:
 
 Use project README.md and implementation templates for runtime development guidance aligned with these principles.
 
-**Version**: 1.0.0 | **Ratified**: 2025-10-10 | **Last Amended**: 2025-10-10
+**Version**: 1.1.0 | **Ratified**: 2025-10-10 | **Last Amended**: 2025-10-10

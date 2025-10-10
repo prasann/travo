@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design System CSS */
+@import './styles/design-system/tokens.css';
+@import './styles/design-system/components.css';
+@import './styles/design-system/animations.css';
+
 @layer base {
   /* RED THEME - Test theme to verify theming works */
   :root {

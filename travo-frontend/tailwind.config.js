@@ -20,6 +20,30 @@ export default {
   ],
   theme: {
     extend: {
+      // Design system spacing tokens
+      spacing: {
+        'ds-xs': '0.25rem',  // 4px
+        'ds-sm': '0.5rem',   // 8px
+        'ds-md': '1rem',     // 16px
+        'ds-lg': '1.5rem',   // 24px
+        'ds-xl': '3rem',     // 48px
+      },
+      // Enhanced shadows for card components
+      boxShadow: {
+        'ds-sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        'ds-md': '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        'ds-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+        'ds-hover': '0 10px 25px -3px rgba(0, 0, 0, 0.1)',
+      },
+      // Typography scale
+      fontSize: {
+        'ds-xs': ['0.75rem', '1rem'],
+        'ds-sm': ['0.875rem', '1.25rem'],
+        'ds-base': ['1rem', '1.5rem'],
+        'ds-lg': ['1.125rem', '1.75rem'],
+        'ds-xl': ['1.25rem', '1.75rem'],
+        'ds-2xl': ['1.5rem', '2rem'],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

@@ -1,0 +1,212 @@
+/**
+ * Design System Animations and Transitions
+ * CSS animations and transitions for interactive components
+ */
+
+/* Base transition classes */
+.ds-transition {
+  transition: all var(--ds-duration-normal) ease-in-out;
+}
+
+.ds-transition-fast {
+  transition: all var(--ds-duration-fast) ease-in-out;
+}
+
+.ds-transition-slow {
+  transition: all var(--ds-duration-slow) ease-in-out;
+}
+
+/* Transform transitions for hover effects */
+.ds-transition-transform {
+  transition: transform var(--ds-duration-normal) ease-in-out;
+}
+
+.ds-transition-shadow {
+  transition: box-shadow var(--ds-duration-normal) ease-in-out;
+}
+
+/* Card hover animations */
+.ds-card-hover {
+  transition: transform var(--ds-duration-normal) ease-out,
+              box-shadow var(--ds-duration-normal) ease-out;
+}
+
+.ds-card-hover:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--ds-shadow-hover);
+}
+
+/* Button hover and active states */
+.ds-button-hover {
+  transition: all var(--ds-duration-fast) ease-in-out;
+}
+
+.ds-button-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--ds-shadow-md);
+}
+
+.ds-button-hover:active {
+  transform: translateY(0px);
+  box-shadow: var(--ds-shadow-sm);
+}
+
+/* Focus ring animations */
+.ds-focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color var(--ds-duration-fast) ease-in-out;
+}
+
+.ds-focus-ring:focus-visible {
+  outline-color: hsl(var(--primary));
+}
+
+/* Fade transitions */
+.ds-fade-in {
+  opacity: 0;
+  animation: ds-fadeIn var(--ds-duration-normal) ease-in-out forwards;
+}
+
+.ds-fade-out {
+  opacity: 1;
+  animation: ds-fadeOut var(--ds-duration-normal) ease-in-out forwards;
+}
+
+/* Scale animations */
+.ds-scale-in {
+  transform: scale(0.95);
+  opacity: 0;
+  animation: ds-scaleIn var(--ds-duration-normal) ease-out forwards;
+}
+
+/* Slide animations */
+.ds-slide-up {
+  transform: translateY(10px);
+  opacity: 0;
+  animation: ds-slideUp var(--ds-duration-normal) ease-out forwards;
+}
+
+.ds-slide-down {
+  transform: translateY(-10px);
+  opacity: 0;
+  animation: ds-slideDown var(--ds-duration-normal) ease-out forwards;
+}
+
+/* Interactive state classes */
+.ds-interactive {
+  cursor: pointer;
+  transition: all var(--ds-duration-normal) ease-in-out;
+}
+
+.ds-interactive:hover {
+  opacity: 0.9;
+}
+
+.ds-interactive:active {
+  transform: scale(0.98);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .ds-transition,
+  .ds-transition-fast, 
+  .ds-transition-slow,
+  .ds-transition-transform,
+  .ds-transition-shadow,
+  .ds-card-hover,
+  .ds-button-hover,
+  .ds-focus-ring,
+  .ds-interactive {
+    transition: none;
+  }
+  
+  .ds-fade-in,
+  .ds-fade-out,
+  .ds-scale-in,
+  .ds-slide-up,
+  .ds-slide-down {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Keyframe animations */
+@keyframes ds-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ds-fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ds-scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ds-slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes ds-slideDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Loading animations */
+.ds-pulse {
+  animation: ds-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.ds-spin {
+  animation: ds-spin 1s linear infinite;
+}
+
+@keyframes ds-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes ds-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

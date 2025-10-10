@@ -1,0 +1,188 @@
+{
+  "trips": [
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "name": "Tokyo Spring Adventure",
+      "description": "7-day journey to experience cherry blossom season in Tokyo. Mixing traditional culture with modern city life. Budget: ¥150,000. Best time to visit: early April for peak sakura. Remember to book restaurants in advance and carry cash for smaller establishments.",
+      "start_date": "2025-04-01",
+      "end_date": "2025-04-07",
+      "updated_at": "2025-10-10T10:00:00.000Z",
+      "places": [
+        {
+          "id": "456e7890-e12b-34c5-d678-901234567890",
+          "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+          "name": "Tokyo Skytree",
+          "plus_code": "8Q7XQXXR+33",
+          "notes": "Day 1 afternoon - Amazing panoramic city views. Visit around 4-5 PM for sunset shots. Advance booking recommended for better rates. Observation deck has cafe.",
+          "order_index": 0,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "789e0123-e45f-67g8-h901-234567890123",
+          "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+          "name": "Senso-ji Temple",
+          "plus_code": "8Q7XPP2G+QF",
+          "notes": "Day 2 morning - Historic Buddhist temple in Asakusa. Early morning visit (8-9 AM) for peaceful experience. Try traditional snacks on Nakamise Street. Free admission.",
+          "order_index": 1,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "abc12345-f678-90de-f123-456789012abc",
+          "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+          "name": "Shibuya Crossing",
+          "plus_code": "8Q7XPM2F+22",
+          "notes": "Day 3 evening - World's busiest pedestrian crossing. Perfect for photos and people watching. Visit Hachiko statue nearby. Great ramen shops in surrounding area.",
+          "order_index": 2,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "def45678-g901-23h4-i567-890123456def",
+          "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+          "name": "Ueno Park",
+          "plus_code": "8Q7XMP8R+V2",
+          "notes": "Day 4 full day - Cherry blossom central! Peak hanami spot. Bring picnic mat for flower viewing. Multiple museums nearby if weather turns bad. Very crowded on weekends.",
+          "order_index": 3,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "ghi78901-j234-56k7-l890-123456789ghi",
+          "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+          "name": "Tsukiji Outer Market",
+          "plus_code": "8Q7XMP6M+R8",
+          "notes": "Day 5 early morning - Fresh sushi breakfast at 6 AM. Try tuna sashimi and tamagoyaki. Cash only at most stalls. Very busy, go early to avoid crowds.",
+          "order_index": 4,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "987f6543-e21a-98b7-c654-321098765abc",
+      "name": "Kyoto Cultural Immersion",
+      "description": "4-day deep dive into traditional Japanese culture and zen gardens. Focus on temples, traditional architecture, and authentic kaiseki dining. Stay in ryokan for authentic experience. Rent bicycle for easy temple hopping.",
+      "start_date": "2025-05-15",
+      "end_date": "2025-05-18",
+      "updated_at": "2025-10-10T10:00:00.000Z",
+      "places": [
+        {
+          "id": "def12345-g678-90h1-i234-567890123def",
+          "trip_id": "987f6543-e21a-98b7-c654-321098765abc",
+          "name": "Fushimi Inari Shrine",
+          "plus_code": "8Q6RQXQF+CR",
+          "notes": "Day 1 morning - Famous for thousands of vermillion torii gates. 2-3 hour hike to summit. Bring water and comfortable shoes. Less crowded early morning or late afternoon.",
+          "order_index": 0,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "ghi56789-j012-34k5-l678-901234567ghi",
+          "trip_id": "987f6543-e21a-98b7-c654-321098765abc",
+          "name": "Kinkaku-ji Temple",
+          "plus_code": "8Q6RQXJC+3R",
+          "notes": "Day 2 early morning - Golden Pavilion reflected in pond is stunning at sunrise. Entry ¥400. Best photo spot is from the viewing platform. Combine with Ryoan-ji nearby.",
+          "order_index": 1,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "jkl01234-m567-89n0-o123-456789012jkl",
+          "trip_id": "987f6543-e21a-98b7-c654-321098765abc",
+          "name": "Bamboo Grove",
+          "plus_code": "8Q6RQX7C+2G",
+          "notes": "Day 2 afternoon - Arashiyama bamboo forest. Magical light filtering through bamboo stalks. 15-minute walk through the grove. Nearby monkey park has city views.",
+          "order_index": 2,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "mno34567-p890-12q3-r456-789012345mno",
+          "trip_id": "987f6543-e21a-98b7-c654-321098765abc",
+          "name": "Gion District",
+          "plus_code": "8Q6RQX8F+3M",
+          "notes": "Day 3 evening - Traditional geisha district. Best chance to spot geiko between 5-6 PM heading to appointments. Respect photography rules. Try kaiseki dinner here.",
+          "order_index": 3,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "456a7890-b123-45c6-d789-012345678def",
+      "name": "Osaka Food & Culture Weekend",
+      "description": "3-day culinary adventure in Japan's kitchen. Focus on street food, local specialties, and food culture. Budget ¥50,000 for food experiences. Staying near Namba for easy access to food districts.",
+      "start_date": "2025-06-10",
+      "end_date": "2025-06-12",
+      "updated_at": "2025-10-10T10:00:00.000Z",
+      "places": [
+        {
+          "id": "jkl90123-m456-78n9-o012-345678901jkl",
+          "trip_id": "456a7890-b123-45c6-d789-012345678def",
+          "name": "Dotonbori District",
+          "plus_code": "8Q6RQPXH+WQ",
+          "notes": "Day 1 evening - Famous food street with iconic neon signs. Must try: takoyaki, okonomiyaki, and kobe beef. Great for photos with Glico sign. Very crowded after 7 PM.",
+          "order_index": 0,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "rst01234-u567-89v0-w123-456789012rst",
+          "trip_id": "456a7890-b123-45c6-d789-012345678def",
+          "name": "Kuromon Ichiba Market",
+          "plus_code": "8Q6RQPVH+8M",
+          "notes": "Day 2 morning - Traditional market with fresh seafood. Try wagyu beef skewers and fresh fruit. Opens early (9 AM). Bring cash, most vendors don't accept cards.",
+          "order_index": 1,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "uvw34567-x890-12y3-z456-789012345uvw",
+          "trip_id": "456a7890-b123-45c6-d789-012345678def",
+          "name": "Osaka Castle",
+          "plus_code": "8Q6RQQJH+6G",
+          "notes": "Day 2 afternoon - Historic castle with museum and panoramic city views. ¥600 admission. Nice contrast to food focus. Park is great for walking off the meals!",
+          "order_index": 2,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "xyz67890-a123-45b6-c789-012345678xyz",
+          "trip_id": "456a7890-b123-45c6-d789-012345678def",
+          "name": "Shinsekai District",
+          "plus_code": "8Q6RQPVF+9H",
+          "notes": "Day 3 lunch - Retro district famous for kushikatsu (fried skewers). Local rule: no double-dipping in sauce! Visit Tsutenkaku Tower for nostalgic atmosphere.",
+          "order_index": 3,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "789d0123-e456-78f9-g012-345678901hij",
+      "name": "Mount Fuji Nature Escape",
+      "description": "3-day mountain retreat for hiking and relaxation. Escape from city life, enjoy onsen, and attempt Fuji climb if weather permits. Pack warm clothes even in summer.",
+      "start_date": "2025-07-05",
+      "end_date": "2025-07-07",
+      "updated_at": "2025-10-10T10:00:00.000Z",
+      "places": [
+        {
+          "id": "stu01234-v567-89w0-x123-456789012stu",
+          "trip_id": "789d0123-e456-78f9-g012-345678901hij",
+          "name": "Mount Fuji 5th Station",
+          "plus_code": "8Q8XG22R+XG",
+          "notes": "Day 1 arrival - Halfway point up Mount Fuji with stunning views (weather permitting). Starting point for serious climbers. Gift shop and basic amenities available. Check weather before driving up.",
+          "order_index": 0,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "abc89012-d345-67e8-f901-234567890abc",
+          "trip_id": "789d0123-e456-78f9-g012-345678901hij",
+          "name": "Kawaguchi Lake",
+          "plus_code": "8Q8XF2XP+4C",
+          "notes": "Day 2 morning - Perfect reflection of Mount Fuji in calm morning conditions. Rent bicycle to cycle around lake. Several onsen resorts with Fuji views. Cherry blossoms in spring, autumn colors in fall.",
+          "order_index": 1,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        },
+        {
+          "id": "def12345-g678-90h1-i234-567890123def",
+          "trip_id": "789d0123-e456-78f9-g012-345678901hij",
+          "name": "Oshino Hakkai Springs",
+          "plus_code": "8Q8XG3VQ+8R",
+          "notes": "Day 2 afternoon - Eight sacred ponds with crystal clear spring water. Traditional thatched roof houses. Try local specialty tofu. Great spot for peaceful walks and photography.",
+          "order_index": 2,
+          "updated_at": "2025-10-10T10:00:00.000Z"
+        }
+      ]
+    }
+  ]
+}

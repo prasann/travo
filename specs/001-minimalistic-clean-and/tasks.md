@@ -22,13 +22,13 @@
 
 **Purpose**: Project initialization and basic Vite + React + TypeScript structure
 
-- [ ] T001 Create Vite React TypeScript project using `npm create vite@latest travo-frontend -- --template react-ts`
-- [ ] T002 [P] Install React Router dependency: `npm install react-router-dom`
-- [ ] T003 [P] Install and configure ShadCN UI: `npx shadcn-ui@latest init`
-- [ ] T004 [P] Install additional ShadCN components: `npx shadcn-ui@latest add button card input label`
-- [ ] T005 [P] Configure Tailwind CSS (if not done by ShadCN setup)
-- [ ] T006 [P] Setup testing environment with Vitest: `npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom`
-- [ ] T007 Create project directory structure: `src/{components,pages,types,data,lib,hooks}`, `src/components/ui`
+- [x] T001 Create Vite React TypeScript project using `npm create vite@latest travo-frontend -- --template react-ts`
+- [x] T002 [P] Install React Router dependency: `npm install react-router-dom`
+- [x] T003 [P] Install and configure ShadCN UI: `npx shadcn@latest init`
+- [x] T004 [P] Install additional ShadCN components: manually created `button` and `card` components
+- [x] T005 [P] Configure Tailwind CSS (if not done by ShadCN setup)
+- [x] T006 [P] Setup testing environment with Vitest: `npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom`
+- [x] T007 Create project directory structure: `src/{components,pages,types,data,lib,hooks}`, `src/components/ui`
 
 ---
 

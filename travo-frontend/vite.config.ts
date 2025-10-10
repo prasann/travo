@@ -10,4 +10,18 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Development server configuration
+  server: {
+    port: 3000,
+    open: true,
+  },
+  // Build configuration
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+  },
+  // Define for environment variables
+  define: {
+    __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),
+  },
 })

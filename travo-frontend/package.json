@@ -5,7 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build", 
+    "build:blue": "VITE_THEME=blue npm run build",
+    "build:green": "VITE_THEME=green npm run build",
+    "build:red": "VITE_THEME=red npm run build",
+    "build:violet": "VITE_THEME=violet npm run build",
+    "dev:blue": "VITE_THEME=blue vite",
+    "dev:green": "VITE_THEME=green vite", 
+    "dev:red": "VITE_THEME=red vite",
+    "dev:violet": "VITE_THEME=violet vite",
     "lint": "eslint .",
     "preview": "vite preview"
   },

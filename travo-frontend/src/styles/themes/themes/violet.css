@@ -1,0 +1,93 @@
+/**
+ * Violet Theme - Based on shadcn.studio violet theme
+ * 
+ * A professional purple/violet color scheme with excellent readability
+ * HSL format for CSS custom properties compatibility
+ * 
+ * Color Palette:
+ * - Primary: Rich violet (#8B5CF6 / hsl(262, 83%, 66%))
+ * - Accent: Soft lavender complements
+ * - Background: Clean whites and subtle grays
+ * - Text: High contrast dark grays
+ */
+
+:root {
+  /* Core background colors */
+  --background: 0 0% 100%;
+  --foreground: 224 71.4% 4.1%;
+  
+  /* Card components */
+  --card: 0 0% 100%;
+  --card-foreground: 224 71.4% 4.1%;
+  
+  /* Popover components */
+  --popover: 0 0% 100%;
+  --popover-foreground: 224 71.4% 4.1%;
+  
+  /* Primary violet theme colors */
+  --primary: 262.1 83.3% 57.8%;
+  --primary-foreground: 210 20% 98%;
+  
+  /* Secondary colors */
+  --secondary: 220 14.3% 95.9%;
+  --secondary-foreground: 220.9 39.3% 11%;
+  
+  /* Muted/subtle colors */
+  --muted: 220 14.3% 95.9%;
+  --muted-foreground: 220 8.9% 46.1%;
+  
+  /* Accent colors */
+  --accent: 220 14.3% 95.9%;
+  --accent-foreground: 220.9 39.3% 11%;
+  
+  /* Destructive/error colors */
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 20% 98%;
+  
+  /* Border and input styling */
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --ring: 262.1 83.3% 57.8%;
+  
+  /* Border radius */
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Dark theme violet variant */
+  --background: 224 71.4% 4.1%;
+  --foreground: 210 20% 98%;
+  
+  /* Dark card components */
+  --card: 224 71.4% 4.1%;
+  --card-foreground: 210 20% 98%;
+  
+  /* Dark popover components */
+  --popover: 224 71.4% 4.1%;
+  --popover-foreground: 210 20% 98%;
+  
+  /* Dark primary violet colors */
+  --primary: 263.4 70% 50.4%;
+  --primary-foreground: 210 20% 98%;
+  
+  /* Dark secondary colors */
+  --secondary: 215 27.9% 16.9%;
+  --secondary-foreground: 210 20% 98%;
+  
+  /* Dark muted colors */
+  --muted: 215 27.9% 16.9%;
+  --muted-foreground: 217.9 10.6% 64.9%;
+  
+  /* Dark accent colors */
+  --accent: 215 27.9% 16.9%;
+  --accent-foreground: 210 20% 98%;
+  
+  /* Dark destructive colors */
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 20% 98%;
+  
+  /* Dark borders and inputs */
+  --border: 215 27.9% 16.9%;
+  --input: 215 27.9% 16.9%;
+  --ring: 263.4 70% 50.4%;
+}

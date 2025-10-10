@@ -1,4 +1,5 @@
 import type { TripListProps } from '@/types';
+import { Navigation } from './Navigation';
 import { TripCard } from './TripCard';
 import { sortTripsByDate } from '@/lib/utils';
 
@@ -12,8 +13,13 @@ export function TripList({ trips, onTripSelect, isLoading = false }: TripListPro
 
   if (isLoading) {
     return (
-      <div className="page-container">
-        <div className="trip-grid">
+      <div>
+        <Navigation 
+          title="My Trips"
+          showBackButton={false}
+        />
+        <div className="page-container pt-4">
+          <div className="trip-grid">
           {/* Loading skeleton cards */}
           {Array.from({ length: 3 }).map((_, index) => (
             <div 
@@ -33,13 +39,19 @@ export function TripList({ trips, onTripSelect, isLoading = false }: TripListPro
             </div>
           ))}
         </div>
+        </div>
       </div>
     );
   }
 
   if (sortedTrips.length === 0) {
     return (
-      <div className="page-container">
+      <div>
+        <Navigation 
+          title="My Trips"
+          showBackButton={false}
+        />
+        <div className="page-container pt-4">
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
             <svg
@@ -70,20 +82,25 @@ export function TripList({ trips, onTripSelect, isLoading = false }: TripListPro
             Start planning your first adventure! Create a trip to get started with your travel itinerary.
           </p>
         </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="page-container">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground mb-2">
-          My Trips
-        </h1>
-        <p className="text-muted-foreground">
-          {sortedTrips.length} {sortedTrips.length === 1 ? 'trip' : 'trips'} planned
-        </p>
-      </div>
+    <div>
+      {/* Navigation Header */}
+      <Navigation 
+        title="My Trips"
+        showBackButton={false}
+      />
+      
+      <div className="page-container pt-4">
+        <div className="mb-6">
+          <p className="text-muted-foreground">
+            {sortedTrips.length} {sortedTrips.length === 1 ? 'trip' : 'trips'} planned
+          </p>
+        </div>
 
       <div className="trip-grid">
         {sortedTrips.map((trip) => (
@@ -93,6 +110,7 @@ export function TripList({ trips, onTripSelect, isLoading = false }: TripListPro
             onClick={onTripSelect}
           />
         ))}
+      </div>
       </div>
     </div>
   );

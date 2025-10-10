@@ -100,14 +100,14 @@
 
 ### Implementation for User Story 3
 
-- [ ] T031 [P] [US3] Create Navigation component in `src/components/Navigation.tsx` with back button and title
-- [ ] T032 [US3] Add Navigation component to TripPage with back button functionality
-- [ ] T033 [US3] Add Navigation component to HomePage with appropriate title
-- [ ] T034 [US3] Implement back navigation using React Router's useNavigate hook
-- [ ] T035 [US3] Add navigation state management to show/hide back button appropriately
-- [ ] T036 [US3] Style Navigation component with clean, minimalist design using ShadCN Button
-- [ ] T037 [US3] Ensure navigation works smoothly with browser back/forward buttons
-- [ ] T038 [US3] Test navigation performance to meet <1 second transition requirement
+- [x] T031 [P] [US3] Create Navigation component in `src/components/Navigation.tsx` with back button and title
+- [x] T032 [US3] Add Navigation component to TripPage with back button functionality
+- [x] T033 [US3] Add Navigation component to HomePage with appropriate title
+- [x] T034 [US3] Implement back navigation using React Router's useNavigate hook
+- [x] T035 [US3] Add navigation state management to show/hide back button appropriately
+- [x] T036 [US3] Style Navigation component with clean, minimalist design using ShadCN Button
+- [x] T037 [US3] Ensure navigation works smoothly with browser back/forward buttons
+- [x] T038 [US3] Test navigation performance to meet <1 second transition requirement
 
 **Checkpoint**: All core navigation should now work seamlessly between views
 

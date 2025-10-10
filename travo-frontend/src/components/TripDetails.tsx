@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Navigation } from './Navigation';
 import { PlaceCard } from './PlaceCard';
 import type { TripDetailsProps } from '@/types';
 import { formatDateRange, getTripDuration, sortPlacesByOrder } from '@/lib/utils';
@@ -14,31 +14,15 @@ export function TripDetails({ trip, onBack }: TripDetailsProps) {
   const sortedPlaces = sortPlacesByOrder(trip.places);
 
   return (
-    <div className="page-container">
-      {/* Header with back button */}
-      <div className="nav-header mb-6">
-        <Button 
-          variant="ghost" 
-          onClick={onBack}
-          className="p-2 hover:bg-muted"
-        >
-          <svg
-            className="w-4 h-4 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Back to Trips
-        </Button>
-      </div>
+    <div>
+      {/* Navigation Header */}
+      <Navigation 
+        title={trip.name}
+        showBackButton={true}
+        onBack={onBack}
+      />
+      
+      <div className="page-container pt-4">
 
       {/* Trip Information Card */}
       <Card className="mb-6">
@@ -118,6 +102,7 @@ export function TripDetails({ trip, onBack }: TripDetailsProps) {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

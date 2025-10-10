@@ -1,56 +1,26 @@
 import * as React from "react"
-
 import { cn } from "@/lib/utils"
-import { cn as dsCn, getTransitionClasses } from "../../lib/design-system/utils"
-import type { CardProps } from "../design-system/types"
 
-// Enhanced Card component with design system features
+// Simplified Enhanced Card component with variants
 const Card = React.forwardRef<
   HTMLDivElement,
-  CardProps & React.HTMLAttributes<HTMLDivElement>
->(({ className, variant = 'default', size = 'md', interactive = false, onClick, children, ...props }, ref) => {
-  
-  // Build variant classes
-  const variantClasses = {
-    default: "bg-card border-border",
-    gradient: "bg-gradient-to-br from-background to-muted/30 border-border/50",
-    elevated: "bg-card border-border shadow-ds-lg"
+  React.HTMLAttributes<HTMLDivElement> & {
+    variant?: 'default' | 'gradient' | 'elevated'
+    interactive?: boolean
   }
-  
-  // Build size classes with design system tokens
-  const sizeClasses = {
-    sm: "p-ds-sm rounded-md",
-    md: "p-ds-lg rounded-lg", // 24px padding as specified
-    lg: "p-ds-xl rounded-xl"
-  }
-  
-  // Interactive states
-  const interactiveClasses = interactive 
-    ? "ds-card-hover cursor-pointer ds-interactive ds-focus-ring"
-    : ""
-  
-  return (
-    <div
-      ref={ref}
-      className={dsCn(
-        cn(
-          "border text-card-foreground shadow-ds-sm",
-          variantClasses[variant],
-          sizeClasses[size],
-          interactiveClasses,
-          getTransitionClasses('normal', ['transform', 'box-shadow']),
-          className
-        )
-      )}
-      onClick={onClick}
-      role={interactive ? "button" : undefined}
-      tabIndex={interactive ? 0 : undefined}
-      {...props}
-    >
-      {children}
-    </div>
-  )
-})
+>(({ className, variant = 'default', interactive = false, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-lg border bg-card text-card-foreground shadow-sm p-6",
+      variant === 'gradient' && "bg-gradient-to-br from-blue-50 to-indigo-50",
+      variant === 'elevated' && "shadow-md hover:shadow-lg",
+      interactive && "cursor-pointer transition-shadow hover:shadow-md",
+      className
+    )}
+    {...props}
+  />
+))
 Card.displayName = "Card"
 
 const CardHeader = React.forwardRef<
@@ -59,22 +29,19 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-ds-sm p-ds-md", className)}
+    className={cn("flex flex-col space-y-2", className)}
     {...props}
   />
 ))
 CardHeader.displayName = "CardHeader"
 
 const CardTitle = React.forwardRef<
-  HTMLParagraphElement,
+  HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn(
-      "ds-h3 font-semibold leading-none tracking-tight text-foreground",
-      className
-    )}
+    className={cn("text-2xl font-semibold leading-none tracking-tight", className)}
     {...props}
   />
 ))
@@ -86,7 +53,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("ds-caption text-muted-foreground", className)}
+    className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
 ))
@@ -96,7 +63,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-ds-md pt-0", className)} {...props} />
+  <div ref={ref} className={cn("pt-0", className)} {...props} />
 ))
 CardContent.displayName = "CardContent"
 
@@ -106,7 +73,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-ds-md pt-0", className)}
+    className={cn("flex items-center pt-0", className)}
     {...props}
   />
 ))

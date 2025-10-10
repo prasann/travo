@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { TripDetails } from '@/components/TripDetails';
-import { Typography } from '@/components/ui/typography';
 import { Button } from '@/components/ui/button';
 import type { Trip } from '@/types';
 import tripsData from '@/data/trips.json';
@@ -109,12 +108,12 @@ export function TripPage() {
                 />
               </svg>
             </div>
-            <Typography variant="h1" className="mb-ds-sm">
+            <h1 className="text-2xl font-semibold mb-4">
               Trip Not Found
-            </Typography>
-            <Typography variant="body" color="muted" className="mb-ds-lg max-w-sm">
+            </h1>
+            <p className="text-muted-foreground mb-6 max-w-sm">
               The trip you're looking for doesn't exist or may have been removed.
-            </Typography>
+            </p>
             <Button
               onClick={handleBack}
               variant="default"

@@ -1,11 +1,15 @@
+@import './styles/themes/blue.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Design System CSS */
-@import './styles/design-system/tokens.css';
-@import './styles/design-system/components.css';
-@import './styles/design-system/animations.css';
+/* Add theme-integrated classes */
+.card-gradient {
+  background: linear-gradient(135deg, 
+    hsl(var(--card-gradient-from)), 
+    hsl(var(--card-gradient-to))
+  );
+}
 
 @layer base {
   /* RED THEME - Test theme to verify theming works */

@@ -1,7 +1,6 @@
 import type { TripListProps } from '@/types';
 import { Navigation } from './Navigation';
 import { TripCard } from './TripCard';
-import { Typography } from './ui/typography';
 import { sortTripsByDate } from '@/lib/utils';
 
 /**
@@ -76,12 +75,12 @@ export function TripList({ trips, onTripSelect, isLoading = false }: TripListPro
               />
             </svg>
           </div>
-          <Typography variant="h2" className="mb-ds-sm">
+          <h2 className="text-xl font-semibold mb-4">
             No trips planned yet
-          </Typography>
-          <Typography variant="body" color="muted" className="mb-ds-lg max-w-sm">
+          </h2>
+          <p className="text-muted-foreground mb-6 max-w-sm">
             Start planning your first adventure! Create a trip to get started with your travel itinerary.
-          </Typography>
+          </p>
         </div>
         </div>
       </div>
@@ -97,10 +96,10 @@ export function TripList({ trips, onTripSelect, isLoading = false }: TripListPro
       />
       
       <div className="page-container pt-4">
-        <div className="mb-ds-lg">
-          <Typography variant="body" color="muted">
+        <div className="mb-6">
+          <p className="text-muted-foreground">
             {sortedTrips.length} {sortedTrips.length === 1 ? 'trip' : 'trips'} planned
-          </Typography>
+          </p>
         </div>
 
       <div className="trip-grid">

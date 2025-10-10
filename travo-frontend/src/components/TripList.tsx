@@ -75,7 +75,7 @@ export function TripList({ trips, onTripSelect, isLoading = false }: TripListPro
               />
             </svg>
           </div>
-          <h2 className="text-lg font-semibold text-foreground mb-2">
+          <h2 className="text-xl font-semibold mb-4">
             No trips planned yet
           </h2>
           <p className="text-muted-foreground mb-6 max-w-sm">

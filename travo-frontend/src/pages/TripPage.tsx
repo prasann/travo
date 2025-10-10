@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { TripDetails } from '@/components/TripDetails';
+import { Button } from '@/components/ui/button';
 import type { Trip } from '@/types';
 import tripsData from '@/data/trips.json';
 
@@ -107,18 +108,19 @@ export function TripPage() {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-semibold text-foreground mb-2">
+            <h1 className="text-2xl font-semibold mb-4">
               Trip Not Found
             </h1>
             <p className="text-muted-foreground mb-6 max-w-sm">
               The trip you're looking for doesn't exist or may have been removed.
             </p>
-            <button
+            <Button
               onClick={handleBack}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              variant="default"
+              size="default"
             >
               Back to Trip List
-            </button>
+            </Button>
           </div>
         </div>
       </main>

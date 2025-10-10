@@ -4,6 +4,7 @@ import type { NavigationProps } from '@/types';
 /**
  * Navigation component - Provides consistent navigation header across pages
  * Shows page title and optional back button for hierarchical navigation
+ * Uses simplified Tailwind classes instead of Typography component
  */
 export function Navigation({ title, showBackButton = false, onBack }: NavigationProps) {
   return (
@@ -34,7 +35,7 @@ export function Navigation({ title, showBackButton = false, onBack }: Navigation
           </Button>
         )}
         
-        <h1 className="text-xl font-semibold text-foreground truncate">
+        <h1 className="text-xl font-semibold truncate">
           {title}
         </h1>
       </div>

@@ -1,0 +1,13 @@
+:root {
+  --primary: 220 90% 56%;
+  --primary-foreground: 220 90% 96%;
+  --card-gradient-from: 220 60% 98%;
+  --card-gradient-to: 220 70% 95%;
+}
+
+.card-gradient {
+  background: linear-gradient(135deg, 
+    hsl(var(--card-gradient-from)), 
+    hsl(var(--card-gradient-to))
+  );
+}

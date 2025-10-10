@@ -57,14 +57,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] Create TripCard component in `src/components/TripCard.tsx` for individual trip display
-- [ ] T015 [P] [US1] Create TripList component in `src/components/TripList.tsx` for trip list container
-- [ ] T016 [US1] Create HomePage component in `src/pages/HomePage.tsx` that loads data and renders TripList
-- [ ] T017 [US1] Setup basic routing in `src/App.tsx` with React Router for home page route
-- [ ] T018 [US1] Update `src/main.tsx` to render App component with proper styling imports
-- [ ] T019 [US1] Style TripCard with ShadCN Card components and Tailwind CSS for clean, minimalist design
-- [ ] T020 [US1] Implement trip sorting by start_date in chronological order
-- [ ] T021 [US1] Handle empty state display when no trips exist
+- [x] T014 [P] [US1] Create TripCard component in `src/components/TripCard.tsx` for individual trip display
+- [x] T015 [P] [US1] Create TripList component in `src/components/TripList.tsx` for trip list container
+- [x] T016 [US1] Create HomePage component in `src/pages/HomePage.tsx` that loads data and renders TripList
+- [x] T017 [US1] Setup basic routing in `src/App.tsx` with React Router for home page route
+- [x] T018 [US1] Update `src/main.tsx` to render App component with proper styling imports
+- [x] T019 [US1] Style TripCard with ShadCN Card components and Tailwind CSS for clean, minimalist design
+- [x] T020 [US1] Implement trip sorting by start_date in chronological order
+- [x] T021 [US1] Handle empty state display when no trips exist
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - trip list displays correctly and loads within 2 seconds
 

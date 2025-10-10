@@ -1,14 +1,30 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HomePage } from '@/pages/HomePage';
+
 function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center">Travo</h1>
-        <p className="text-center text-muted-foreground mt-2">
-          Trip planner app - Ready for implementation
-        </p>
+    <Router>
+      <div className="min-h-screen bg-background text-foreground">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          {/* Trip details route will be added in Phase 4 */}
+          <Route path="/trip/:tripId" element={
+            <div className="page-container">
+              <h1 className="text-2xl font-bold">Trip Details</h1>
+              <p className="text-muted-foreground">Coming soon in Phase 4...</p>
+            </div>
+          } />
+          {/* Catch-all route for 404 */}
+          <Route path="*" element={
+            <div className="page-container">
+              <h1 className="text-2xl font-bold">Page Not Found</h1>
+              <p className="text-muted-foreground">The page you're looking for doesn't exist.</p>
+            </div>
+          } />
+        </Routes>
       </div>
-    </div>
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;

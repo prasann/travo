@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Typography } from '@/components/ui/typography';
 import type { NavigationProps } from '@/types';
 
 /**
@@ -34,9 +35,9 @@ export function Navigation({ title, showBackButton = false, onBack }: Navigation
           </Button>
         )}
         
-        <h1 className="text-xl font-semibold text-foreground truncate">
+        <Typography variant="h2" className="truncate" as="h1">
           {title}
-        </h1>
+        </Typography>
       </div>
       
       {/* Optional actions slot - can be extended in the future */}

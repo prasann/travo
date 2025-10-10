@@ -144,3 +144,39 @@
 .ds-gap-md { gap: var(--ds-spacing-md); }
 .ds-gap-lg { gap: var(--ds-spacing-lg); }
 .ds-gap-xl { gap: var(--ds-spacing-xl); }
+
+/* Responsive Typography Scaling */
+@media (max-width: 640px) {
+  .ds-display {
+    font-size: var(--ds-font-size-xl);
+    line-height: var(--ds-line-height-tight);
+  }
+  
+  .ds-h1 {
+    font-size: var(--ds-font-size-lg);
+    line-height: var(--ds-line-height-normal);
+  }
+  
+  .ds-h2 {
+    font-size: var(--ds-font-size-base);
+    line-height: var(--ds-line-height-normal);
+  }
+}
+
+@media (max-width: 480px) {
+  .ds-display {
+    font-size: var(--ds-font-size-lg);
+  }
+  
+  .ds-h1 {
+    font-size: var(--ds-font-size-base);
+  }
+  
+  .ds-h2 {
+    font-size: var(--ds-font-size-sm);
+  }
+  
+  /* Adjust spacing for mobile */
+  .ds-p-lg { padding: var(--ds-spacing-md); }
+  .ds-p-xl { padding: var(--ds-spacing-lg); }
+}

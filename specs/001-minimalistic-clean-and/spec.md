@@ -74,8 +74,6 @@ A user can access the application on different devices (desktop, tablet, mobile)
 ### Edge Cases
 
 - What happens when a trip has no places added?
-- How does the system display very long trip names or place descriptions?
-- What happens when Plus Codes are missing or invalid?
 - How does the interface handle trips with many places (scrolling behavior)?
 
 ## Requirements *(mandatory)*
@@ -110,6 +108,13 @@ A user can access the application on different devices (desktop, tablet, mobile)
 - **SC-005**: Navigation between views works smoothly with no broken states or loading issues
 - **SC-006**: Text remains readable and UI elements remain accessible across all supported screen sizes
 
+## Clarifications
+
+### Session 2025-10-10
+
+- Q: How should the UI handle very long trip names or place descriptions? → A: Trip names assumed to be reasonable length, no special handling needed
+- Q: How should the UI display places when Plus Codes are missing or invalid? → A: Invalid Plus Codes prevented at data creation level, not applicable for hardcoded data
+
 ## Assumptions
 
 - The hardcoded JSON data will follow the data model structure outlined in the README (Trip and Place entities)
@@ -118,3 +123,5 @@ A user can access the application on different devices (desktop, tablet, mobile)
 - No user authentication is required for this MVP since data is hardcoded
 - No data persistence or editing capabilities are needed in this initial version
 - Plus Codes will be displayed as-is without validation or Google Maps integration
+- Trip names will be of reasonable length and not require special truncation handling
+- All Plus Codes in hardcoded data are pre-validated and correct

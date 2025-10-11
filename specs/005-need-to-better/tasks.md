@@ -115,17 +115,17 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 
 **Purpose**: Improvements that affect multiple user stories and overall quality
 
-- [ ] T040 [P] [POLISH] Add responsive layout testing: verify timeline, cards, and restaurant list work on mobile (320px), tablet (768px), and desktop (1024px+) viewports
-- [ ] T041 [P] [POLISH] Add loading states to trip detail page while loadTrip fetches data (DaisyUI skeleton or spinner)
-- [ ] T042 [P] [POLISH] Add error handling for failed trip loads (404, network errors) with user-friendly error messages
-- [ ] T043 [P] [POLISH] Update README.md in `/frontend/README.md` with feature overview, new components list, and data structure changes
-- [ ] T044 [P] [POLISH] Add JSDoc comments to all utility functions in `/frontend/lib/dateTime.ts`, `/frontend/lib/utils.ts`, `/frontend/lib/tripLoader.ts`
-- [ ] T045 [POLISH] Verify constitution compliance: offline-first (no network dependencies except image URLs), privacy-friendly (plus codes used), minimalist UX (no clutter, optional fields hidden when empty)
-- [ ] T046 [POLISH] Accessibility audit: check keyboard navigation through timeline, screen reader compatibility for card components, proper semantic HTML, color contrast
-- [ ] T047 [P] [POLISH] Add TypeScript strict mode checks: verify no `any` types, all props typed, no type assertions without justification
-- [ ] T048 [POLISH] Code cleanup: remove old Place interface references if no longer used, clean up deprecated trips.json reference
-- [ ] T049 [POLISH] Run quickstart.md validation: follow all steps in quickstart.md to ensure developer onboarding works correctly
-- [ ] T050 [POLISH] Final testing checklist from quickstart.md: verify all test items pass (trip list loads, timeline displays, timezones correct, optional fields handled, etc.)
+- [X] T040 [P] [POLISH] Add responsive layout testing: verify timeline, cards, and restaurant list work on mobile (320px), tablet (768px), and desktop (1024px+) viewports
+- [X] T041 [P] [POLISH] Add loading states to trip detail page while loadTrip fetches data (DaisyUI skeleton or spinner)
+- [X] T042 [P] [POLISH] Add error handling for failed trip loads (404, network errors) with user-friendly error messages
+- [X] T043 [P] [POLISH] Update README.md in `/frontend/README.md` with feature overview, new components list, and data structure changes
+- [X] T044 [P] [POLISH] Add JSDoc comments to all utility functions in `/frontend/lib/dateTime.ts`, `/frontend/lib/utils.ts`, `/frontend/lib/tripLoader.ts`
+- [X] T045 [POLISH] Verify constitution compliance: offline-first (no network dependencies except image URLs), privacy-friendly (plus codes used), minimalist UX (no clutter, optional fields hidden when empty)
+- [X] T046 [POLISH] Accessibility audit: check keyboard navigation through timeline, screen reader compatibility for card components, proper semantic HTML, color contrast
+- [X] T047 [P] [POLISH] Add TypeScript strict mode checks: verify no `any` types, all props typed, no type assertions without justification
+- [X] T048 [POLISH] Code cleanup: remove old Place interface references if no longer used, clean up deprecated trips.json reference
+- [X] T049 [POLISH] Run quickstart.md validation: follow all steps in quickstart.md to ensure developer onboarding works correctly
+- [X] T050 [POLISH] Final testing checklist from quickstart.md: verify all test items pass (trip list loads, timeline displays, timezones correct, optional fields handled, etc.)
 
 ---
 

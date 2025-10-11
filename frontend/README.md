@@ -5,9 +5,14 @@ A simple and elegant trip planning application built with Next.js 15, React 19, 
 ## Features
 
 - 📝 View trip list with detailed information
-- 🗺️ View trip details with associated places
+- ✈️ **Complete trip timeline** with flights, hotels, and daily activities in chronological order
+- 🏨 **Accommodation tracking** with check-in/out times and confirmation numbers
+- 🗓️ **Daily itinerary** with timezone-aware time display
+- 🍽️ **Restaurant recommendations** grouped by city
+- 📍 **Privacy-friendly location data** using Plus Codes
+- 🖼️ **Activity images** with lazy loading and error handling
 - 🎨 5 beautiful theme variants (default, blue, green, red, violet)
-- 📱 Fully responsive design
+- 📱 Fully responsive design (optimized for mobile and desktop)
 - ⚡ Static site generation for optimal performance
 - 🎯 Offline-first architecture
 
@@ -92,19 +97,62 @@ frontend/
 ├── components/              # React components
 │   ├── TripCard.tsx         # Trip list item
 │   ├── TripList.tsx         # Trip list container
-│   ├── TripDetails.tsx      # Trip detail view
-│   ├── PlaceCard.tsx        # Place card
+│   ├── TripTimeline.tsx     # NEW: Chronological timeline view
+│   ├── FlightCard.tsx       # NEW: Flight information display
+│   ├── HotelCard.tsx        # NEW: Hotel/accommodation display
+│   ├── ActivityCard.tsx     # NEW: Activity with images and timing
+│   ├── RestaurantList.tsx   # NEW: Restaurant recommendations
+│   ├── TripDetails.tsx      # Trip detail view (legacy)
+│   ├── PlaceCard.tsx        # Place card (legacy)
 │   └── Navigation.tsx       # Page header
 ├── config/                  # Configuration files
 │   └── theme.ts            # Theme configuration (change ACTIVE_THEME here)
 ├── data/                    # Static data
-│   └── trips.json          # Trip data
+│   ├── trips/              # NEW: Individual trip JSON files
+│   └── trip-index.json     # NEW: Trip list index
 ├── lib/                     # Utility functions
-│   └── utils.ts
+│   ├── utils.ts            # Chronological sorting logic
+│   ├── dateTime.ts         # NEW: Timezone-aware formatting
+│   └── tripLoader.ts       # NEW: Load trip data from files
 ├── types/                   # TypeScript definitions
-│   └── index.ts
+│   └── index.ts            # Trip, Flight, Hotel, Activity interfaces
 └── public/                  # Static assets
 ```
+
+## New Components
+
+### TripTimeline
+Displays a chronological timeline of all trip items (flights, hotels, activities) sorted by timestamp and order_index.
+
+### FlightCard
+Shows flight information including airline, flight number, departure/arrival times with timezones, locations, and confirmation numbers. Supports multi-leg flights.
+
+### HotelCard
+Displays accommodation details with check-in/out times, address, phone, and confirmation number.
+
+### ActivityCard
+Shows daily activities with optional images, start time, duration, address, notes, and Plus Codes for location.
+
+### RestaurantList
+Groups restaurant recommendations by city, displaying cuisine type, address, phone, website, and notes.
+
+## Data Structure
+
+Trips are now stored as individual JSON files in `/frontend/data/trips/` with a central index file for listing:
+
+```typescript
+// Trip structure includes:
+{
+  "id": "uuid",
+  "name": "Trip Name",
+  "flights": [...],      // Flight details with timezones
+  "hotels": [...],       // Accommodation with check-in/out
+  "activities": [...],   // Daily activities with timing
+  "restaurants": [...]   // Restaurant recommendations
+}
+```
+
+See `/specs/005-need-to-better/` for detailed data model documentation.
 
 ## Theming
 
@@ -131,9 +179,14 @@ The app uses Next.js static export which generates static HTML/CSS/JS files. Dep
 
 For detailed implementation information, see:
 
-- [Quick Start Guide](../specs/004-port-app-to/quickstart.md)
-- [Technical Plan](../specs/004-port-app-to/plan.md)
-- [Component Contracts](../specs/004-port-app-to/contracts/interfaces.md)
+- [Enhanced Trip Model Quick Start](../specs/005-need-to-better/quickstart.md)
+- [Data Model Documentation](../specs/005-need-to-better/data-model.md)
+- [TypeScript Interfaces](../specs/005-need-to-better/contracts/interfaces.ts)
+- [Technical Plan](../specs/005-need-to-better/plan.md)
+
+Legacy documentation:
+- [Migration Quick Start](../specs/004-port-app-to/quickstart.md)
+- [DaisyUI Migration Plan](../specs/004-port-app-to/plan.md)
 
 ## Migration from Vite
 

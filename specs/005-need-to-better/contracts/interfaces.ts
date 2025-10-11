@@ -1,6 +1,11 @@
 /**
- * Core TypeScript interfaces for Travo
- * Enhanced Trip Data Model & Itinerary Management
+ * TypeScript Interface Contracts
+ * Feature: Enhanced Trip Data Model & Itinerary Management
+ * Generated: 2025-10-11
+ * 
+ * These interfaces define the complete type system for the enhanced trip model
+ * with flights, hotels, activities, and restaurant recommendations.
+ * All entities support optional fields for flexible trip planning.
  */
 
 // =============================================================================
@@ -372,4 +377,78 @@ export function getItemType(item: TimelineItem): TimelineItemType {
   if (isFlight(item)) return 'flight';
   if (isHotel(item)) return 'hotel';
   return 'activity';
+}
+
+// =============================================================================
+// VALIDATION TYPES
+// =============================================================================
+
+/**
+ * ValidationRule - Validation constraint for a field
+ */
+export interface ValidationRule {
+  field: string;
+  rule: 'required' | 'uuid' | 'date' | 'datetime' | 'url' | 'plus_code' | 'positive' | 'non_negative';
+  message: string;
+}
+
+/**
+ * Validation rules for Trip entity
+ */
+export const TRIP_VALIDATION: ValidationRule[] = [
+  { field: 'id', rule: 'uuid', message: 'Trip ID must be valid UUID' },
+  { field: 'name', rule: 'required', message: 'Trip name is required' },
+  { field: 'start_date', rule: 'date', message: 'Start date must be valid ISO date' },
+  { field: 'end_date', rule: 'date', message: 'End date must be valid ISO date' },
+  { field: 'updated_at', rule: 'datetime', message: 'Updated timestamp must be valid ISO datetime' },
+];
+
+/**
+ * Validation rules for DailyActivity entity
+ */
+export const ACTIVITY_VALIDATION: ValidationRule[] = [
+  { field: 'id', rule: 'uuid', message: 'Activity ID must be valid UUID' },
+  { field: 'trip_id', rule: 'uuid', message: 'Trip ID must be valid UUID' },
+  { field: 'name', rule: 'required', message: 'Activity name is required' },
+  { field: 'date', rule: 'date', message: 'Activity date must be valid ISO date' },
+  { field: 'order_index', rule: 'non_negative', message: 'Order index must be non-negative' },
+];
+
+// =============================================================================
+// MIGRATION TYPES
+// =============================================================================
+
+/**
+ * LegacyPlace - Old place structure from current trips.json
+ * 
+ * Used during migration to convert existing data to new DailyActivity format.
+ */
+export interface LegacyPlace {
+  id: string;
+  trip_id: string;
+  name: string;
+  plus_code: string;
+  notes?: string;
+  order_index: number;
+  updated_at: string;
+}
+
+/**
+ * LegacyTrip - Old trip structure from current trips.json
+ */
+export interface LegacyTrip {
+  id: string;
+  name: string;
+  description?: string;
+  start_date: string;
+  end_date: string;
+  updated_at: string;
+  places: LegacyPlace[];
+}
+
+/**
+ * LegacyTripsFile - Structure of current trips.json
+ */
+export interface LegacyTripsFile {
+  trips: LegacyTrip[];
 }

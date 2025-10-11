@@ -1,0 +1,10 @@
+I need to add a better data model for trips.
+Typically these trips start from home, and i go to multiple cities and return home.
+I need to hold the flight details, hotel details based on the dates.
+For each day in the trip i would like to plan for some sightseeing or activities.
+I would also like to hold some recommendations for restaurants in each city.
+These aren't part of my itinerary but i would like to have them handy.
+In the future i'm planning to add google maps integration to show the places on a map.
+also i would like to have an image for sightseeing places.
+For travel information i would like to hold the flight info, times, airline, flight number, etc.
+For hotel info i would like to hold the hotel name, address, checkin and checkout times. reservation id etc

@@ -627,10 +627,57 @@ npx tsx scripts/migrate-trips.ts
 4. Add calendar view for timeline
 5. Implement search/filter functionality
 
+## Location Data Format
+
+### Plus Codes
+
+Plus Codes (also known as Open Location Codes) are used for privacy-friendly location data without requiring full coordinate storage.
+
+**Format**: `8Q7XQX4R+33` (11-character code)
+- First 4 characters: ~14km x 14km area
+- Next 2 characters: ~250m x 250m area  
+- Next 2 characters: ~5m x 5m area
+- Last 2 characters: ~0.25m x 0.25m precision
+
+**Example Usage**:
+```typescript
+{
+  "name": "Tokyo Skytree",
+  "plus_code": "8Q7XQX4R+33",
+  "address": "1 Chome-1-2 Oshiage, Sumida City, Tokyo"
+}
+```
+
+**Google Maps Integration** (Future Implementation):
+```typescript
+// Convert Plus Code to coordinates for map display
+const plusCode = "8Q7XQX4R+33";
+const googleMapsUrl = `https://plus.codes/${plusCode}`;
+
+// Or embed in map:
+const embedUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(plusCode)}`;
+```
+
+### Coordinates (Optional, Not Currently Used)
+
+If coordinates are added in the future, use this format:
+
+```typescript
+{
+  "latitude": 35.7100627,
+  "longitude": 139.8107004,
+  "plus_code": "8Q7XQX4R+33"  // Keep plus_code as primary reference
+}
+```
+
+**Note**: Plus Codes are preferred over coordinates for privacy reasons - they provide sufficient precision for navigation while being less personally identifiable.
+
 ## Resources
 
 - [Data Model Documentation](./data-model.md)
 - [TypeScript Interfaces](./contracts/interfaces.ts)
 - [Research Decisions](./research.md)
+- [Plus Codes Official Site](https://plus.codes/)
+- [Google Maps Platform Documentation](https://developers.google.com/maps/documentation)
 - [DaisyUI Timeline Component](https://daisyui.com/components/timeline/)
 - [MDN: Intl.DateTimeFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat)

@@ -55,18 +55,18 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 
 ### Implementation for User Story 1
 
-- [ ] T015 [P] [US1] Implement FlightCard component in `/frontend/components/FlightCard.tsx` displaying airline, flight_number, departure/arrival times with timezones, locations, confirmation_number, notes, and connection leg count
-- [ ] T016 [P] [US1] Implement HotelCard component in `/frontend/components/HotelCard.tsx` displaying name, address, check-in/check-out times with timezones, confirmation_number, phone, notes
-- [ ] T017 [P] [US1] Implement ActivityCard component in `/frontend/components/ActivityCard.tsx` displaying name, optional image, start_time with timezone, duration, address, notes, plus_code
-- [ ] T018 [US1] Implement TripTimeline component in `/frontend/components/TripTimeline.tsx` that combines flights, hotels, activities, sorts chronologically using sortChronologically utility, and renders appropriate card component per item type
-- [ ] T019 [US1] Update trip detail page `/frontend/app/trip/[tripId]/page.tsx` to load trip using loadTrip utility and render TripTimeline component with trip data
-- [ ] T020 [US1] Update trip detail page to display trip name, description, start/end dates using formatDate utility from dateTime.ts
-- [ ] T021 [US1] Update TripCard component in `/frontend/components/TripCard.tsx` to display trip summary from TripIndex (name, dates) for list view
-- [ ] T022 [US1] Update trip list page `/frontend/app/page.tsx` to load trip-index.json using loadTripIndex utility and render TripCard components
-- [ ] T023 [US1] Add empty state handling to TripTimeline component when no flights, hotels, or activities exist
-- [ ] T024 [US1] Test chronological ordering with sample trip containing overnight flight (departure/arrival different dates), multi-leg flight, hotel overlapping with activities, and same-day activities with different order_index values
-- [ ] T025 [US1] Verify timezone-aware time display shows correct local times with timezone abbreviations (e.g., "10:30 AM PST" vs "2:30 PM JST")
-- [ ] T026 [US1] Test optional field handling: trip with flights only, activities only, hotels only, and mixed combinations with missing optional fields (no confirmation numbers, no times, etc.)
+- [X] T015 [P] [US1] Implement FlightCard component in `/frontend/components/FlightCard.tsx` displaying airline, flight_number, departure/arrival times with timezones, locations, confirmation_number, notes, and connection leg count
+- [X] T016 [P] [US1] Implement HotelCard component in `/frontend/components/HotelCard.tsx` displaying name, address, check-in/check-out times with timezones, confirmation_number, phone, notes
+- [X] T017 [P] [US1] Implement ActivityCard component in `/frontend/components/ActivityCard.tsx` displaying name, optional image, start_time with timezone, duration, address, notes, plus_code
+- [X] T018 [US1] Implement TripTimeline component in `/frontend/components/TripTimeline.tsx` that combines flights, hotels, activities, sorts chronologically using sortChronologically utility, and renders appropriate card component per item type
+- [X] T019 [US1] Update trip detail page `/frontend/app/trip/[tripId]/page.tsx` to load trip using loadTrip utility and render TripTimeline component with trip data
+- [X] T020 [US1] Update trip detail page to display trip name, description, start/end dates using formatDate utility from dateTime.ts
+- [X] T021 [US1] Update TripCard component in `/frontend/components/TripCard.tsx` to display trip summary from TripIndex (name, dates) for list view
+- [X] T022 [US1] Update trip list page `/frontend/app/page.tsx` to load trip-index.json using loadTripIndex utility and render TripCard components
+- [X] T023 [US1] Add empty state handling to TripTimeline component when no flights, hotels, or activities exist
+- [X] T024 [US1] Test chronological ordering with sample trip containing overnight flight (departure/arrival different dates), multi-leg flight, hotel overlapping with activities, and same-day activities with different order_index values
+- [X] T025 [US1] Verify timezone-aware time display shows correct local times with timezone abbreviations (e.g., "10:30 AM PST" vs "2:30 PM JST")
+- [X] T026 [US1] Test optional field handling: trip with flights only, activities only, hotels only, and mixed combinations with missing optional fields (no confirmation numbers, no times, etc.)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently - users can view complete trip timelines with all logistics
 
@@ -80,12 +80,12 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Implement RestaurantList component in `/frontend/components/RestaurantList.tsx` that groups restaurants by city and displays name, cuisine_type, address, phone, website, notes for each
-- [ ] T028 [US2] Add RestaurantList component to trip detail page `/frontend/app/trip/[tripId]/page.tsx` below timeline section, conditionally rendered when trip.restaurants exists and has items
-- [ ] T029 [US2] Style restaurant section with clear visual separation from timeline (e.g., separate heading "Restaurant Recommendations", distinct card styling)
-- [ ] T030 [US2] Test restaurant display with multi-city trip: verify restaurants are grouped by city, each city has clear heading, and restaurants within city are listed
-- [ ] T031 [US2] Test optional restaurant fields: restaurants with minimal data (name only) and full data (all fields populated) both display correctly
-- [ ] T032 [US2] Verify restaurant section does not appear when trip.restaurants is empty or undefined
+- [X] T027 [US2] Implement RestaurantList component in `/frontend/components/RestaurantList.tsx` that groups restaurants by city and displays name, cuisine_type, address, phone, website, notes for each
+- [X] T028 [US2] Add RestaurantList component to trip detail page `/frontend/app/trip/[tripId]/page.tsx` below timeline section, conditionally rendered when trip.restaurants exists and has items
+- [X] T029 [US2] Style restaurant section with clear visual separation from timeline (e.g., separate heading "Restaurant Recommendations", distinct card styling)
+- [X] T030 [US2] Test restaurant display with multi-city trip: verify restaurants are grouped by city, each city has clear heading, and restaurants within city are listed
+- [X] T031 [US2] Test optional restaurant fields: restaurants with minimal data (name only) and full data (all fields populated) both display correctly
+- [X] T032 [US2] Verify restaurant section does not appear when trip.restaurants is empty or undefined
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - users can view timeline and separate restaurant recommendations
 
@@ -99,13 +99,13 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 
 ### Implementation for User Story 3
 
-- [ ] T033 [US3] Update ActivityCard component in `/frontend/components/ActivityCard.tsx` to display image_url with proper loading states (loading placeholder, error fallback to no-image state)
-- [ ] T034 [US3] Add image optimization attributes to ActivityCard img tags (lazy loading, responsive sizing, alt text with activity name)
-- [ ] T035 [US3] Update ActivityCard to display plus_code prominently when available (small text below activity details)
-- [ ] T036 [US3] Test image loading with various scenarios: valid image URLs, broken URLs (404), missing image_url (undefined), slow-loading images
-- [ ] T037 [US3] Verify plus_code display: activities with plus_code show code, activities without plus_code don't show empty field
-- [ ] T038 [US3] Create sample trip data with activities containing Google Maps image URLs and plus_codes to validate full US3 functionality
-- [ ] T039 [US3] Document location data format in quickstart.md for future Google Maps API integration (plus_code format, coordinate format if added)
+- [X] T033 [US3] Update ActivityCard component in `/frontend/components/ActivityCard.tsx` to display image_url with proper loading states (loading placeholder, error fallback to no-image state)
+- [X] T034 [US3] Add image optimization attributes to ActivityCard img tags (lazy loading, responsive sizing, alt text with activity name)
+- [X] T035 [US3] Update ActivityCard to display plus_code prominently when available (small text below activity details)
+- [X] T036 [US3] Test image loading with various scenarios: valid image URLs, broken URLs (404), missing image_url (undefined), slow-loading images
+- [X] T037 [US3] Verify plus_code display: activities with plus_code show code, activities without plus_code don't show empty field
+- [X] T038 [US3] Create sample trip data with activities containing Google Maps image URLs and plus_codes to validate full US3 functionality
+- [X] T039 [US3] Document location data format in quickstart.md for future Google Maps API integration (plus_code format, coordinate format if added)
 
 **Checkpoint**: All user stories should now be independently functional - timeline, restaurants, and images/location data all working
 

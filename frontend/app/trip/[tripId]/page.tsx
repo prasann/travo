@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { TripTimeline } from '@/components/TripTimeline'
+import { RestaurantList } from '@/components/RestaurantList'
 import { loadTrip, loadTripIndex } from '@/lib/tripLoader'
 import { formatDate } from '@/lib/dateTime'
 
@@ -51,6 +52,11 @@ export default async function TripPage({ params }: TripPageProps) {
           <h2 className="text-2xl font-bold mb-4">Timeline</h2>
           <TripTimeline trip={trip} />
         </div>
+
+        {/* Restaurant Recommendations */}
+        {trip.restaurants && trip.restaurants.length > 0 && (
+          <RestaurantList restaurants={trip.restaurants} />
+        )}
       </div>
     </main>
   )

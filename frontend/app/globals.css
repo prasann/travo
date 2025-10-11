@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: all;
+}
+
+/* Custom styles */
+body {
+  @apply bg-base-100 text-base-content antialiased;
+}
+
+.page-container {
+  @apply container mx-auto px-4 py-8;
+}

@@ -6,15 +6,14 @@ A lightweight, privacy-friendly trip planner app to organize itineraries offline
 ## 🚀 Quick Start
 
 ```bash
-cd travo-nextjs
+cd frontend
 npm install
-npm run dev              # Start with default theme
-npm run dev:blue         # Start with blue theme
+npm run dev
 ```
 
 Visit http://localhost:3000
 
-For detailed setup and deployment, see [travo-nextjs/README.md](./travo-nextjs/README.md)
+For detailed setup and deployment, see [frontend/README.md](./frontend/README.md)
 
 ---
 
@@ -57,7 +56,7 @@ For detailed setup and deployment, see [travo-nextjs/README.md](./travo-nextjs/R
 | Framework | Next.js 15 | App Router with static export |
 | Language | TypeScript 5 | Strict mode enabled |
 | UI Library | DaisyUI 5 | Simplified component styling |
-| Styling | Tailwind CSS 3 | Utility-first CSS |
+| Styling | Tailwind CSS 4 | Latest stable version |
 | Icons | Lucide React | Lightweight icon library |
 
 ---
@@ -109,9 +108,10 @@ erDiagram
 ## 📂 Project Structure
 
 ```
-travo-nextjs/          # Next.js application
+frontend/              # Next.js application
   ├── app/             # App Router pages
   ├── components/      # React components
+  ├── config/          # Configuration files (theme)
   ├── data/            # trips.json data file
   ├── lib/             # Utility functions
   └── types/           # TypeScript interfaces
@@ -120,10 +120,9 @@ specs/                 # Feature specifications
 
 ---
 
-## � Documentation
+## 📖 Documentation
 
-- [Quick Start Guide](./travo-nextjs/README.md)
+- [Quick Start Guide](./frontend/README.md)
 - [Feature Specifications](./specs/)
-- [Technical Architecture](./TECHNICAL_ARCHITECTURE.md)
 
 ---

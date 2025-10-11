@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-
-const theme = process.env.NEXT_PUBLIC_THEME || 'default'
+import { ACTIVE_THEME } from "@/config/theme"
 
 export const metadata: Metadata = {
   title: "Travo - Trip Planner",
@@ -14,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme={theme}>
-      <body className="antialiased">
+    <html lang="en" data-theme={ACTIVE_THEME} suppressHydrationWarning>
+      <body className="antialiased" suppressHydrationWarning>
         {children}
       </body>
     </html>

@@ -23,52 +23,52 @@
 
 **Purpose**: Create new Next.js project structure and install dependencies
 
-- [ ] **T001** Create new Next.js 14+ application at `travo-nextjs/` with TypeScript, Tailwind CSS, App Router, and import alias `@/*`
+- [X] **T001** Create new Next.js 14+ application at `travo-nextjs/` with TypeScript, Tailwind CSS, App Router, and import alias `@/*`
   ```bash
   npx create-next-app@latest travo-nextjs --typescript --tailwind --app --no-src-dir --import-alias "@/*"
   ```
 
-- [ ] **T002** [P] Install DaisyUI and utility dependencies in `travo-nextjs/`
+- [X] **T002** [P] Install DaisyUI and utility dependencies in `travo-nextjs/`
   ```bash
   cd travo-nextjs && npm install daisyui clsx tailwind-merge
   ```
 
-- [ ] **T003** [P] Configure Next.js for static export in `travo-nextjs/next.config.mjs`
+- [X] **T003** [P] Configure Next.js for static export in `travo-nextjs/next.config.mjs`
   - Set `output: 'export'`
   - Set `trailingSlash: true`
   - Set `images.unoptimized: true`
 
-- [ ] **T004** Configure Tailwind CSS with DaisyUI in `travo-nextjs/tailwind.config.ts`
+- [X] **T004** Configure Tailwind CSS with DaisyUI in `travo-nextjs/tailwind.config.ts`
   - Add `daisyui` plugin
   - Configure 5 custom themes: default, blue, green, red, violet
   - Each theme defines: primary, secondary, accent, neutral, base-100, base-200, base-300
   - Reference: `specs/004-port-app-to/research.md` section "DaisyUI Theming System"
 
-- [ ] **T005** Update global styles in `travo-nextjs/app/globals.css`
+- [X] **T005** Update global styles in `travo-nextjs/app/globals.css`
   - Keep Tailwind directives
   - Add base layer styles for body
   - Add utilities layer for `.page-container` class
   - Remove ShadCN-specific CSS
 
-- [ ] **T006** [P] Copy data files from old app
+- [X] **T006** [P] Copy data files from old app
   ```bash
   mkdir -p travo-nextjs/data
   cp travo-frontend/src/data/trips.json travo-nextjs/data/
   ```
 
-- [ ] **T007** [P] Copy type definitions from old app
+- [X] **T007** [P] Copy type definitions from old app
   ```bash
   mkdir -p travo-nextjs/types
   cp travo-frontend/src/types/index.ts travo-nextjs/types/
   ```
 
-- [ ] **T008** [P] Copy utility functions from old app
+- [X] **T008** [P] Copy utility functions from old app
   ```bash
   mkdir -p travo-nextjs/lib
   cp travo-frontend/src/lib/utils.ts travo-nextjs/lib/
   ```
 
-- [ ] **T009** Update package.json scripts in `travo-nextjs/package.json`
+- [X] **T009** Update package.json scripts in `travo-nextjs/package.json`
   - Add `dev`, `dev:blue`, `dev:green`, `dev:red`, `dev:violet`
   - Add `build`, `build:blue`, `build:green`, `build:red`, `build:violet`
   - All theme scripts use `NEXT_PUBLIC_THEME` environment variable
@@ -83,24 +83,24 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] **T010** Create root layout with theme support in `travo-nextjs/app/layout.tsx`
+- [X] **T010** Create root layout with theme support in `travo-nextjs/app/layout.tsx`
   - Read theme from `process.env.NEXT_PUBLIC_THEME || 'default'`
   - Set `data-theme` attribute on `<html>` tag
   - Configure metadata (title, description)
   - Apply base body classes
 
-- [ ] **T011** [P] Create error boundary in `travo-nextjs/app/error.tsx`
+- [X] **T011** [P] Create error boundary in `travo-nextjs/app/error.tsx`
   - Client Component (`'use client'`)
   - Display error message using DaisyUI card
   - Include "Try again" button with reset handler
   - Apply error styling with DaisyUI classes
 
-- [ ] **T012** [P] Create 404 not found page in `travo-nextjs/app/not-found.tsx`
+- [X] **T012** [P] Create 404 not found page in `travo-nextjs/app/not-found.tsx`
   - Display 404 message using DaisyUI alert/card
   - Include Link back to home page
   - Center content on page
 
-- [ ] **T013** [P] Create Navigation component in `travo-nextjs/components/Navigation.tsx`
+- [X] **T013** [P] Create Navigation component in `travo-nextjs/components/Navigation.tsx`
   - Client Component for back button interactivity
   - Props: `title: string`, `showBackButton?: boolean`, `backHref?: string`
   - Use Next.js Link for back navigation
@@ -119,7 +119,7 @@
 
 ### Implementation for User Story 1
 
-- [ ] **T014** [P] [US1] Create TripCard component in `travo-nextjs/components/TripCard.tsx`
+- [X] **T014** [P] [US1] Create TripCard component in `travo-nextjs/components/TripCard.tsx`
   - Client Component (needs Link interactivity)
   - Props: `trip: Trip`
   - Wrap entire card in Next.js Link to `/trip/${trip.id}`
@@ -128,7 +128,7 @@
   - Add hover effects with `hover:shadow-2xl transition-shadow`
   - Reference: `specs/004-port-app-to/quickstart.md` TripCard example
 
-- [ ] **T015** [P] [US1] Create TripList component in `travo-nextjs/components/TripList.tsx`
+- [X] **T015** [P] [US1] Create TripList component in `travo-nextjs/components/TripList.tsx`
   - Client Component (for future interactivity)
   - Props: `trips: Trip[]`, `isLoading?: boolean`
   - Render grid layout: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6`
@@ -138,7 +138,7 @@
   - Add page title "My Trips" with proper heading styles
   - Reference: `specs/004-port-app-to/contracts/interfaces.md` TripListProps
 
-- [ ] **T016** [US1] Create home page in `travo-nextjs/app/page.tsx`
+- [X] **T016** [US1] Create home page in `travo-nextjs/app/page.tsx`
   - Server Component (default - for data loading)
   - Import trips data: `import tripsData from '@/data/trips.json'`
   - Extract trips array: `const trips = tripsData.trips`
@@ -146,7 +146,7 @@
   - Wrap in `<main className="min-h-screen">`
   - Reference: `specs/004-port-app-to/quickstart.md` HomePage example
 
-- [ ] **T017** [US1] Verify acceptance criteria for User Story 1
+- [X] **T017** [US1] Verify acceptance criteria for User Story 1
   - Start dev server: `npm run dev`
   - Visit http://localhost:3000
   - ✓ All trips from trips.json display in grid
@@ -167,7 +167,7 @@
 
 ### Implementation for User Story 2
 
-- [ ] **T018** [P] [US2] Create PlaceCard component in `travo-nextjs/components/PlaceCard.tsx`
+- [X] **T018** [P] [US2] Create PlaceCard component in `travo-nextjs/components/PlaceCard.tsx`
   - Client Component (could be Server Component but Client for consistency)
   - Props: `place: Place`
   - Use DaisyUI classes: `card`, `card-body`, `card-title`
@@ -175,7 +175,7 @@
   - Apply compact card styling for list view
   - Reference: `specs/004-port-app-to/contracts/interfaces.md` PlaceCardProps
 
-- [ ] **T019** [P] [US2] Create TripDetails component in `travo-nextjs/components/TripDetails.tsx`
+- [X] **T019** [P] [US2] Create TripDetails component in `travo-nextjs/components/TripDetails.tsx`
   - Client Component
   - Props: `trip: Trip`
   - Display trip header with Navigation component (showBackButton=true, backHref="/")
@@ -185,7 +185,7 @@
   - Apply responsive layout with page-container class
   - Reference: `specs/004-port-app-to/contracts/interfaces.md` TripDetailsProps
 
-- [ ] **T020** [US2] Create trip detail page in `travo-nextjs/app/trip/[tripId]/page.tsx`
+- [X] **T020** [US2] Create trip detail page in `travo-nextjs/app/trip/[tripId]/page.tsx`
   - Server Component (default)
   - Params: `{ params: { tripId: string } }`
   - Import trips data: `import tripsData from '@/data/trips.json'`
@@ -195,7 +195,7 @@
   - Wrap in `<main className="min-h-screen">`
   - Reference: `specs/004-port-app-to/quickstart.md` TripPage example
 
-- [ ] **T021** [US2] Verify acceptance criteria for User Story 2
+- [X] **T021** [US2] Verify acceptance criteria for User Story 2
   - Visit home page: http://localhost:3000
   - Click any trip card
   - ✓ Navigates to `/trip/[tripId]` URL
@@ -217,18 +217,18 @@
 
 ### Implementation for User Story 3
 
-- [ ] **T022** [US3] Verify theme configuration in `travo-nextjs/tailwind.config.ts`
+- [X] **T022** [US3] Verify theme configuration in `travo-nextjs/tailwind.config.ts`
   - Confirm all 5 themes defined with complete color palettes
   - Verify theme names: default, blue, green, red, violet
   - Ensure each theme has: primary, secondary, accent, neutral, base-100, base-200, base-300, info, success, warning, error
   - Reference: `specs/004-port-app-to/research.md` section "DaisyUI Theming System"
 
-- [ ] **T023** [US3] Verify theme application in `travo-nextjs/app/layout.tsx`
+- [X] **T023** [US3] Verify theme application in `travo-nextjs/app/layout.tsx`
   - Confirm theme read from environment: `process.env.NEXT_PUBLIC_THEME || 'default'`
   - Verify `data-theme={theme}` attribute on `<html>` tag
   - No additional logic needed - DaisyUI handles theme via data-theme attribute
 
-- [ ] **T024** [US3] Test all theme variants
+- [X] **T024** [US3] Test all theme variants
   - Test default theme: `npm run dev` → visit http://localhost:3000
   - Test blue theme: `npm run dev:blue` → verify blue color scheme
   - Test green theme: `npm run dev:green` → verify green color scheme  
@@ -240,7 +240,7 @@
     - ✓ Card styling reflects theme
     - ✓ Theme consistent across home page and trip detail pages
 
-- [ ] **T025** [US3] Test theme build scripts
+- [X] **T025** [US3] Test theme build scripts
   - Test default build: `npm run build` → verify out/ directory created
   - Test blue build: `npm run build:blue` → verify theme in static output
   - Test green build: `npm run build:green` → verify theme in static output
@@ -259,17 +259,17 @@
 
 **Purpose**: Final verification, cleanup, and documentation
 
-- [ ] **T026** [P] Validate TypeScript compilation
+- [X] **T026** [P] Validate TypeScript compilation
   - Run: `cd travo-nextjs && npm run build`
   - ✓ Zero TypeScript errors (meets FR-006)
   - Fix any type errors before proceeding
 
-- [ ] **T027** [P] Run ESLint checks
+- [X] **T027** [P] Run ESLint checks
   - Run: `cd travo-nextjs && npm run lint`
   - Fix any linting errors
   - Ensure code quality standards maintained
 
-- [ ] **T028** Verify all functional requirements met
+- [X] **T028** Verify all functional requirements met
   - ✓ FR-001: All routes migrated (/, /trip/[tripId], 404)
   - ✓ FR-002: ShadCN components replaced with DaisyUI utilities
   - ✓ FR-003: 5 themes working via DaisyUI configuration
@@ -281,7 +281,7 @@
   - ✓ FR-009: Loading states handled (Server Components optimize this)
   - ✓ FR-010: Reduced complexity (no custom UI component files)
 
-- [ ] **T029** Verify success criteria met
+- [X] **T029** Verify success criteria met
   - ✓ SC-001: All pages function identically to Vite app
   - ✓ SC-002: Count component files - should have 0 UI component files (was 4 in travo-frontend/src/components/ui/)
   - ✓ SC-003: Compare build times (should be within 10%)
@@ -290,25 +290,25 @@
   - ✓ SC-006: TypeScript passes with zero errors
   - ✓ SC-007: No custom CSS files needed for basic styling
 
-- [ ] **T030** [P] Test edge cases from spec
+- [X] **T030** [P] Test edge cases from spec
   - ✓ Empty trips.json → shows "No trips" message
   - ✓ Invalid trip ID → shows 404 page
   - ✓ Trip with no places → shows "No places added yet"
   - ✓ Very long trip names → UI handles gracefully (text truncation)
   - ✓ Slow network simulation → static export means instant loading after first load
 
-- [ ] **T031** [P] Update project README
+- [X] **T031** [P] Update project README
   - Document new Next.js structure
   - Update setup instructions to reference `specs/004-port-app-to/quickstart.md`
   - Document theme switching process
   - Update technology stack section
 
-- [ ] **T032** Archive old Vite application
+- [X] **T032** Archive old Vite application
   - Rename: `travo-frontend` → `travo-frontend-archived`
   - Add README in archived folder explaining migration
   - Keep for reference during transition period
 
-- [ ] **T033** Create deployment documentation
+- [X] **T033** Create deployment documentation
   - Document static export deployment process
   - Add instructions for Vercel/Netlify/GitHub Pages
   - Document theme selection for production builds

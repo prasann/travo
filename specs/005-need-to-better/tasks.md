@@ -41,9 +41,7 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 - [ ] T011 [P] Implement timezone-aware datetime formatting utilities in `/frontend/lib/dateTime.ts` (formatDateTime, formatTime, formatDate functions)
 - [ ] T012 Implement chronological sorting logic in `/frontend/lib/utils.ts` (getTimestamp, sortChronologically functions handling Flight, Hotel, DailyActivity with timestamp + order_index fallback)
 - [ ] T013 Implement trip loader functions in `/frontend/lib/tripLoader.ts` (loadTripIndex, loadTrip functions for JSON file reading)
-- [ ] T014 Create data migration script `/scripts/migrate-trips.ts` to convert existing `trips.json` to individual trip files in `/frontend/data/trips/` and generate `trip-index.json`
-- [ ] T015 Run migration script to populate `/frontend/data/trips/` directory and create `/frontend/data/trip-index.json` with existing trip data
-- [ ] T016 Verify migration output: check that all trips have individual JSON files and trip-index.json contains correct summaries
+- [ ] T014 Create new mock trip data files in `/frontend/data/trips/` directory (2-3 sample trips with flights, hotels, activities, restaurants) and generate `/frontend/data/trip-index.json` with trip summaries
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -57,18 +55,18 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 
 ### Implementation for User Story 1
 
-- [ ] T017 [P] [US1] Implement FlightCard component in `/frontend/components/FlightCard.tsx` displaying airline, flight_number, departure/arrival times with timezones, locations, confirmation_number, notes, and connection leg count
-- [ ] T018 [P] [US1] Implement HotelCard component in `/frontend/components/HotelCard.tsx` displaying name, address, check-in/check-out times with timezones, confirmation_number, phone, notes
-- [ ] T019 [P] [US1] Implement ActivityCard component in `/frontend/components/ActivityCard.tsx` displaying name, optional image, start_time with timezone, duration, address, notes, plus_code
-- [ ] T020 [US1] Implement TripTimeline component in `/frontend/components/TripTimeline.tsx` that combines flights, hotels, activities, sorts chronologically using sortChronologically utility, and renders appropriate card component per item type
-- [ ] T021 [US1] Update trip detail page `/frontend/app/trip/[tripId]/page.tsx` to load trip using loadTrip utility and render TripTimeline component with trip data
-- [ ] T022 [US1] Update trip detail page to display trip name, description, start/end dates using formatDate utility from dateTime.ts
-- [ ] T023 [US1] Update TripCard component in `/frontend/components/TripCard.tsx` to display trip summary from TripIndex (name, dates) for list view
-- [ ] T024 [US1] Update trip list page `/frontend/app/page.tsx` to load trip-index.json using loadTripIndex utility and render TripCard components
-- [ ] T025 [US1] Add empty state handling to TripTimeline component when no flights, hotels, or activities exist
-- [ ] T026 [US1] Test chronological ordering with sample trip containing overnight flight (departure/arrival different dates), multi-leg flight, hotel overlapping with activities, and same-day activities with different order_index values
-- [ ] T027 [US1] Verify timezone-aware time display shows correct local times with timezone abbreviations (e.g., "10:30 AM PST" vs "2:30 PM JST")
-- [ ] T028 [US1] Test optional field handling: trip with flights only, activities only, hotels only, and mixed combinations with missing optional fields (no confirmation numbers, no times, etc.)
+- [ ] T015 [P] [US1] Implement FlightCard component in `/frontend/components/FlightCard.tsx` displaying airline, flight_number, departure/arrival times with timezones, locations, confirmation_number, notes, and connection leg count
+- [ ] T016 [P] [US1] Implement HotelCard component in `/frontend/components/HotelCard.tsx` displaying name, address, check-in/check-out times with timezones, confirmation_number, phone, notes
+- [ ] T017 [P] [US1] Implement ActivityCard component in `/frontend/components/ActivityCard.tsx` displaying name, optional image, start_time with timezone, duration, address, notes, plus_code
+- [ ] T018 [US1] Implement TripTimeline component in `/frontend/components/TripTimeline.tsx` that combines flights, hotels, activities, sorts chronologically using sortChronologically utility, and renders appropriate card component per item type
+- [ ] T019 [US1] Update trip detail page `/frontend/app/trip/[tripId]/page.tsx` to load trip using loadTrip utility and render TripTimeline component with trip data
+- [ ] T020 [US1] Update trip detail page to display trip name, description, start/end dates using formatDate utility from dateTime.ts
+- [ ] T021 [US1] Update TripCard component in `/frontend/components/TripCard.tsx` to display trip summary from TripIndex (name, dates) for list view
+- [ ] T022 [US1] Update trip list page `/frontend/app/page.tsx` to load trip-index.json using loadTripIndex utility and render TripCard components
+- [ ] T023 [US1] Add empty state handling to TripTimeline component when no flights, hotels, or activities exist
+- [ ] T024 [US1] Test chronological ordering with sample trip containing overnight flight (departure/arrival different dates), multi-leg flight, hotel overlapping with activities, and same-day activities with different order_index values
+- [ ] T025 [US1] Verify timezone-aware time display shows correct local times with timezone abbreviations (e.g., "10:30 AM PST" vs "2:30 PM JST")
+- [ ] T026 [US1] Test optional field handling: trip with flights only, activities only, hotels only, and mixed combinations with missing optional fields (no confirmation numbers, no times, etc.)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently - users can view complete trip timelines with all logistics
 
@@ -82,12 +80,12 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 
 ### Implementation for User Story 2
 
-- [ ] T029 [US2] Implement RestaurantList component in `/frontend/components/RestaurantList.tsx` that groups restaurants by city and displays name, cuisine_type, address, phone, website, notes for each
-- [ ] T030 [US2] Add RestaurantList component to trip detail page `/frontend/app/trip/[tripId]/page.tsx` below timeline section, conditionally rendered when trip.restaurants exists and has items
-- [ ] T031 [US2] Style restaurant section with clear visual separation from timeline (e.g., separate heading "Restaurant Recommendations", distinct card styling)
-- [ ] T032 [US2] Test restaurant display with multi-city trip: verify restaurants are grouped by city, each city has clear heading, and restaurants within city are listed
-- [ ] T033 [US2] Test optional restaurant fields: restaurants with minimal data (name only) and full data (all fields populated) both display correctly
-- [ ] T034 [US2] Verify restaurant section does not appear when trip.restaurants is empty or undefined
+- [ ] T027 [US2] Implement RestaurantList component in `/frontend/components/RestaurantList.tsx` that groups restaurants by city and displays name, cuisine_type, address, phone, website, notes for each
+- [ ] T028 [US2] Add RestaurantList component to trip detail page `/frontend/app/trip/[tripId]/page.tsx` below timeline section, conditionally rendered when trip.restaurants exists and has items
+- [ ] T029 [US2] Style restaurant section with clear visual separation from timeline (e.g., separate heading "Restaurant Recommendations", distinct card styling)
+- [ ] T030 [US2] Test restaurant display with multi-city trip: verify restaurants are grouped by city, each city has clear heading, and restaurants within city are listed
+- [ ] T031 [US2] Test optional restaurant fields: restaurants with minimal data (name only) and full data (all fields populated) both display correctly
+- [ ] T032 [US2] Verify restaurant section does not appear when trip.restaurants is empty or undefined
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - users can view timeline and separate restaurant recommendations
 
@@ -101,13 +99,13 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 
 ### Implementation for User Story 3
 
-- [ ] T035 [US3] Update ActivityCard component in `/frontend/components/ActivityCard.tsx` to display image_url with proper loading states (loading placeholder, error fallback to no-image state)
-- [ ] T036 [US3] Add image optimization attributes to ActivityCard img tags (lazy loading, responsive sizing, alt text with activity name)
-- [ ] T037 [US3] Update ActivityCard to display plus_code prominently when available (small text below activity details)
-- [ ] T038 [US3] Test image loading with various scenarios: valid image URLs, broken URLs (404), missing image_url (undefined), slow-loading images
-- [ ] T039 [US3] Verify plus_code display: activities with plus_code show code, activities without plus_code don't show empty field
-- [ ] T040 [US3] Create sample trip data with activities containing Google Maps image URLs and plus_codes to validate full US3 functionality
-- [ ] T041 [US3] Document location data format in quickstart.md for future Google Maps API integration (plus_code format, coordinate format if added)
+- [ ] T033 [US3] Update ActivityCard component in `/frontend/components/ActivityCard.tsx` to display image_url with proper loading states (loading placeholder, error fallback to no-image state)
+- [ ] T034 [US3] Add image optimization attributes to ActivityCard img tags (lazy loading, responsive sizing, alt text with activity name)
+- [ ] T035 [US3] Update ActivityCard to display plus_code prominently when available (small text below activity details)
+- [ ] T036 [US3] Test image loading with various scenarios: valid image URLs, broken URLs (404), missing image_url (undefined), slow-loading images
+- [ ] T037 [US3] Verify plus_code display: activities with plus_code show code, activities without plus_code don't show empty field
+- [ ] T038 [US3] Create sample trip data with activities containing Google Maps image URLs and plus_codes to validate full US3 functionality
+- [ ] T039 [US3] Document location data format in quickstart.md for future Google Maps API integration (plus_code format, coordinate format if added)
 
 **Checkpoint**: All user stories should now be independently functional - timeline, restaurants, and images/location data all working
 
@@ -117,19 +115,17 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 
 **Purpose**: Improvements that affect multiple user stories and overall quality
 
-- [ ] T042 [P] [POLISH] Add responsive layout testing: verify timeline, cards, and restaurant list work on mobile (320px), tablet (768px), and desktop (1024px+) viewports
-- [ ] T043 [P] [POLISH] Add loading states to trip detail page while loadTrip fetches data (DaisyUI skeleton or spinner)
-- [ ] T044 [P] [POLISH] Add error handling for failed trip loads (404, network errors) with user-friendly error messages
-- [ ] T045 [P] [POLISH] Update README.md in `/frontend/README.md` with feature overview, new components list, and data structure changes
-- [ ] T046 [P] [POLISH] Add JSDoc comments to all utility functions in `/frontend/lib/dateTime.ts`, `/frontend/lib/utils.ts`, `/frontend/lib/tripLoader.ts`
-- [ ] T047 [POLISH] Verify constitution compliance: offline-first (no network dependencies except image URLs), privacy-friendly (plus codes used), minimalist UX (no clutter, optional fields hidden when empty)
-- [ ] T048 [POLISH] Performance testing: create test trip with 50+ activities, 5+ flights, 3+ hotels and verify page load under 3 seconds (SC-001), smooth rendering (SC-007)
-- [ ] T049 [POLISH] Accessibility audit: check keyboard navigation through timeline, screen reader compatibility for card components, proper semantic HTML, color contrast
-- [ ] T050 [P] [POLISH] Add TypeScript strict mode checks: verify no `any` types, all props typed, no type assertions without justification
-- [ ] T051 [POLISH] Code cleanup: remove old Place interface references from `/frontend/components/PlaceCard.tsx` if no longer used after migration
-- [ ] T052 [POLISH] Create example trip data files in `/frontend/data/trips/` with comprehensive examples: direct flight, multi-leg flight, overnight flight, minimal trip (name+dates only), full trip (all fields populated)
-- [ ] T053 [POLISH] Run quickstart.md validation: follow all steps in quickstart.md to ensure developer onboarding works correctly
-- [ ] T054 [POLISH] Final testing checklist from quickstart.md: verify all 12 test items pass (trip list loads, timeline displays, timezones correct, optional fields handled, etc.)
+- [ ] T040 [P] [POLISH] Add responsive layout testing: verify timeline, cards, and restaurant list work on mobile (320px), tablet (768px), and desktop (1024px+) viewports
+- [ ] T041 [P] [POLISH] Add loading states to trip detail page while loadTrip fetches data (DaisyUI skeleton or spinner)
+- [ ] T042 [P] [POLISH] Add error handling for failed trip loads (404, network errors) with user-friendly error messages
+- [ ] T043 [P] [POLISH] Update README.md in `/frontend/README.md` with feature overview, new components list, and data structure changes
+- [ ] T044 [P] [POLISH] Add JSDoc comments to all utility functions in `/frontend/lib/dateTime.ts`, `/frontend/lib/utils.ts`, `/frontend/lib/tripLoader.ts`
+- [ ] T045 [POLISH] Verify constitution compliance: offline-first (no network dependencies except image URLs), privacy-friendly (plus codes used), minimalist UX (no clutter, optional fields hidden when empty)
+- [ ] T046 [POLISH] Accessibility audit: check keyboard navigation through timeline, screen reader compatibility for card components, proper semantic HTML, color contrast
+- [ ] T047 [P] [POLISH] Add TypeScript strict mode checks: verify no `any` types, all props typed, no type assertions without justification
+- [ ] T048 [POLISH] Code cleanup: remove old Place interface references if no longer used, clean up deprecated trips.json reference
+- [ ] T049 [POLISH] Run quickstart.md validation: follow all steps in quickstart.md to ensure developer onboarding works correctly
+- [ ] T050 [POLISH] Final testing checklist from quickstart.md: verify all test items pass (trip list loads, timeline displays, timezones correct, optional fields handled, etc.)
 
 ---
 
@@ -160,38 +156,36 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 - T010, T011 can run in parallel after T009
 - T012 depends on T009, T010 (needs types and timestamp extraction)
 - T013 depends on T009 (needs Trip, TripIndex types)
-- T014 depends on T009 (needs all entity types)
-- T015 depends on T014 (run migration script)
-- T016 depends on T015 (verify migration output)
+- T014 depends on T009 (create mock trip data with new structure)
 
 **Phase 3 (User Story 1)**:
-- T017, T018, T019 can run in parallel [P] (different card components)
-- T020 depends on T017, T018, T019 (timeline needs all cards)
-- T021 depends on T020 (trip detail page renders timeline)
-- T022 can run in parallel with T021 (same page, different sections)
-- T023 can run in parallel with T021, T022 (different component)
-- T024 depends on T023 (list page renders trip cards)
-- T025 depends on T020 (enhances timeline component)
-- T026, T027, T028 can run after T024 (testing tasks)
+- T015, T016, T017 can run in parallel [P] (different card components)
+- T018 depends on T015, T016, T017 (timeline needs all cards)
+- T019 depends on T018 (trip detail page renders timeline)
+- T020 can run in parallel with T019 (same page, different sections)
+- T021 can run in parallel with T019, T020 (different component)
+- T022 depends on T021 (list page renders trip cards)
+- T023 depends on T018 (enhances timeline component)
+- T024, T025, T026 can run after T022 (testing tasks)
 
 **Phase 4 (User Story 2)**:
-- T029 (restaurant list component) can start immediately after Foundational
-- T030 depends on T029 (integrate component into page)
-- T031 depends on T030 (styling enhancement)
-- T032, T033, T034 can run after T031 (testing tasks)
+- T027 (restaurant list component) can start immediately after Foundational
+- T028 depends on T027 (integrate component into page)
+- T029 depends on T028 (styling enhancement)
+- T030, T031, T032 can run after T029 (testing tasks)
 
 **Phase 5 (User Story 3)**:
-- T035 (add images to ActivityCard) can start immediately after Foundational (or after T019 if sequential)
-- T036 depends on T035 (enhance image display)
-- T037 depends on T035 (add plus_code display)
-- T038, T039 can run after T037 (testing tasks)
-- T040, T041 can run in parallel [P] after T037 (sample data and docs)
+- T033 (add images to ActivityCard) can start immediately after Foundational (or after T017 if sequential)
+- T034 depends on T033 (enhance image display)
+- T035 depends on T033 (add plus_code display)
+- T036, T037 can run after T035 (testing tasks)
+- T038, T039 can run in parallel [P] after T035 (sample data and docs)
 
 **Phase 6 (Polish)**:
-- Most polish tasks can run in parallel [P] (T042, T043, T044, T045, T046, T050)
-- T047, T048, T049 require all user stories complete
-- T051 can run after T024 (after migration complete)
-- T052, T053, T054 should run last (final validation)
+- Most polish tasks can run in parallel [P] (T040, T041, T042, T043, T044, T047)
+- T045, T046 require all user stories complete
+- T048 can run after T014 (after data files created)
+- T049, T050 should run last (final validation)
 
 ### Parallel Opportunities
 
@@ -199,7 +193,7 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 
 **Foundational Phase**: After T009 completes, T010 and T011 can run together
 
-**User Story 1 Cards**: Launch T017 (FlightCard), T018 (HotelCard), T019 (ActivityCard) together
+**User Story 1 Cards**: Launch T015 (FlightCard), T016 (HotelCard), T017 (ActivityCard) together
 ```bash
 Task: "Implement FlightCard component in /frontend/components/FlightCard.tsx"
 Task: "Implement HotelCard component in /frontend/components/HotelCard.tsx"
@@ -224,13 +218,13 @@ Task: "Add JSDoc comments to utility functions"
 
 ## Implementation Strategy
 
-### MVP First (User Story 1 Only)
+**MVP First (User Story 1 Only)**
 
 **Fastest path to working timeline view:**
 
 1. Complete Phase 1: Setup (T001-T008) → ~15 minutes
-2. Complete Phase 2: Foundational (T009-T016) → ~2-3 hours (includes migration)
-3. Complete Phase 3: User Story 1 (T017-T028) → ~4-5 hours
+2. Complete Phase 2: Foundational (T009-T014) → ~2-3 hours (includes creating mock data)
+3. Complete Phase 3: User Story 1 (T015-T026) → ~4-5 hours
 4. **STOP and VALIDATE**: Test User Story 1 independently with sample trip data
 5. Deploy/demo if ready → Users can now view trip timelines!
 
@@ -265,10 +259,11 @@ Each deploy/demo adds value without breaking previous functionality.
 ## Verification Checkpoints
 
 ### After Phase 2 (Foundational)
+
 - [ ] TypeScript compiles without errors
 - [ ] All new type exports available from `/frontend/types/index.ts`
-- [ ] Migration script runs successfully, creates trip files
-- [ ] trip-index.json contains all legacy trips
+- [ ] Mock trip data files created in `/frontend/data/trips/` directory
+- [ ] trip-index.json contains all sample trips
 - [ ] loadTripIndex and loadTrip utilities work with new file structure
 
 ### After Phase 3 (User Story 1)
@@ -318,19 +313,19 @@ Each deploy/demo adds value without breaking previous functionality.
 ## Task Count Summary
 
 - **Phase 1 (Setup)**: 8 tasks (all parallel)
-- **Phase 2 (Foundational)**: 8 tasks (sequential dependencies)
+- **Phase 2 (Foundational)**: 6 tasks (sequential dependencies, no migration)
 - **Phase 3 (User Story 1)**: 12 tasks (3 parallel cards + sequential integration + 3 tests)
 - **Phase 4 (User Story 2)**: 6 tasks (sequential with 3 tests)
 - **Phase 5 (User Story 3)**: 7 tasks (sequential with 4 tests + 2 parallel docs)
-- **Phase 6 (Polish)**: 13 tasks (mostly parallel quality tasks)
+- **Phase 6 (Polish)**: 11 tasks (mostly parallel quality tasks, no performance testing)
 
-**Total**: 54 tasks
+**Total**: 50 tasks (reduced from 54 by removing migration and performance tasks)
 
 **Critical Path** (minimum for MVP):
 - Phase 1: 8 tasks
-- Phase 2: 8 tasks  
+- Phase 2: 6 tasks  
 - Phase 3: 12 tasks
-- **MVP Total**: 28 tasks
+- **MVP Total**: 26 tasks
 
 **Full Feature** (all user stories):
-- All 54 tasks
+- All 50 tasks

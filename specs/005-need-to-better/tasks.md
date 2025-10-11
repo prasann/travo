@@ -19,14 +19,14 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 
 **Purpose**: Project initialization and directory structure
 
-- [ ] T001 [P] Create `/frontend/data/trips/` directory for individual trip JSON files
-- [ ] T002 [P] Create placeholder `/frontend/lib/dateTime.ts` file
-- [ ] T003 [P] Create placeholder `/frontend/lib/tripLoader.ts` file
-- [ ] T004 [P] Create placeholder `/frontend/components/TripTimeline.tsx` file
-- [ ] T005 [P] Create placeholder `/frontend/components/FlightCard.tsx` file
-- [ ] T006 [P] Create placeholder `/frontend/components/HotelCard.tsx` file
-- [ ] T007 [P] Create placeholder `/frontend/components/ActivityCard.tsx` file
-- [ ] T008 [P] Create placeholder `/frontend/components/RestaurantList.tsx` file
+- [X] T001 [P] Create `/frontend/data/trips/` directory for individual trip JSON files
+- [X] T002 [P] Create placeholder `/frontend/lib/dateTime.ts` file
+- [X] T003 [P] Create placeholder `/frontend/lib/tripLoader.ts` file
+- [X] T004 [P] Create placeholder `/frontend/components/TripTimeline.tsx` file
+- [X] T005 [P] Create placeholder `/frontend/components/FlightCard.tsx` file
+- [X] T006 [P] Create placeholder `/frontend/components/HotelCard.tsx` file
+- [X] T007 [P] Create placeholder `/frontend/components/ActivityCard.tsx` file
+- [X] T008 [P] Create placeholder `/frontend/components/RestaurantList.tsx` file
 
 ---
 
@@ -36,12 +36,12 @@ description: "Implementation tasks for Enhanced Trip Data Model & Itinerary Mana
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T009 Update TypeScript interfaces in `/frontend/types/index.ts` with Trip, Flight, FlightLeg, Hotel, DailyActivity, RestaurantRecommendation, TripIndex, TripIndexFile interfaces from `contracts/interfaces.ts`
-- [ ] T010 [P] Add type guards (isFlight, isHotel, isActivity) and utility functions (getItemTimestamp, getItemType) to `/frontend/types/index.ts`
-- [ ] T011 [P] Implement timezone-aware datetime formatting utilities in `/frontend/lib/dateTime.ts` (formatDateTime, formatTime, formatDate functions)
-- [ ] T012 Implement chronological sorting logic in `/frontend/lib/utils.ts` (getTimestamp, sortChronologically functions handling Flight, Hotel, DailyActivity with timestamp + order_index fallback)
-- [ ] T013 Implement trip loader functions in `/frontend/lib/tripLoader.ts` (loadTripIndex, loadTrip functions for JSON file reading)
-- [ ] T014 Create new mock trip data files in `/frontend/data/trips/` directory (2-3 sample trips with flights, hotels, activities, restaurants) and generate `/frontend/data/trip-index.json` with trip summaries
+- [X] T009 Update TypeScript interfaces in `/frontend/types/index.ts` with Trip, Flight, FlightLeg, Hotel, DailyActivity, RestaurantRecommendation, TripIndex, TripIndexFile interfaces from `contracts/interfaces.ts`
+- [X] T010 [P] Add type guards (isFlight, isHotel, isActivity) and utility functions (getItemTimestamp, getItemType) to `/frontend/types/index.ts`
+- [X] T011 [P] Implement timezone-aware datetime formatting utilities in `/frontend/lib/dateTime.ts` (formatDateTime, formatTime, formatDate functions)
+- [X] T012 Implement chronological sorting logic in `/frontend/lib/utils.ts` (getTimestamp, sortChronologically functions handling Flight, Hotel, DailyActivity with timestamp + order_index fallback)
+- [X] T013 Implement trip loader functions in `/frontend/lib/tripLoader.ts` (loadTripIndex, loadTrip functions for JSON file reading)
+- [X] T014 Create new mock trip data files in `/frontend/data/trips/` directory (2-3 sample trips with flights, hotels, activities, restaurants) and generate `/frontend/data/trip-index.json` with trip summaries
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 

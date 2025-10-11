@@ -1,16 +1,23 @@
 'use client'
 
 import { Navigation } from './Navigation'
-import { PlaceCard } from './PlaceCard'
+import { TripTimeline } from './TripTimeline'
 import type { Trip } from '@/types'
+import { formatDate } from '@/lib/dateTime'
 
 export interface TripDetailsProps {
   trip: Trip
 }
 
+/**
+ * @deprecated This component is being replaced by the new trip detail page
+ * using TripTimeline component. Kept for backward compatibility.
+ */
 export function TripDetails({ trip }: TripDetailsProps) {
-  const startDate = new Date(trip.start_date).toLocaleDateString()
-  const endDate = new Date(trip.end_date).toLocaleDateString()
+  const activityCount = (trip.activities || []).length
+  const flightCount = (trip.flights || []).length
+  const hotelCount = (trip.hotels || []).length
+  const totalItems = activityCount + flightCount + hotelCount
 
   return (
     <div>
@@ -19,9 +26,9 @@ export function TripDetails({ trip }: TripDetailsProps) {
       <div className="page-container">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <div className="badge badge-primary">{trip.places.length} places</div>
+            <div className="badge badge-primary">{totalItems} items</div>
             <p className="text-sm text-base-content/60">
-              {startDate} - {endDate}
+              {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
             </p>
           </div>
           
@@ -31,18 +38,8 @@ export function TripDetails({ trip }: TripDetailsProps) {
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold mb-4">Places to Visit</h2>
-          {trip.places.length === 0 ? (
-            <div className="alert alert-info">
-              <span>No places added yet</span>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {trip.places.map(place => (
-                <PlaceCard key={place.id} place={place} />
-              ))}
-            </div>
-          )}
+          <h2 className="text-2xl font-bold mb-4">Timeline</h2>
+          <TripTimeline trip={trip} />
         </div>
       </div>
     </div>

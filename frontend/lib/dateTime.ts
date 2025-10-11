@@ -52,3 +52,17 @@ export function formatDate(isoDate: string): string {
     year: 'numeric',
   }).format(date);
 }
+
+/**
+ * Format ISO date for day navigation buttons
+ * 
+ * @param isoDate ISO 8601 date (YYYY-MM-DD)
+ * @returns Short format (e.g., "Apr 1")
+ */
+export function formatDayButton(isoDate: string): string {
+  const date = new Date(isoDate + 'T00:00:00');
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+  }).format(date);
+}

@@ -29,6 +29,25 @@ export function getTimestamp(item: TimelineItem): Date | null {
 }
 
 /**
+ * Extract date string from timeline item
+ * 
+ * @param item Timeline item (Flight, Hotel, or DailyActivity)
+ * @returns ISO date string (YYYY-MM-DD) or null if no date available
+ */
+export function getItemDate(item: TimelineItem): string | null {
+  if ('departure_time' in item && item.departure_time) {
+    return item.departure_time.split('T')[0];
+  }
+  if ('check_in_time' in item && item.check_in_time) {
+    return item.check_in_time.split('T')[0];
+  }
+  if ('date' in item && item.date) {
+    return item.date;
+  }
+  return null;
+}
+
+/**
  * Sort timeline items chronologically
  * 
  * Priority:

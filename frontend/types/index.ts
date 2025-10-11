@@ -373,20 +373,3 @@ export function getItemType(item: TimelineItem): TimelineItemType {
   if (isHotel(item)) return 'hotel';
   return 'activity';
 }
-
-// =============================================================================
-// LEGACY TYPES (for backward compatibility)
-// =============================================================================
-
-/**
- * @deprecated Use DailyActivity instead
- */
-export interface Place {
-  id: string
-  trip_id: string
-  name: string
-  plus_code: string
-  notes?: string
-  order_index: number
-  updated_at: string
-}

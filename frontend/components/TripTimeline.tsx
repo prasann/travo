@@ -8,7 +8,9 @@
 import { useMemo, useState } from 'react';
 import type { Trip, TimelineItem, Flight, Hotel, DailyActivity } from '@/types';
 import { isFlight, isHotel, isActivity } from '@/types';
-import { sortChronologically } from '@/lib/utils';
+import { sortChronologically, getItemDate } from '@/lib/utils';
+import { formatDayButton } from '@/lib/dateTime';
+import { usePagination } from '@/hooks/usePagination';
 import { FlightCard } from './FlightCard';
 import { HotelCard } from './HotelCard';
 import { ActivityCard } from './ActivityCard';
@@ -44,19 +46,6 @@ const DAY_COLORS = [
   { bg: 'bg-rose-50', border: 'border-rose-400', text: 'text-rose-600', dot: 'bg-rose-400' },
 ];
 
-function getItemDate(item: TimelineItem): string | null {
-  if ('departure_time' in item && item.departure_time) {
-    return item.departure_time.split('T')[0];
-  }
-  if ('check_in_time' in item && item.check_in_time) {
-    return item.check_in_time.split('T')[0];
-  }
-  if ('date' in item && item.date) {
-    return item.date;
-  }
-  return null;
-}
-
 function getDaysBetween(start: string, end: string): string[] {
   const dates: string[] = [];
   const startDate = new Date(start);
@@ -70,6 +59,13 @@ function getDaysBetween(start: string, end: string): string[] {
   
   return dates;
 }
+
+/**
+ * TimelineDot - Small colored dot indicator for timeline items
+ */
+const TimelineDot = ({ color }: { color: string }) => (
+  <div className={`absolute -left-[26px] md:-left-[34px] top-4 w-3 h-3 rounded-full ${color} shadow-sm`} />
+);
 
 export function TripTimeline({ trip }: TripTimelineProps) {
   // Track active day for navigation highlighting
@@ -130,28 +126,14 @@ export function TripTimeline({ trip }: TripTimelineProps) {
     return dayGroupsArray;
   }, [trip]);
 
-  // Carousel state for day navigation (must come after dayGroups)
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const daysPerPage = 3; // Show 3 days at a time
-  const totalPages = Math.ceil(dayGroups.length / daysPerPage);
-  
-  const visibleDays = useMemo(() => {
-    const start = currentPage * daysPerPage;
-    const end = start + daysPerPage;
-    return dayGroups.slice(start, end);
-  }, [dayGroups, currentPage]);
-  
-  const handlePrevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-  
-  const handleNextPage = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  // Pagination for day navigation carousel
+  const {
+    visibleItems: visibleDays,
+    canGoPrev,
+    canGoNext,
+    handlePrev,
+    handleNext,
+  } = usePagination(dayGroups, 3);
 
   if (dayGroups.length === 0) {
     return (
@@ -176,9 +158,9 @@ export function TripTimeline({ trip }: TripTimelineProps) {
         <div className="flex items-center gap-2 px-2">
           {/* Previous button */}
           <button
-            onClick={handlePrevPage}
-            disabled={currentPage === 0}
-            className={`btn btn-sm btn-circle ${currentPage === 0 ? 'btn-disabled opacity-30' : 'btn-ghost'}`}
+            onClick={handlePrev}
+            disabled={!canGoPrev}
+            className={`btn btn-sm btn-circle ${!canGoPrev ? 'btn-disabled opacity-30' : 'btn-ghost'}`}
             aria-label="Previous days"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -196,19 +178,16 @@ export function TripTimeline({ trip }: TripTimelineProps) {
                     : `btn-ghost ${day.color.text} opacity-70 hover:opacity-100`
                 }`}
               >
-                {day.dayNumber}. {new Date(day.date).toLocaleDateString('en-US', { 
-                  month: 'short', 
-                  day: 'numeric' 
-                })}
+                {day.dayNumber}. {formatDayButton(day.date)}
               </button>
             ))}
           </div>
           
           {/* Next button */}
           <button
-            onClick={handleNextPage}
-            disabled={currentPage >= totalPages - 1}
-            className={`btn btn-sm btn-circle ${currentPage >= totalPages - 1 ? 'btn-disabled opacity-30' : 'btn-ghost'}`}
+            onClick={handleNext}
+            disabled={!canGoNext}
+            className={`btn btn-sm btn-circle ${!canGoNext ? 'btn-disabled opacity-30' : 'btn-ghost'}`}
             aria-label="Next days"
           >
             <ChevronRight className="w-4 h-4" />
@@ -249,14 +228,12 @@ export function TripTimeline({ trip }: TripTimelineProps) {
                 {day.hotelStay && (
                   day.isCheckInDay ? (
                     <div className="relative">
-                      {/* Color dot indicator */}
-                      <div className={`absolute -left-[26px] md:-left-[34px] top-4 w-3 h-3 rounded-full ${day.color.dot} shadow-sm`} />
+                      <TimelineDot color={day.color.dot} />
                       <HotelCard hotel={day.hotelStay} />
                     </div>
                   ) : (
                     <div className="relative">
-                      {/* Color dot indicator */}
-                      <div className={`absolute -left-[26px] md:-left-[34px] top-4 w-3 h-3 rounded-full ${day.color.dot} shadow-sm`} />
+                      <TimelineDot color={day.color.dot} />
                       <div className="card bg-base-100/50 shadow-sm border border-base-300">
                         <div className="card-body p-3 sm:p-4">
                           <div className="flex items-center gap-3 opacity-60">
@@ -274,8 +251,7 @@ export function TripTimeline({ trip }: TripTimelineProps) {
                 {/* Day's activities and flights */}
                 {day.items.map((item) => (
                   <div key={item.id} className="relative">
-                    {/* Color dot indicator */}
-                    <div className={`absolute -left-[26px] md:-left-[34px] top-4 w-3 h-3 rounded-full ${day.color.dot} shadow-sm`} />
+                    <TimelineDot color={day.color.dot} />
                     {isFlight(item) && <FlightCard flight={item} />}
                     {isHotel(item) && !day.hotelStay && <HotelCard hotel={item} />}
                     {isActivity(item) && <ActivityCard activity={item} />}

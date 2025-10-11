@@ -3,6 +3,8 @@
  * Feature: Enhanced Trip Data Model & Itinerary Management
  */
 
+'use client'
+
 import { MapPin } from 'lucide-react';
 import type { DailyActivity } from '@/types';
 import { formatTime } from '@/lib/dateTime';

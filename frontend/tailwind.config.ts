@@ -12,6 +12,16 @@ const config: Config = {
   plugins: [
     require('daisyui'),
   ],
+  daisyui: {
+    themes: true,
+    styled: true,
+    base: true,
+    utils: true,
+    logs: false,
+    themeRoot: ":root",
+    // Override default border radius values
+    prefix: "",
+  },
 }
 
 export default config

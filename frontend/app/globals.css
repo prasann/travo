@@ -3,11 +3,21 @@
   themes: all;
 }
 
-/* DaisyUI Border Radius Overrides */
-:root {
-  --rounded-box: 0.375rem;  /* 6px - subtle rounding for cards, inputs */
-  --rounded-btn: 0.5rem;    /* 8px - slightly more for buttons */
-  --rounded-badge: 0.25rem; /* 4px - minimal for badges */
+
+/* Force override on input components */
+.input {
+  border-radius: 0.25rem !important;
+}
+
+.select,
+.textarea,
+.btn,
+.card {
+  border-radius: 0.75rem !important;
+}
+
+.btn {
+  border-radius: 0.5rem !important;
 }
 
 /* Custom styles */

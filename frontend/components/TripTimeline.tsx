@@ -28,22 +28,23 @@ interface DayGroup {
   isCheckInDay?: boolean; // First day of hotel stay
   color: {
     bg: string;
+    bgInactive: string;
     border: string;
     text: string;
+    textInactive: string;
     dot: string;
   };
 }
 
-// Color palette for day groups
+// Color palette for day groups - optimized for dark themes
 const DAY_COLORS = [
-  { bg: 'bg-blue-50', border: 'border-blue-400', text: 'text-blue-600', dot: 'bg-blue-400' },
-  { bg: 'bg-green-50', border: 'border-green-400', text: 'text-green-600', dot: 'bg-green-400' },
-  { bg: 'bg-purple-50', border: 'border-purple-400', text: 'text-purple-600', dot: 'bg-purple-400' },
-  { bg: 'bg-orange-50', border: 'border-orange-400', text: 'text-orange-600', dot: 'bg-orange-400' },
-  { bg: 'bg-pink-50', border: 'border-pink-400', text: 'text-pink-600', dot: 'bg-pink-400' },
-  { bg: 'bg-indigo-50', border: 'border-indigo-400', text: 'text-indigo-600', dot: 'bg-indigo-400' },
-  { bg: 'bg-teal-50', border: 'border-teal-400', text: 'text-teal-600', dot: 'bg-teal-400' },
-  { bg: 'bg-rose-50', border: 'border-rose-400', text: 'text-rose-600', dot: 'bg-rose-400' },
+  { bg: 'bg-blue-700', bgInactive: 'bg-blue-900/10', border: 'border-blue-500', text: 'text-white', textInactive: 'text-gray-500', dot: 'bg-blue-500' },
+  { bg: 'bg-red-700', bgInactive: 'bg-red-900/10', border: 'border-red-500', text: 'text-white', textInactive: 'text-gray-500', dot: 'bg-red-500' },
+  { bg: 'bg-emerald-700', bgInactive: 'bg-emerald-900/10', border: 'border-emerald-500', text: 'text-white', textInactive: 'text-gray-500', dot: 'bg-emerald-500' },
+  { bg: 'bg-gray-700', bgInactive: 'bg-gray-900/10', border: 'border-gray-500', text: 'text-white', textInactive: 'text-gray-500', dot: 'bg-gray-500' },
+  { bg: 'bg-teal-700', bgInactive: 'bg-teal-900/10', border: 'border-teal-500', text: 'text-white', textInactive: 'text-gray-500', dot: 'bg-teal-500' },
+  { bg: 'bg-rose-700', bgInactive: 'bg-rose-900/10', border: 'border-rose-500', text: 'text-white', textInactive: 'text-gray-500', dot: 'bg-rose-500' },
+
 ];
 
 function getDaysBetween(start: string, end: string): string[] {
@@ -154,7 +155,7 @@ export function TripTimeline({ trip }: TripTimelineProps) {
   return (
     <div>
       {/* Day Navigation with Carousel */}
-      <div className="sticky top-0 z-10 bg-base-100 py-2 mb-6 border-b border-base-300">
+      <div className="sticky top-0 z-10 bg-base-200 py-2 mb-6 border-b border-base-300">
         <div className="flex items-center gap-2 px-2">
           {/* Previous button */}
           <button
@@ -174,8 +175,8 @@ export function TripTimeline({ trip }: TripTimelineProps) {
                 onClick={() => scrollToDay(day.dayNumber)}
                 className={`btn btn-sm whitespace-nowrap transition-all ${
                   activeDay === day.dayNumber
-                    ? `${day.color.bg} ${day.color.border} ${day.color.text} border-2 font-semibold`
-                    : `btn-ghost ${day.color.text} opacity-70 hover:opacity-100`
+                    ? `${day.color.bg} ${day.color.border} ${day.color.text} border-2 font-semibold hover:${day.color.bg}`
+                    : `${day.color.bgInactive} ${day.color.textInactive} border border-transparent hover:border-${day.color.border.replace('border-', '')}`
                 }`}
               >
                 {day.dayNumber}. {formatDayButton(day.date)}

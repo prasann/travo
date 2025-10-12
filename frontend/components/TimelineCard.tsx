@@ -27,7 +27,7 @@ interface TimelineCardProps {
  */
 export function TimelineCard({ icon, iconColor, title, content, details }: TimelineCardProps) {
   return (
-    <div className="card bg-base-100 shadow-md">
+    <div className="card bg-base-100 shadow-xl">
       <div className="card-body p-3 sm:p-4">
         {/* Top section: Icon/Image + Key info */}
         <div className="flex gap-3">

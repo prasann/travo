@@ -28,7 +28,7 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <main className="min-h-screen bg-base-200 flex items-center justify-center">
         <div className="loading loading-spinner loading-lg"></div>
       </main>
     );
@@ -36,7 +36,7 @@ export default function HomePage() {
 
   if (error) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <main className="min-h-screen bg-base-200 flex items-center justify-center">
         <div className="alert alert-error max-w-md">
           <span>Error loading trips: {error}</span>
         </div>
@@ -45,7 +45,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-base-200">
       <TripList trips={trips} />
     </main>
   );

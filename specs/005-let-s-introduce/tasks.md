@@ -47,21 +47,21 @@ This is a web application with frontend-only implementation:
 
 **⚠️ CRITICAL**: This phase MUST complete before ANY other implementation work can begin
 
-- [ ] T005 Backup current `frontend/lib/db/models.ts` to `frontend/lib/db/models-original.ts`
-- [ ] T006 Rewrite `frontend/lib/db/models.ts` to import base types from `@/types` (Trip, Flight, FlightLeg, Hotel, DailyActivity, RestaurantRecommendation, TripIndex)
-- [ ] T007 Add Trip extension with `deleted: boolean` field in `frontend/lib/db/models.ts` (database-specific field)
-- [ ] T008 [P] Create Input types for all entities in `frontend/lib/db/models.ts` (TripInput, FlightInput, HotelInput, ActivityInput, RestaurantInput, FlightLegInput - omit id/updated_at)
-- [ ] T009 [P] Create Update types for all entities in `frontend/lib/db/models.ts` (TripUpdate, FlightUpdate, HotelUpdate, ActivityUpdate, RestaurantUpdate, FlightLegUpdate - partial with id required)
-- [ ] T010 [P] Create query result types in `frontend/lib/db/models.ts` (TripWithRelations extending Trip with flights[], hotels[], activities[], restaurants[])
-- [ ] T011 Keep existing DbError types and Result<T> pattern in `frontend/lib/db/models.ts` (no changes needed)
-- [ ] T012 Keep existing error type guards in `frontend/lib/db/models.ts` (isValidationError, isQuotaExceededError, isDatabaseError, isNotFoundError)
-- [ ] T013 Update imports in `frontend/lib/db/schema.ts` to use new models.ts structure
-- [ ] T014 [P] Update imports in `frontend/lib/db/errors.ts` to use new models.ts structure
-- [ ] T015 [P] Update imports in `frontend/lib/db/validation.ts` to use new models.ts structure
-- [ ] T016 [P] Update imports in `frontend/lib/db/init.ts` to use new models.ts structure
-- [ ] T017 [P] Update imports in `frontend/lib/db/seed.ts` to use new models.ts structure
+- [x] T005 Backup current `frontend/lib/db/models.ts` to `frontend/lib/db/models-original.ts`
+- [x] T006 Rewrite `frontend/lib/db/models.ts` to import base types from `@/types` (Trip, Flight, FlightLeg, Hotel, DailyActivity, RestaurantRecommendation, TripIndex)
+- [x] T007 Add Trip extension with `deleted: boolean` field in `frontend/lib/db/models.ts` (database-specific field)
+- [x] T008 [P] Create Input types for all entities in `frontend/lib/db/models.ts` (TripInput, FlightInput, HotelInput, ActivityInput, RestaurantInput, FlightLegInput - omit id/updated_at)
+- [x] T009 [P] Create Update types for all entities in `frontend/lib/db/models.ts` (TripUpdate, FlightUpdate, HotelUpdate, ActivityUpdate, RestaurantUpdate, FlightLegUpdate - partial with id required)
+- [x] T010 [P] Create query result types in `frontend/lib/db/models.ts` (TripWithRelations extending Trip with flights[], hotels[], activities[], restaurants[])
+- [x] T011 Keep existing DbError types and Result<T> pattern in `frontend/lib/db/models.ts` (no changes needed)
+- [x] T012 Keep existing error type guards in `frontend/lib/db/models.ts` (isValidationError, isQuotaExceededError, isDatabaseError, isNotFoundError)
+- [x] T013 Update imports in `frontend/lib/db/schema.ts` to use new models.ts structure
+- [x] T014 [P] Update imports in `frontend/lib/db/errors.ts` to use new models.ts structure
+- [x] T015 [P] Update imports in `frontend/lib/db/validation.ts` to use new models.ts structure
+- [x] T016 [P] Update imports in `frontend/lib/db/init.ts` to use new models.ts structure
+- [x] T017 [P] Update imports in `frontend/lib/db/seed.ts` to use new models.ts structure
 
-**Checkpoint**: Type system unified - all imports working, ready for schema extension
+**Checkpoint**: ✅ Type system unified - all imports working, ready for schema extension
 
 ---
 
@@ -71,16 +71,16 @@ This is a web application with frontend-only implementation:
 
 **⚠️ CRITICAL**: This phase MUST complete before seed loading or CRUD operations
 
-- [ ] T018 Update `frontend/lib/db/schema.ts` - Add flights table definition with indexes (id, trip_id, departure_time, updated_at)
-- [ ] T019 [P] Update `frontend/lib/db/schema.ts` - Add flightLegs table definition with indexes (id, flight_id, [flight_id+leg_number])
-- [ ] T020 [P] Update `frontend/lib/db/schema.ts` - Add hotels table definition with indexes (id, trip_id, check_in_time, city, updated_at)
-- [ ] T021 [P] Update `frontend/lib/db/schema.ts` - Add activities table definition with indexes (id, trip_id, date, [trip_id+date+order_index], city, updated_at)
-- [ ] T022 [P] Update `frontend/lib/db/schema.ts` - Add restaurants table definition with indexes (id, trip_id, city, updated_at)
-- [ ] T023 Update `frontend/lib/db/schema.ts` - Update trips table indexes to include start_date, end_date for range queries
-- [ ] T024 Update `frontend/lib/db/schema.ts` - Implement version 2 schema migration (upgrade function from v1)
-- [ ] T025 Add TypeScript table declarations in schema.ts (flights!: Table<Flight, string>, flightLegs!: Table<FlightLeg, string>, etc.)
+- [x] T018 Update `frontend/lib/db/schema.ts` - Add flights table definition with indexes (id, trip_id, departure_time, updated_at)
+- [x] T019 [P] Update `frontend/lib/db/schema.ts` - Add flightLegs table definition with indexes (id, flight_id, [flight_id+leg_number])
+- [x] T020 [P] Update `frontend/lib/db/schema.ts` - Add hotels table definition with indexes (id, trip_id, check_in_time, city, updated_at)
+- [x] T021 [P] Update `frontend/lib/db/schema.ts` - Add activities table definition with indexes (id, trip_id, date, [trip_id+date+order_index], city, updated_at)
+- [x] T022 [P] Update `frontend/lib/db/schema.ts` - Add restaurants table definition with indexes (id, trip_id, city, updated_at)
+- [x] T023 Update `frontend/lib/db/schema.ts` - Update trips table indexes to include start_date, end_date for range queries
+- [x] T024 Update `frontend/lib/db/schema.ts` - Implement version 2 schema migration (upgrade function from v1)
+- [x] T025 Add TypeScript table declarations in schema.ts (flights!: Table<Flight, string>, flightLegs!: Table<FlightLeg, string>, etc.)
 
-**Checkpoint**: Schema v2 complete with all 6 tables - ready for seed loading
+**Checkpoint**: ✅ Schema v2 complete with all 6 tables - ready for seed loading
 
 ---
 
@@ -88,20 +88,20 @@ This is a web application with frontend-only implementation:
 
 **Purpose**: Update seed loader to support multi-file structure with enhanced entities
 
-- [ ] T026 Update `frontend/lib/db/seed.ts` - Read trip-index.json to get list of trip IDs
-- [ ] T027 Update `frontend/lib/db/seed.ts` - Implement loadTripFromFile(tripId) function to read from `/frontend/data/trips/{id}.json`
-- [ ] T028 Update `frontend/lib/db/seed.ts` - Parse Trip base properties from JSON (id, name, description, start_date, end_date, home_location, updated_at)
-- [ ] T029 [P] Update `frontend/lib/db/seed.ts` - Parse Flight array from trip JSON, extract flight properties
-- [ ] T030 [P] Update `frontend/lib/db/seed.ts` - Parse FlightLeg array from each flight, flatten to separate array
-- [ ] T031 [P] Update `frontend/lib/db/seed.ts` - Parse Hotel array from trip JSON
-- [ ] T032 [P] Update `frontend/lib/db/seed.ts` - Parse DailyActivity array from trip JSON
-- [ ] T033 [P] Update `frontend/lib/db/seed.ts` - Parse RestaurantRecommendation array from trip JSON
-- [ ] T034 Update `frontend/lib/db/seed.ts` - Implement bulk insert transaction (trips first, then all child entities in parallel)
-- [ ] T035 Update `frontend/lib/db/seed.ts` - Add validation for nested structure (flights, hotels, activities, restaurants present)
-- [ ] T036 Update `frontend/lib/db/seed.ts` - Update error handling for multi-file loading failures
-- [ ] T037 Update `frontend/lib/db/init.ts` - Update isInitialized check to verify all tables have data
+- [x] T026 Update `frontend/lib/db/seed.ts` - Read trip-index.json to get list of trip IDs
+- [x] T027 Update `frontend/lib/db/seed.ts` - Implement loadTripFromFile(tripId) function to read from `/frontend/data/trips/{id}.json`
+- [x] T028 Update `frontend/lib/db/seed.ts` - Parse Trip base properties from JSON (id, name, description, start_date, end_date, home_location, updated_at)
+- [x] T029 [P] Update `frontend/lib/db/seed.ts` - Parse Flight array from trip JSON, extract flight properties
+- [x] T030 [P] Update `frontend/lib/db/seed.ts` - Parse FlightLeg array from each flight, flatten to separate array
+- [x] T031 [P] Update `frontend/lib/db/seed.ts` - Parse Hotel array from trip JSON
+- [x] T032 [P] Update `frontend/lib/db/seed.ts` - Parse DailyActivity array from trip JSON
+- [x] T033 [P] Update `frontend/lib/db/seed.ts` - Parse RestaurantRecommendation array from trip JSON
+- [x] T034 Update `frontend/lib/db/seed.ts` - Implement bulk insert transaction (trips first, then all child entities in parallel)
+- [x] T035 Update `frontend/lib/db/seed.ts` - Add validation for nested structure (flights, hotels, activities, restaurants present)
+- [x] T036 Update `frontend/lib/db/seed.ts` - Update error handling for multi-file loading failures
+- [x] T037 Update `frontend/lib/db/init.ts` - Update isInitialized check to verify all tables have data
 
-**Checkpoint**: Seed loading works with multi-file structure - database initializes with full enhanced data
+**Checkpoint**: ✅ Seed loading works with multi-file structure - database initializes with full enhanced data
 
 ---
 

@@ -2,44 +2,53 @@
  * TypeScript Interface Contracts for Travo Local Database Layer
  * 
  * Feature: 005-let-s-introduce
- * Date: 2025-10-12
+ * Date: 2025-10-12 (Enhanced Model)
  * 
  * This file defines the TypeScript interfaces for the local database layer.
- * These interfaces serve as the contract between the database layer and consumers.
+ * Base domain types are imported from @/types (single source of truth).
+ * Database-specific extensions and utility types are defined here.
  */
 
 // ============================================================================
-// Core Domain Types
+// Import Base Domain Types (Single Source of Truth)
+// ============================================================================
+
+import type {
+  Trip as BaseTripType,
+  Flight as FlightType,
+  FlightLeg as FlightLegType,
+  Hotel as HotelType,
+  DailyActivity as DailyActivityType,
+  RestaurantRecommendation as RestaurantRecommendationType,
+  TripIndex as TripIndexType,
+  TripIndexFile as TripIndexFileType,
+} from '@/types';
+
+// Re-export base types for convenience
+export type Flight = FlightType;
+export type FlightLeg = FlightLegType;
+export type Hotel = HotelType;
+export type DailyActivity = DailyActivityType;
+export type RestaurantRecommendation = RestaurantRecommendationType;
+export type TripIndex = TripIndexType;
+export type TripIndexFile = TripIndexFileType;
+
+// ============================================================================
+// Database-Specific Type Extensions
 // ============================================================================
 
 /**
- * Trip entity representing a travel itinerary
+ * Trip entity with database-specific fields
+ * Extends base Trip type with soft delete support
  */
-export interface Trip {
-  /** Unique identifier (UUID v4) */
-  id: string;
-  
-  /** Trip name/title */
-  name: string;
-  
-  /** Detailed trip description (optional) */
-  description?: string;
-  
-  /** Trip start date in ISO 8601 format (YYYY-MM-DD) */
-  start_date: string;
-  
-  /** Trip end date in ISO 8601 format (YYYY-MM-DD) */
-  end_date: string;
-  
+export interface Trip extends Omit<BaseTripType, 'flights' | 'hotels' | 'activities' | 'restaurants'> {
   /** Soft delete flag (true = deleted, false = active) */
   deleted: boolean;
-  
-  /** Last modification timestamp in ISO 8601 format */
-  updated_at: string;
 }
 
 /**
- * Place entity representing a location within a trip
+ * Legacy Place entity (DEPRECATED - use DailyActivity instead)
+ * Maintained for backward compatibility during migration
  */
 export interface Place {
   /** Unique identifier (UUID v4) */
@@ -65,13 +74,47 @@ export interface Place {
 }
 
 // ============================================================================
-// Input Types (for Create/Update operations)
+// Input Types (for Create operations - omit generated fields)
 // ============================================================================
 
 /**
  * Input type for creating a new trip (omits generated fields)
  */
 export type TripInput = Omit<Trip, 'id' | 'updated_at' | 'deleted'>;
+
+/**
+ * Input type for creating a new flight (omits generated fields)
+ */
+export type FlightInput = Omit<Flight, 'id' | 'updated_at' | 'legs'>;
+
+/**
+ * Input type for creating a new flight leg (omits generated fields)
+ */
+export type FlightLegInput = Omit<FlightLeg, 'id'>;
+
+/**
+ * Input type for creating a new hotel (omits generated fields)
+ */
+export type HotelInput = Omit<Hotel, 'id' | 'updated_at'>;
+
+/**
+ * Input type for creating a new activity (omits generated fields)
+ */
+export type ActivityInput = Omit<DailyActivity, 'id' | 'updated_at'>;
+
+/**
+ * Input type for creating a new restaurant (omits generated fields)
+ */
+export type RestaurantInput = Omit<RestaurantRecommendation, 'id' | 'updated_at'>;
+
+/**
+ * Input type for creating a new place (DEPRECATED - omits generated fields)
+ */
+export type PlaceInput = Omit<Place, 'id' | 'updated_at'>;
+
+// ============================================================================
+// Update Types (for Update operations - partial with id required)
+// ============================================================================
 
 /**
  * Input type for updating an existing trip (all fields optional except id)
@@ -81,28 +124,118 @@ export type TripUpdate = Partial<Omit<Trip, 'id' | 'updated_at' | 'deleted'>> & 
 };
 
 /**
- * Input type for creating a new place (omits generated fields)
+ * Input type for updating an existing flight (all fields optional except id)
  */
-export type PlaceInput = Omit<Place, 'id' | 'updated_at'>;
+export type FlightUpdate = Partial<Omit<Flight, 'id' | 'updated_at' | 'legs'>> & {
+  id: string;
+};
 
 /**
- * Input type for updating an existing place (all fields optional except id)
+ * Input type for updating an existing flight leg (all fields optional except id)
+ */
+export type FlightLegUpdate = Partial<Omit<FlightLeg, 'id'>> & {
+  id: string;
+};
+
+/**
+ * Input type for updating an existing hotel (all fields optional except id)
+ */
+export type HotelUpdate = Partial<Omit<Hotel, 'id' | 'updated_at'>> & {
+  id: string;
+};
+
+/**
+ * Input type for updating an existing activity (all fields optional except id)
+ */
+export type ActivityUpdate = Partial<Omit<DailyActivity, 'id' | 'updated_at'>> & {
+  id: string;
+};
+
+/**
+ * Input type for updating an existing restaurant (all fields optional except id)
+ */
+export type RestaurantUpdate = Partial<Omit<RestaurantRecommendation, 'id' | 'updated_at'>> & {
+  id: string;
+};
+
+/**
+ * Input type for updating an existing place (DEPRECATED - all fields optional except id)
  */
 export type PlaceUpdate = Partial<Omit<Place, 'id' | 'updated_at'>> & {
   id: string;
 };
 
 // ============================================================================
-// Query Result Types
+// Query Result Types (with related entities)
 // ============================================================================
 
 /**
- * Trip with associated places included
+ * Trip with all associated entities included
+ * Used for full trip detail queries with all related data
+ */
+export interface TripWithRelations extends Trip {
+  /** Array of flights belonging to this trip */
+  flights: Flight[];
+  
+  /** Array of hotels belonging to this trip */
+  hotels: Hotel[];
+  
+  /** Array of activities belonging to this trip */
+  activities: DailyActivity[];
+  
+  /** Array of restaurant recommendations for this trip */
+  restaurants: RestaurantRecommendation[];
+}
+
+/**
+ * Flight with flight legs included
+ * Used for flight detail queries with connection legs
+ */
+export interface FlightWithLegs extends Flight {
+  /** Array of flight legs (connections) */
+  legs: FlightLeg[];
+}
+
+/**
+ * Trip with associated places included (DEPRECATED)
+ * Maintained for backward compatibility
  */
 export interface TripWithPlaces extends Trip {
   /** Array of places belonging to this trip */
   places: Place[];
 }
+
+// ============================================================================
+// Seed Data Types
+// ============================================================================
+
+/**
+ * Structure of individual trip JSON file
+ * Matches the structure in /frontend/data/trips/{id}.json
+ */
+export interface SeedTripFile extends Omit<BaseTripType, 'updated_at'> {
+  updated_at: string;
+}
+
+/**
+ * Legacy seed data structure (single trips.json file)
+ * DEPRECATED - now using multi-file structure
+ */
+export interface SeedData {
+  trips: SeedTrip[];
+}
+
+/**
+ * Legacy trip structure in seed data (DEPRECATED)
+ */
+export interface SeedTrip extends Omit<Trip, 'deleted'> {
+  places: Place[];
+}
+
+/**
+ * Legacy place structure in seed data (DEPRECATED)
+ */
+export type SeedPlace = Place;
 
 // ============================================================================
 // Error Types
@@ -162,29 +295,6 @@ export interface NotFoundError extends DbError {
 export type Result<T> =
   | { success: true; data: T }
   | { success: false; error: DbError };
-
-// ============================================================================
-// Seed Data Types
-// ============================================================================
-
-/**
- * Structure of seed data JSON file
- */
-export interface SeedData {
-  trips: SeedTrip[];
-}
-
-/**
- * Trip structure in seed data (includes nested places)
- */
-export interface SeedTrip extends Omit<Trip, 'deleted'> {
-  places: SeedPlace[];
-}
-
-/**
- * Place structure in seed data
- */
-export type SeedPlace = Place;
 
 // ============================================================================
 // Type Guards

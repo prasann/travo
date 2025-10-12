@@ -13,6 +13,9 @@ import { loadSeedData } from './seed';
 /**
  * Check if the database has been initialized with data
  * Returns true if trips table contains data
+ * 
+ * Note: We only check trips table since seed loader ensures
+ * all tables are populated together in a transaction
  */
 export async function isInitialized(): Promise<boolean> {
   try {
@@ -34,8 +37,15 @@ export async function initializeDatabase(): Promise<Result<void>> {
     // Opening the database will automatically create tables based on schema
     await db.open();
     
-    // Verify tables exist by checking if we can access them
+    // Verify all tables exist by checking if we can access them
     await db.trips.count();
+    await db.flights.count();
+    await db.flightLegs.count();
+    await db.hotels.count();
+    await db.activities.count();
+    await db.restaurants.count();
+    
+    // Places table maintained for backward compatibility
     await db.places.count();
     
     // Load seed data if database is empty

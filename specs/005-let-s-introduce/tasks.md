@@ -27,10 +27,10 @@ This is a web application with frontend-only implementation:
 
 **Purpose**: Install dependencies and create project structure
 
-- [ ] T001 Install Dexie.js 4.x dependency in frontend (`cd frontend && npm install dexie@^4.0.0`)
-- [ ] T002 [P] Install uuid for UUID generation (`cd frontend && npm install uuid@^9.0.0`)
-- [ ] T003 [P] Install TypeScript type definitions (`cd frontend && npm install --save-dev @types/uuid fake-indexeddb`)
-- [ ] T004 Create database layer directory structure (`frontend/lib/db/` with subdirectories `operations/`)
+- [x] T001 Install Dexie.js 4.x dependency in frontend (`cd frontend && npm install dexie@^4.0.0`)
+- [x] T002 [P] Install uuid for UUID generation (`cd frontend && npm install uuid@^9.0.0`)
+- [x] T003 [P] Install TypeScript type definitions (`cd frontend && npm install --save-dev @types/uuid fake-indexeddb`)
+- [x] T004 Create database layer directory structure (`frontend/lib/db/` with subdirectories `operations/`)
 
 **Checkpoint**: Dependencies installed - foundation ready for implementation
 
@@ -42,11 +42,11 @@ This is a web application with frontend-only implementation:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Create TypeScript interfaces in `frontend/lib/db/models.ts` (Trip, Place, TripInput, PlaceInput, TripUpdate, PlaceUpdate, TripWithPlaces, DbError types, Result<T> type, type guards)
-- [ ] T006 Create Dexie database schema in `frontend/lib/db/schema.ts` (TravoDatabase class extending Dexie, version 1 with trips and places tables, indexes: trips by id/deleted/updated_at, places by id/trip_id/order_index/updated_at)
-- [ ] T007 Create validation utilities in `frontend/lib/db/validation.ts` (validateTripInput, validatePlaceInput, validateDateFormat, validateUUID, return ValidationError with field-specific messages)
-- [ ] T008 Create error handling utilities in `frontend/lib/db/errors.ts` (createValidationError, createQuotaExceededError, createDatabaseError, createNotFoundError, wrapDatabaseOperation for try-catch)
-- [ ] T009 Create database initialization logic in `frontend/lib/db/init.ts` (initializeDatabase, checkIfInitialized, functions to open database and verify schema version)
+- [x] T005 Create TypeScript interfaces in `frontend/lib/db/models.ts` (Trip, Place, TripInput, PlaceInput, TripUpdate, PlaceUpdate, TripWithPlaces, DbError types, Result<T> type, type guards)
+- [x] T006 Create Dexie database schema in `frontend/lib/db/schema.ts` (TravoDatabase class extending Dexie, version 1 with trips and places tables, indexes: trips by id/deleted/updated_at, places by id/trip_id/order_index/updated_at)
+- [x] T007 Create validation utilities in `frontend/lib/db/validation.ts` (validateTripInput, validatePlaceInput, validateDateFormat, validateUUID, return ValidationError with field-specific messages)
+- [x] T008 Create error handling utilities in `frontend/lib/db/errors.ts` (createValidationError, createQuotaExceededError, createDatabaseError, createNotFoundError, wrapDatabaseOperation for try-catch)
+- [x] T009 Create database initialization logic in `frontend/lib/db/init.ts` (initializeDatabase, checkIfInitialized, functions to open database and verify schema version)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -60,11 +60,11 @@ This is a web application with frontend-only implementation:
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Create seed data loader in `frontend/lib/db/seed.ts` (loadSeedData function, validate JSON structure, parse trips.json, transform nested structure to flat tables)
-- [ ] T011 [US1] Implement seed validation in `frontend/lib/db/seed.ts` (validateSeedData function, check trips array exists, validate each trip has required fields, validate places structure, return clear errors for corrupted data)
-- [ ] T012 [US1] Implement seed loading transaction in `frontend/lib/db/seed.ts` (bulkAddTrips and bulkAddPlaces within Dexie transaction, handle errors with rollback, detect and handle quota exceeded errors)
-- [ ] T013 [US1] Add initialization check logic in `frontend/lib/db/init.ts` (isInitialized function checking if trips table has data, conditional seed loading only if empty)
-- [ ] T014 [US1] Create public initialization API in `frontend/lib/db/index.ts` (export initialize() and isInitialized() functions, call seed loader if needed, return Result<void>)
+- [x] T010 [US1] Create seed data loader in `frontend/lib/db/seed.ts` (loadSeedData function, validate JSON structure, parse trips.json, transform nested structure to flat tables)
+- [x] T011 [US1] Implement seed validation in `frontend/lib/db/seed.ts` (validateSeedData function, check trips array exists, validate each trip has required fields, validate places structure, return clear errors for corrupted data)
+- [x] T012 [US1] Implement seed loading transaction in `frontend/lib/db/seed.ts` (bulkAddTrips and bulkAddPlaces within Dexie transaction, handle errors with rollback, detect and handle quota exceeded errors)
+- [x] T013 [US1] Add initialization check logic in `frontend/lib/db/init.ts` (isInitialized function checking if trips table has data, conditional seed loading only if empty)
+- [x] T014 [US1] Create public initialization API in `frontend/lib/db/index.ts` (export initialize() and isInitialized() functions, call seed loader if needed, return Result<void>)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - seed data loads on first launch
 
@@ -78,11 +78,11 @@ This is a web application with frontend-only implementation:
 
 ### Implementation for User Story 2
 
-- [ ] T015 [P] [US2] Create Trip read operations in `frontend/lib/db/operations/trips.ts` (getAllTrips function - query trips where deleted=false, return Result<Trip[]>)
-- [ ] T016 [P] [US2] Add getTripById operation in `frontend/lib/db/operations/trips.ts` (query single trip by id, handle not found case, return Result<Trip>)
-- [ ] T017 [P] [US2] Create Place read operations in `frontend/lib/db/operations/places.ts` (getPlacesByTripId function - query places where trip_id matches, sort by order_index, return Result<Place[]>)
-- [ ] T018 [US2] Add getTripWithPlaces operation in `frontend/lib/db/operations/trips.ts` (combines getTripById and getPlacesByTripId, return Result<TripWithPlaces>)
-- [ ] T019 [US2] Export read operations in `frontend/lib/db/index.ts` (export getAllTrips, getTripById, getTripWithPlaces, getPlacesByTripId)
+- [x] T015 [P] [US2] Create Trip read operations in `frontend/lib/db/operations/trips.ts` (getAllTrips function - query trips where deleted=false, return Result<Trip[]>)
+- [x] T016 [P] [US2] Add getTripById operation in `frontend/lib/db/operations/trips.ts` (query single trip by id, handle not found case, return Result<Trip>)
+- [x] T017 [P] [US2] Create Place read operations in `frontend/lib/db/operations/places.ts` (getPlacesByTripId function - query places where trip_id matches, sort by order_index, return Result<Place[]>)
+- [x] T018 [US2] Add getTripWithPlaces operation in `frontend/lib/db/operations/trips.ts` (combines getTripById and getPlacesByTripId, return Result<TripWithPlaces>)
+- [x] T019 [US2] Export read operations in `frontend/lib/db/index.ts` (export getAllTrips, getTripById, getTripWithPlaces, getPlacesByTripId)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - data loads and can be queried
 

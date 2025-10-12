@@ -36,9 +36,9 @@ export default function PlusCodeInput({
   });
   
   const handleLookup = async () => {
-    if (!value || value.trim().length < 8) {
-      setState(prev => ({ ...prev, error: 'Plus Code must be at least 8 characters' }));
-      onLookupError('Plus Code must be at least 8 characters');
+    if (!value || value.trim().length < 4) {
+      setState(prev => ({ ...prev, error: 'Plus Code is too short' }));
+      onLookupError('Plus Code is too short');
       return;
     }
     
@@ -80,7 +80,7 @@ export default function PlusCodeInput({
       <label className="label">
         <span className="label-text">{label}</span>
         <span className="label-text-alt text-xs text-base-content/60">
-          8+ characters (e.g., 8Q7X9R9W+GF)
+          e.g., "MP52+Q6 Shibuya, Tokyo" or "8Q7XMP52+Q6"
         </span>
       </label>
       
@@ -91,9 +91,9 @@ export default function PlusCodeInput({
           onChange={(e) => onChange(e.target.value.toUpperCase())}
           onKeyPress={handleKeyPress}
           className="input input-bordered join-item flex-1"
-          placeholder="8Q7X9R9W+GF"
+          placeholder="MP52+Q6 Shibuya, Tokyo"
           disabled={isDisabled}
-          maxLength={20}
+          maxLength={50}
         />
         <button
           type="button"

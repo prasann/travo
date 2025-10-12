@@ -91,47 +91,7 @@ export default function SortableAttractionItem({
               </button>
             </div>
             
-            {/* Editable fields */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-              <div className="form-control">
-                <label className="label py-1">
-                  <span className="label-text text-sm">City</span>
-                </label>
-                <input
-                  type="text"
-                  {...register(`activities.${index}.city`)}
-                  className="input input-bordered input-sm"
-                  placeholder="Tokyo"
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label py-1">
-                  <span className="label-text text-sm">Start Time</span>
-                </label>
-                <input
-                  type="time"
-                  {...register(`activities.${index}.start_time`)}
-                  className="input input-bordered input-sm"
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label py-1">
-                  <span className="label-text text-sm">Duration (minutes)</span>
-                </label>
-                <input
-                  type="number"
-                  {...register(`activities.${index}.duration_minutes`, {
-                    valueAsNumber: true
-                  })}
-                  className="input input-bordered input-sm"
-                  placeholder="120"
-                  min="0"
-                />
-              </div>
-            </div>
-            
+            {/* Notes field */}
             <div className="form-control mt-3">
               <label className="label py-1">
                 <span className="label-text text-sm">Notes</span>

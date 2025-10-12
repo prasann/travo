@@ -357,85 +357,87 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           {activeCategory === 'info' && (
             <div className="card bg-base-100 shadow-xl mb-6">
               <div className="card-body">
-                <h2 className="card-title">Trip Information</h2>
+                <h2 className="card-title mb-4">Trip Information</h2>
                 
-                {/* Trip Name */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Trip Name *</span>
-                  </label>
-                  <input
-                    type="text"
-                    {...register('name', { required: 'Trip name is required' })}
-                    className="input input-bordered"
-                    placeholder="My Amazing Trip"
-                  />
-                  {errors.name && (
-                    <label className="label">
-                      <span className="label-text-alt text-error">{errors.name.message}</span>
-                    </label>
-                  )}
-                </div>
-                
-                {/* Description */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Description</span>
-                  </label>
-                  <textarea
-                    {...register('description')}
-                    className="textarea textarea-bordered"
-                    placeholder="Brief description of your trip"
-                    rows={3}
-                  />
-                </div>
-                
-                {/* Dates */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  {/* Trip Name */}
                   <div className="form-control">
-                    <label className="label">
-                      <span className="label-text">Start Date *</span>
+                    <label className="label py-1">
+                      <span className="label-text font-medium">Trip Name *</span>
                     </label>
                     <input
-                      type="date"
-                      {...register('start_date', { required: 'Start date is required' })}
-                      className="input input-bordered"
+                      type="text"
+                      {...register('name', { required: 'Trip name is required' })}
+                      className="input input-bordered input-sm"
+                      placeholder="My Amazing Trip"
                     />
-                    {errors.start_date && (
-                      <label className="label">
-                        <span className="label-text-alt text-error">{errors.start_date.message}</span>
+                    {errors.name && (
+                      <label className="label py-1">
+                        <span className="label-text-alt text-error">{errors.name.message}</span>
                       </label>
                     )}
                   </div>
                   
+                  {/* Description */}
                   <div className="form-control">
-                    <label className="label">
-                      <span className="label-text">End Date *</span>
+                    <label className="label py-1">
+                      <span className="label-text font-medium">Description</span>
+                    </label>
+                    <textarea
+                      {...register('description')}
+                      className="textarea textarea-bordered textarea-sm"
+                      placeholder="Brief description of your trip"
+                      rows={2}
+                    />
+                  </div>
+                  
+                  {/* Dates */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="form-control">
+                      <label className="label py-1">
+                        <span className="label-text font-medium">Start Date *</span>
+                      </label>
+                      <input
+                        type="date"
+                        {...register('start_date', { required: 'Start date is required' })}
+                        className="input input-bordered input-sm"
+                      />
+                      {errors.start_date && (
+                        <label className="label py-1">
+                          <span className="label-text-alt text-error">{errors.start_date.message}</span>
+                        </label>
+                      )}
+                    </div>
+                    
+                    <div className="form-control">
+                      <label className="label py-1">
+                        <span className="label-text font-medium">End Date *</span>
+                      </label>
+                      <input
+                        type="date"
+                        {...register('end_date', { required: 'End date is required' })}
+                        className="input input-bordered input-sm"
+                      />
+                      {errors.end_date && (
+                        <label className="label py-1">
+                          <span className="label-text-alt text-error">{errors.end_date.message}</span>
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Home Location */}
+                  <div className="form-control">
+                    <label className="label py-1">
+                      <span className="label-text font-medium">Home Location</span>
                     </label>
                     <input
-                      type="date"
-                      {...register('end_date', { required: 'End date is required' })}
-                      className="input input-bordered"
+                      type="text"
+                      {...register('home_location')}
+                      className="input input-bordered input-sm"
+                      placeholder="San Francisco"
                     />
-                    {errors.end_date && (
-                      <label className="label">
-                        <span className="label-text-alt text-error">{errors.end_date.message}</span>
-                      </label>
-                    )}
                   </div>
-                </div>
-                
-                {/* Home Location */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Home Location</span>
-                  </label>
-                  <input
-                    type="text"
-                    {...register('home_location')}
-                    className="input input-bordered"
-                    placeholder="San Francisco"
-                  />
                 </div>
               </div>
             </div>

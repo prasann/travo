@@ -118,32 +118,41 @@ export default function AttractionSection({
       return;
     }
     
-    // Get activities for this specific date
-    const dateActivities = visibleActivities.filter(a => a.date === date);
-    const activeIndex = dateActivities.findIndex(a => (a.id || `temp-${activities.indexOf(a)}`) === active.id);
-    const overIndex = dateActivities.findIndex(a => (a.id || `temp-${activities.indexOf(a)}`) === over.id);
+    // Get all activities (including deleted) and find indices
+    const activeGlobalIndex = activities.findIndex(a => 
+      (a.id && a.id === active.id) || `temp-${activities.indexOf(a)}` === active.id
+    );
+    const overGlobalIndex = activities.findIndex(a => 
+      (a.id && a.id === over.id) || `temp-${activities.indexOf(a)}` === over.id
+    );
     
-    if (activeIndex === -1 || overIndex === -1) {
+    if (activeGlobalIndex === -1 || overGlobalIndex === -1) {
       return;
     }
     
-    // Reorder the activities for this date
-    const reorderedDateActivities = arrayMove(dateActivities, activeIndex, overIndex);
+    // Only reorder within the same date
+    if (activities[activeGlobalIndex].date !== date || activities[overGlobalIndex].date !== date) {
+      return;
+    }
     
-    // Recalculate order_index to be sequential
-    reorderedDateActivities.forEach((activity, idx) => {
-      activity.order_index = idx;
-    });
+    // Get activities for this date only (with their global indices)
+    const dateActivitiesWithIndices = activities
+      .map((a, idx) => ({ activity: a, globalIndex: idx }))
+      .filter(item => item.activity.date === date && !item.activity._deleted);
     
-    // Update the full activities array
-    const updatedActivities = activities.map(activity => {
-      if (activity.date === date && !activity._deleted) {
-        const reordered = reorderedDateActivities.find(a => 
-          (a.id && a.id === activity.id) || (a.name === activity.name && a.plus_code === activity.plus_code)
-        );
-        return reordered || activity;
-      }
-      return activity;
+    const activeLocalIndex = dateActivitiesWithIndices.findIndex(item => item.globalIndex === activeGlobalIndex);
+    const overLocalIndex = dateActivitiesWithIndices.findIndex(item => item.globalIndex === overGlobalIndex);
+    
+    // Reorder within date
+    const reordered = arrayMove(dateActivitiesWithIndices, activeLocalIndex, overLocalIndex);
+    
+    // Create new activities array with updated order_index
+    const updatedActivities = [...activities];
+    reordered.forEach((item, newIdx) => {
+      updatedActivities[item.globalIndex] = {
+        ...updatedActivities[item.globalIndex],
+        order_index: newIdx
+      };
     });
     
     setValue('activities', updatedActivities, { shouldDirty: true });

@@ -118,10 +118,10 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                   </div>
                   
                   {/* Editable fields */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                     <div className="form-control">
-                      <label className="label">
-                        <span className="label-text">City</span>
+                      <label className="label py-1">
+                        <span className="label-text text-sm">City</span>
                       </label>
                       <input
                         type="text"
@@ -132,8 +132,8 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                     </div>
                     
                     <div className="form-control">
-                      <label className="label">
-                        <span className="label-text">Confirmation Number</span>
+                      <label className="label py-1">
+                        <span className="label-text text-sm">Confirmation Number</span>
                       </label>
                       <input
                         type="text"
@@ -144,8 +144,8 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                     </div>
                     
                     <div className="form-control">
-                      <label className="label">
-                        <span className="label-text">Check-in</span>
+                      <label className="label py-1">
+                        <span className="label-text text-sm">Check-in</span>
                       </label>
                       <input
                         type="datetime-local"
@@ -155,8 +155,8 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                     </div>
                     
                     <div className="form-control">
-                      <label className="label">
-                        <span className="label-text">Check-out</span>
+                      <label className="label py-1">
+                        <span className="label-text text-sm">Check-out</span>
                       </label>
                       <input
                         type="datetime-local"
@@ -166,8 +166,8 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                     </div>
                     
                     <div className="form-control">
-                      <label className="label">
-                        <span className="label-text">Phone</span>
+                      <label className="label py-1">
+                        <span className="label-text text-sm">Phone</span>
                       </label>
                       <input
                         type="tel"
@@ -178,10 +178,10 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                     </div>
                   </div>
                   
-                  <div className="form-control mt-4">
-                    <label className="label">
-                      <span className="label-text">Notes</span>
-                      <span className="label-text-alt">
+                  <div className="form-control mt-3">
+                    <label className="label py-1">
+                      <span className="label-text text-sm">Notes</span>
+                      <span className="label-text-alt text-xs">
                         {(watch(`hotels.${index}.notes`) || '').length}/2000
                       </span>
                     </label>
@@ -189,7 +189,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                       {...register(`hotels.${index}.notes`, {
                         maxLength: { value: 2000, message: 'Notes cannot exceed 2000 characters' }
                       })}
-                      className="textarea textarea-bordered"
+                      className="textarea textarea-bordered textarea-sm"
                       rows={2}
                       placeholder="Hotel notes..."
                     />

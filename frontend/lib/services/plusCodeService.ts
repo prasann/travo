@@ -67,11 +67,11 @@ interface GeocodeResponse {
  * ```
  */
 export async function lookupPlusCode(plusCode: string): Promise<PlusCodeLookupResult> {
-  // Validate Plus Code format (basic check - 8 characters minimum)
-  if (!plusCode || plusCode.trim().length < 8) {
+  // Validate Plus Code format (basic check - minimum length)
+  if (!plusCode || plusCode.trim().length < 4) {
     return {
       success: false,
-      error: 'Plus Code must be at least 8 characters',
+      error: 'Plus Code is too short',
       errorType: 'invalid'
     };
   }

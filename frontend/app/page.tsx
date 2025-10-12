@@ -1,13 +1,52 @@
-import { TripList } from '@/components/TripList'
-import { loadTripIndex } from '@/lib/tripLoader'
+'use client';
 
-export default async function HomePage() {
-  const tripIndex = await loadTripIndex()
-  const trips = tripIndex.trips
+import { TripList } from '@/components/TripList';
+import { getAllTrips } from '@/lib/db';
+import { useEffect, useState } from 'react';
+import type { Trip } from '@/lib/db';
+
+export default function HomePage() {
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadTrips() {
+      const result = await getAllTrips();
+      
+      if (result.success) {
+        setTrips(result.data);
+      } else {
+        setError(result.error.message);
+      }
+      
+      setIsLoading(false);
+    }
+
+    loadTrips();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg"></div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <div className="alert alert-error max-w-md">
+          <span>Error loading trips: {error}</span>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen">
       <TripList trips={trips} />
     </main>
-  )
+  );
 }

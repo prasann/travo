@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ACTIVE_THEME } from "@/config/theme"
+import { ACTIVE_THEME } from "@/config/theme";
+import { DatabaseProvider } from "@/components/DatabaseProvider";
 
 export const metadata: Metadata = {
   title: "Travo - Trip Planner",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme={ACTIVE_THEME} suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
-        {children}
+        <DatabaseProvider>
+          {children}
+        </DatabaseProvider>
       </body>
     </html>
   );

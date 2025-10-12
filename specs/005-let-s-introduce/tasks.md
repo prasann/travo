@@ -133,20 +133,20 @@ This is a web application with frontend-only implementation:
 
 ### Tasks for User Story 2
 
-- [ ] T045 [US2] Implement getAllTrips() in `frontend/lib/db/operations/trips.ts` - query trips where deleted=false, return Result<Trip[]>
-- [ ] T046 [US2] Implement getTripById(id) in `frontend/lib/db/operations/trips.ts` - query single trip, handle not found, return Result<Trip>
-- [ ] T047 [US2] Create `frontend/lib/db/operations/flights.ts` - implement getFlightsByTripId(tripId) returning Result<Flight[]> sorted by departure_time
-- [ ] T048 [P] [US2] Create `frontend/lib/db/operations/flights.ts` - implement getFlightLegsByFlightId(flightId) returning Result<FlightLeg[]> sorted by leg_number
-- [ ] T049 [P] [US2] Create `frontend/lib/db/operations/hotels.ts` - implement getHotelsByTripId(tripId) returning Result<Hotel[]> sorted by check_in_time
-- [ ] T050 [P] [US2] Create `frontend/lib/db/operations/activities.ts` - implement getActivitiesByTripId(tripId) returning Result<DailyActivity[]> sorted by date, order_index
-- [ ] T051 [P] [US2] Create `frontend/lib/db/operations/restaurants.ts` - implement getRestaurantsByTripId(tripId) returning Result<RestaurantRecommendation[]> grouped by city
-- [ ] T052 [US2] Implement getTripWithRelations(id) in `frontend/lib/db/operations/trips.ts` - combine trip + flights + hotels + activities + restaurants, return Result<TripWithRelations>
-- [ ] T053 [US2] Update `frontend/lib/db/index.ts` - export getAllTrips, getTripById, getTripWithRelations
-- [ ] T054 [P] [US2] Update `frontend/lib/db/index.ts` - export getFlightsByTripId, getFlightLegsByFlightId
-- [ ] T055 [P] [US2] Update `frontend/lib/db/index.ts` - export getHotelsByTripId, getActivitiesByTripId, getRestaurantsByTripId
-- [ ] T056 [US2] Verify read operations return empty arrays for trips with no flights/hotels/activities
-- [ ] T057 [US2] Verify read operations handle missing trip gracefully (NotFoundError)
-- [ ] T058 [US2] Test getTripWithRelations with fully populated trip (all entity types present)
+- [x] T045 [US2] Implement getAllTrips() in `frontend/lib/db/operations/trips.ts` - query trips where deleted=false, return Result<Trip[]>
+- [x] T046 [US2] Implement getTripById(id) in `frontend/lib/db/operations/trips.ts` - query single trip, handle not found, return Result<Trip>
+- [x] T047 [US2] Create `frontend/lib/db/operations/flights.ts` - implement getFlightsByTripId(tripId) returning Result<Flight[]> sorted by departure_time
+- [x] T048 [P] [US2] Create `frontend/lib/db/operations/flights.ts` - implement getFlightLegsByFlightId(flightId) returning Result<FlightLeg[]> sorted by leg_number
+- [x] T049 [P] [US2] Create `frontend/lib/db/operations/hotels.ts` - implement getHotelsByTripId(tripId) returning Result<Hotel[]> sorted by check_in_time
+- [x] T050 [P] [US2] Create `frontend/lib/db/operations/activities.ts` - implement getActivitiesByTripId(tripId) returning Result<DailyActivity[]> sorted by date, order_index
+- [x] T051 [P] [US2] Create `frontend/lib/db/operations/restaurants.ts` - implement getRestaurantsByTripId(tripId) returning Result<RestaurantRecommendation[]> grouped by city
+- [x] T052 [US2] Implement getTripWithRelations(id) in `frontend/lib/db/operations/trips.ts` - combine trip + flights + hotels + activities + restaurants, return Result<TripWithRelations>
+- [x] T053 [US2] Update `frontend/lib/db/index.ts` - export getAllTrips, getTripById, getTripWithRelations
+- [x] T054 [P] [US2] Update `frontend/lib/db/index.ts` - export getFlightsByTripId, getFlightLegsByFlightId
+- [x] T055 [P] [US2] Update `frontend/lib/db/index.ts` - export getHotelsByTripId, getActivitiesByTripId, getRestaurantsByTripId
+- [x] T056 [US2] Verify read operations return empty arrays for trips with no flights/hotels/activities
+- [x] T057 [US2] Verify read operations handle missing trip gracefully (NotFoundError)
+- [x] T058 [US2] Test getTripWithRelations with fully populated trip (all entity types present)
 - [ ] T059 [US2] Test performance: getAllTrips completes <50ms for 100 trips
 
 **Checkpoint US2**: ✅ All read operations working for enhanced data model

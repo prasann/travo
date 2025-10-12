@@ -86,15 +86,14 @@ export default function SortableAttractionItem({
           </div>
           
           {/* Drag Handle (optional - for desktop users who prefer it) */}
-          <button
-            type="button"
+          <div
             className="btn btn-ghost btn-sm btn-square cursor-grab active:cursor-grabbing mt-1 hidden sm:flex"
             {...attributes}
             {...listeners}
             title="Drag to reorder"
           >
             <GripVertical className="h-4 w-4 text-base-content/60" />
-          </button>
+          </div>
           
           {/* Content */}
           <div className="flex-1">

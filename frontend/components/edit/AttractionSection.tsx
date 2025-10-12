@@ -112,6 +112,7 @@ export default function AttractionSection({
   };
   
   const handleDragStart = (event: DragStartEvent) => {
+    console.log('🎯 Drag started:', event.active.id);
     setActiveId(event.active.id as string);
   };
   
@@ -187,9 +188,12 @@ export default function AttractionSection({
   const handleDragEnd = (event: DragEndEvent, date: string) => {
     const { active, over } = event;
     
+    console.log('🏁 Drag ended:', { activeId: active.id, overId: over?.id, date });
+    
     setActiveId(null);
     
     if (!over || active.id === over.id) {
+      console.log('❌ No valid drop target or dropped on self');
       return;
     }
     
@@ -204,11 +208,20 @@ export default function AttractionSection({
     });
     
     if (activeGlobalIndex === -1 || overGlobalIndex === -1) {
+      console.log('❌ Could not find activity indices:', { activeGlobalIndex, overGlobalIndex });
       return;
     }
     
+    console.log('✅ Found activities:', { 
+      activeGlobalIndex, 
+      overGlobalIndex,
+      activeActivity: activities[activeGlobalIndex]?.name,
+      overActivity: activities[overGlobalIndex]?.name 
+    });
+    
     // Only reorder within the same date
     if (activities[activeGlobalIndex].date !== date || activities[overGlobalIndex].date !== date) {
+      console.log('❌ Activities not in same date group');
       return;
     }
     
@@ -232,6 +245,7 @@ export default function AttractionSection({
       };
     });
     
+    console.log('💾 Saving reordered activities');
     setValue('activities', updatedActivities, { shouldDirty: true });
   };
   

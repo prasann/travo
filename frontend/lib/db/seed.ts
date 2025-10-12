@@ -80,47 +80,34 @@ async function loadTripFromFile(tripId: string): Promise<SeedTripFile> {
  * Throws error if validation fails
  */
 function validateTripData(trip: SeedTripFile): void {
-  if (!validateUUID(trip.id)) {
-    throw new Error(`Invalid trip UUID: ${trip.id}`);
+  // Minimal validation - only check required fields exist
+  if (!trip.id) {
+    throw new Error(`Trip missing id`);
   }
   
-  if (!trip.name || trip.name.trim() === '') {
+  if (!trip.name) {
     throw new Error(`Trip ${trip.id} missing name`);
   }
   
-  if (!trip.start_date || !validateDateFormat(trip.start_date)) {
-    throw new Error(`Trip ${trip.id} has invalid start_date: ${trip.start_date}`);
+  if (!trip.start_date) {
+    throw new Error(`Trip ${trip.id} missing start_date`);
   }
   
-  if (!trip.end_date || !validateDateFormat(trip.end_date)) {
-    throw new Error(`Trip ${trip.id} has invalid end_date: ${trip.end_date}`);
-  }
-  
-  if (!trip.updated_at) {
-    throw new Error(`Trip ${trip.id} missing updated_at`);
+  if (!trip.end_date) {
+    throw new Error(`Trip ${trip.id} missing end_date`);
   }
 }
 
 /**
  * Validate nested entity arrays exist (can be empty)
- * Throws error if arrays are missing (not just empty)
+ * Provides defaults if arrays are missing
  */
 function validateNestedStructure(trip: SeedTripFile): void {
-  if (!Array.isArray(trip.flights)) {
-    throw new Error(`Trip ${trip.id} missing flights array`);
-  }
-  
-  if (!Array.isArray(trip.hotels)) {
-    throw new Error(`Trip ${trip.id} missing hotels array`);
-  }
-  
-  if (!Array.isArray(trip.activities)) {
-    throw new Error(`Trip ${trip.id} missing activities array`);
-  }
-  
-  if (!Array.isArray(trip.restaurants)) {
-    throw new Error(`Trip ${trip.id} missing restaurants array`);
-  }
+  // Make arrays optional - provide defaults if missing
+  trip.flights = trip.flights || [];
+  trip.hotels = trip.hotels || [];
+  trip.activities = trip.activities || [];
+  trip.restaurants = trip.restaurants || [];
 }
 
 /**

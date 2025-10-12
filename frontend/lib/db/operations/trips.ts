@@ -15,12 +15,14 @@ import { wrapDatabaseOperation, createNotFoundError } from '../errors';
  */
 export async function getAllTrips(): Promise<Result<Trip[]>> {
   return wrapDatabaseOperation(async () => {
-    const trips = await db.trips
-      .where('deleted')
-      .equals(0)  // IndexedDB stores boolean as 0 (false) or 1 (true)
-      .reverse()
-      .sortBy('start_date');
-    return trips;
+    // Get all trips and filter out deleted ones (handles both boolean and number)
+    const allTrips = await db.trips.toArray();
+    const activeTrips = allTrips.filter(trip => !trip.deleted);
+    
+    // Sort by start_date descending (newest first)
+    activeTrips.sort((a, b) => b.start_date.localeCompare(a.start_date));
+    
+    return activeTrips;
   });
 }
 

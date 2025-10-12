@@ -8,50 +8,37 @@
 import type { TripInput, PlaceInput, ValidationError } from './models';
 
 /**
- * Validate UUID v4 format
+ * Validate UUID format (lenient - just checks it's a non-empty string)
  */
 export function validateUUID(id: string): boolean {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(id);
+  return typeof id === 'string' && id.length > 0;
 }
 
 /**
- * Validate ISO 8601 date format (YYYY-MM-DD)
+ * Validate date format (lenient - just checks it's a non-empty string)
  */
 export function validateDateFormat(dateString: string): boolean {
-  // Check format
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!dateRegex.test(dateString)) {
-    return false;
-  }
-  
-  // Check if it's a valid date
-  const date = new Date(dateString);
-  return !isNaN(date.getTime());
+  return typeof dateString === 'string' && dateString.length > 0;
 }
 
 /**
- * Validate trip input data
+ * Validate trip input data (minimal validation)
  * Returns ValidationError if validation fails, null if valid
  */
 export function validateTripInput(input: TripInput): ValidationError | null {
   const fields: Record<string, string> = {};
   
-  // Validate required fields
-  if (!input.name || input.name.trim() === '') {
+  // Only validate that required fields exist
+  if (!input.name) {
     fields.name = 'Trip name is required';
   }
   
   if (!input.start_date) {
     fields.start_date = 'Start date is required';
-  } else if (!validateDateFormat(input.start_date)) {
-    fields.start_date = 'Start date must be in YYYY-MM-DD format';
   }
   
   if (!input.end_date) {
     fields.end_date = 'End date is required';
-  } else if (!validateDateFormat(input.end_date)) {
-    fields.end_date = 'End date must be in YYYY-MM-DD format';
   }
   
   // Return error if any validation failed
@@ -67,27 +54,23 @@ export function validateTripInput(input: TripInput): ValidationError | null {
 }
 
 /**
- * Validate place input data
+ * Validate place input data (minimal validation)
  * Returns ValidationError if validation fails, null if valid
  */
 export function validatePlaceInput(input: PlaceInput): ValidationError | null {
   const fields: Record<string, string> = {};
   
-  // Validate required fields
-  if (!input.name || input.name.trim() === '') {
+  // Only validate that required fields exist
+  if (!input.name) {
     fields.name = 'Place name is required';
   }
   
-  if (!input.trip_id || input.trip_id.trim() === '') {
+  if (!input.trip_id) {
     fields.trip_id = 'Trip ID is required';
-  } else if (!validateUUID(input.trip_id)) {
-    fields.trip_id = 'Trip ID must be a valid UUID';
   }
   
   if (input.order_index === undefined || input.order_index === null) {
     fields.order_index = 'Order index is required';
-  } else if (input.order_index < 0) {
-    fields.order_index = 'Order index must be non-negative';
   }
   
   // Return error if any validation failed

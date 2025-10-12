@@ -1,8 +1,12 @@
+'use client';
+
 import { notFound } from 'next/navigation'
 import { TripTimeline } from '@/components/TripTimeline'
 import { RestaurantList } from '@/components/RestaurantList'
-import { loadTrip, loadTripIndex } from '@/lib/tripLoader'
+import { getTripWithRelations } from '@/lib/db'
 import { formatDate } from '@/lib/dateTime'
+import { useEffect, useState } from 'react'
+import type { TripWithRelations } from '@/lib/db'
 
 interface TripPageProps {
   params: Promise<{
@@ -10,22 +14,44 @@ interface TripPageProps {
   }>
 }
 
-// Generate static paths for all trips at build time
-export async function generateStaticParams() {
-  const tripIndex = await loadTripIndex()
-  return tripIndex.trips.map((trip) => ({
-    tripId: trip.id,
-  }))
-}
+export default function TripPage({ params }: TripPageProps) {
+  const [tripId, setTripId] = useState<string | null>(null);
+  const [trip, setTrip] = useState<TripWithRelations | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default async function TripPage({ params }: TripPageProps) {
-  const { tripId } = await params
-  
-  let trip
-  try {
-    trip = await loadTrip(tripId)
-  } catch (error) {
-    notFound()
+  useEffect(() => {
+    params.then(p => setTripId(p.tripId));
+  }, [params]);
+
+  useEffect(() => {
+    if (!tripId) return;
+
+    async function loadTrip() {
+      const result = await getTripWithRelations(tripId!);
+      
+      if (result.success) {
+        setTrip(result.data);
+      } else {
+        setError(result.error.message);
+      }
+      
+      setIsLoading(false);
+    }
+
+    loadTrip();
+  }, [tripId]);
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg"></div>
+      </main>
+    );
+  }
+
+  if (error || !trip) {
+    notFound();
   }
 
   return (

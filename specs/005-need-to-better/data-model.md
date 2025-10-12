@@ -122,6 +122,7 @@ This document defines the complete data model for the enhanced trip system, incl
 | name | string | ✗ | Hotel name |
 | address | string | ✗ | Full address |
 | city | string | ✗ | City name (for grouping) |
+| plus_code | string | ✗ | Google Maps Plus Code |
 | check_in_time | string (ISO datetime with TZ) | ✗ | Check-in timestamp |
 | check_out_time | string (ISO datetime with TZ) | ✗ | Check-out timestamp |
 | confirmation_number | string | ✗ | Reservation ID |
@@ -131,6 +132,7 @@ This document defines the complete data model for the enhanced trip system, incl
 **Validation Rules**:
 - `id`, `trip_id`: Must be valid UUID v4
 - `check_in_time` < `check_out_time` (when both present)
+- `plus_code`: Valid Plus Code format when present (8-char standard)
 - All fields except identifiers optional per FR-008
 
 **Relationships**:

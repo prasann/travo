@@ -130,14 +130,10 @@ export default function AttractionSection({
     
     // Swap order_index values
     const tempOrder = updatedActivities[currentIdx].order_index;
-    console.log("currentIdx", currentIdx)
-    console.log("nextIdx", nextIdx)
-    console.log("temp", tempOrder)
     updatedActivities[currentIdx].order_index = updatedActivities[nextIdx].order_index;
     updatedActivities[nextIdx].order_index = tempOrder;
     
     setValue('activities', updatedActivities);
-    console.log("updated", updatedActivities)
   };
   
   // Filter out deleted activities for display

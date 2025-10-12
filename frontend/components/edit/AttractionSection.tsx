@@ -106,42 +106,34 @@ export default function AttractionSection({
     setValue('activities', updatedActivities);
   };
   
-  const handleMoveUp = (index: number, date: string) => {
-    const updatedActivities = [...activities];
-    const itemsForDate = visibleActivities.filter(a => a.date === date);
-    const currentItem = updatedActivities[index];
-    const currentPosition = itemsForDate.findIndex(a => a === currentItem);
+  const handleMoveUp = (actualIndex: number, positionInDate: number, dateItems: Array<{ activity: ActivityEditFormData; actualIndex: number }>) => {
+    if (positionInDate === 0) return; // Already at top
     
-    if (currentPosition > 0) {
-      const prevItem = itemsForDate[currentPosition - 1];
-      const prevIndex = updatedActivities.findIndex(a => a === prevItem);
-      
-      // Swap order_index values
-      const tempOrder = updatedActivities[index].order_index;
-      updatedActivities[index].order_index = updatedActivities[prevIndex].order_index;
-      updatedActivities[prevIndex].order_index = tempOrder;
-      
-      setValue('activities', updatedActivities);
-    }
+    const updatedActivities = [...activities];
+    const currentIdx = actualIndex;
+    const prevIdx = dateItems[positionInDate - 1].actualIndex;
+    
+    // Swap order_index values
+    const tempOrder = updatedActivities[currentIdx].order_index;
+    updatedActivities[currentIdx].order_index = updatedActivities[prevIdx].order_index;
+    updatedActivities[prevIdx].order_index = tempOrder;
+    
+    setValue('activities', updatedActivities);
   };
   
-  const handleMoveDown = (index: number, date: string) => {
-    const updatedActivities = [...activities];
-    const itemsForDate = visibleActivities.filter(a => a.date === date);
-    const currentItem = updatedActivities[index];
-    const currentPosition = itemsForDate.findIndex(a => a === currentItem);
+  const handleMoveDown = (actualIndex: number, positionInDate: number, dateItems: Array<{ activity: ActivityEditFormData; actualIndex: number }>) => {
+    if (positionInDate === dateItems.length - 1) return; // Already at bottom
     
-    if (currentPosition < itemsForDate.length - 1) {
-      const nextItem = itemsForDate[currentPosition + 1];
-      const nextIndex = updatedActivities.findIndex(a => a === nextItem);
-      
-      // Swap order_index values
-      const tempOrder = updatedActivities[index].order_index;
-      updatedActivities[index].order_index = updatedActivities[nextIndex].order_index;
-      updatedActivities[nextIndex].order_index = tempOrder;
-      
-      setValue('activities', updatedActivities);
-    }
+    const updatedActivities = [...activities];
+    const currentIdx = actualIndex;
+    const nextIdx = dateItems[positionInDate + 1].actualIndex;
+    
+    // Swap order_index values
+    const tempOrder = updatedActivities[currentIdx].order_index;
+    updatedActivities[currentIdx].order_index = updatedActivities[nextIdx].order_index;
+    updatedActivities[nextIdx].order_index = tempOrder;
+    
+    setValue('activities', updatedActivities);
   };
   
   // Filter out deleted activities for display
@@ -182,8 +174,8 @@ export default function AttractionSection({
                           register={register}
                           watch={watch}
                           onDelete={() => handleDeleteActivity(actualIndex)}
-                          onMoveUp={() => handleMoveUp(actualIndex, date)}
-                          onMoveDown={() => handleMoveDown(actualIndex, date)}
+                          onMoveUp={() => handleMoveUp(actualIndex, positionInDate, items)}
+                          onMoveDown={() => handleMoveDown(actualIndex, positionInDate, items)}
                           isFirst={positionInDate === 0}
                           isLast={positionInDate === items.length - 1}
                           availableDates={availableDates}

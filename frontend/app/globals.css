@@ -3,6 +3,23 @@
   themes: all;
 }
 
+
+/* Force override on input components */
+.input {
+  border-radius: 0.25rem !important;
+}
+
+.select,
+.textarea,
+.btn,
+.card {
+  border-radius: 0.75rem !important;
+}
+
+.btn {
+  border-radius: 0.5rem !important;
+}
+
 /* Custom styles */
 body {
   @apply bg-base-100 text-base-content antialiased;

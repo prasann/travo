@@ -9,7 +9,7 @@
 
 import { db } from '../schema';
 import type { Flight, FlightLeg, Result } from '../models';
-import { wrapDatabaseOperation } from '../errors';
+import { wrapDatabaseOperation, createNotFoundError } from '../errors';
 
 /**
  * Get all flights for a trip
@@ -38,5 +38,32 @@ export async function getFlightLegsByFlightId(flightId: string): Promise<Result<
       .sortBy('leg_number');
     
     return legs;
+  });
+}
+
+/**
+ * Update a flight's properties
+ * Automatically updates timestamp
+ */
+export async function updateFlight(
+  id: string,
+  updates: Partial<Omit<Flight, 'id' | 'trip_id' | 'updated_at'>>
+): Promise<Result<Flight>> {
+  return wrapDatabaseOperation(async () => {
+    const flight = await db.flights.get(id);
+    
+    if (!flight) {
+      throw createNotFoundError('Flight', id);
+    }
+    
+    const updatedFlight: Flight = {
+      ...flight,
+      ...updates,
+      updated_at: new Date().toISOString()
+    };
+    
+    await db.flights.put(updatedFlight);
+    
+    return updatedFlight;
   });
 }

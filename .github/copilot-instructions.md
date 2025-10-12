@@ -12,6 +12,8 @@ Auto-generated from all feature plans. Last updated: 2025-10-10
 - TypeScript 5.x (strict mode), JavaScript ES2020+ + Next.js 15.5.4, React 19.1.0, DaisyUI 5.2.0, Tailwind CSS 4.1.14 (005-need-to-better)
 - JSON files (one per trip) in `/frontend/data/trips/` directory, migrating from single `trips.json` (005-need-to-better)
 >>>>>>> main
+- TypeScript 5.x (strict mode), JavaScript ES2020+ + Next.js 15.5.4 (App Router), React 19.1.0, DaisyUI 5.2.0, Tailwind CSS 4.1.14, Dexie.js (IndexedDB wrapper) (006-edit-mode-for)
+- IndexedDB (via Dexie.js) for offline-first local persistence (006-edit-mode-for)
 
 ## Project Structure
 ```
@@ -32,10 +34,9 @@ tests/
 - Follow Next.js App Router conventions
 
 ## Recent Changes
+- 006-edit-mode-for: Added TypeScript 5.x (strict mode), JavaScript ES2020+ + Next.js 15.5.4 (App Router), React 19.1.0, DaisyUI 5.2.0, Tailwind CSS 4.1.14, Dexie.js (IndexedDB wrapper)
 - 005-let-s-introduce: Added TypeScript 5.x (strict mode enabled)
 - 005-need-to-better: Added TypeScript 5.x (strict mode), JavaScript ES2020+ + Next.js 15.5.4, React 19.1.0, DaisyUI 5.2.0, Tailwind CSS 4.1.14
-- 004-port-app-to: Migrated to Next.js 15.5.4 + DaisyUI 5.2.0 + Tailwind CSS 4.1.14
-- Renamed travo-nextjs to frontend directory
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

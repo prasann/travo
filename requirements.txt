@@ -1,0 +1,11 @@
+- Let's introduce a local database using IndexDB
+- We will need this to perform, edit and add new data to our app.
+- For now, let's load this JSON into the DB at the start of the app.
+- then we will read from the DB instead of the JSON file. and perform operations on the DB.
+- JSON is merely a seed data for the DB.
+- eventually we will add a sync mechanism to sync the local DB with a remote DB. (Supabase)
+- For now, let's focus on getting the local DB working.
+- once this is done, we will work on UI part for adding/editing/deleting data. that's not a scope for now.
+- we will use Dexie.js as a wrapper around IndexDB to make it easier to work.   
+- ensure to keep the data layer separate from the UI layer.
+- in future, i might directly make calls to Supabase, and UI layer should not be affected by this change.

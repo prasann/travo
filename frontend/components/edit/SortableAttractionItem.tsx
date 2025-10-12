@@ -9,7 +9,7 @@
 
 import { UseFormRegister, UseFormWatch } from 'react-hook-form';
 import type { TripEditFormData, ActivityEditFormData } from '@/types/editMode';
-import { Lock } from 'lucide-react';
+import { Lock, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface AttractionItemProps {
   activity: ActivityEditFormData;
@@ -17,8 +17,11 @@ interface AttractionItemProps {
   register: UseFormRegister<TripEditFormData>;
   watch: UseFormWatch<TripEditFormData>;
   onDelete: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  isFirst: boolean;
+  isLast: boolean;
   availableDates: string[];
-  maxPositionForDate: number;
 }
 
 export default function AttractionItem({
@@ -27,8 +30,11 @@ export default function AttractionItem({
   register,
   watch,
   onDelete,
-  availableDates,
-  maxPositionForDate
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast,
+  availableDates
 }: AttractionItemProps) {
   return (
     <div className="card bg-base-200">
@@ -64,7 +70,7 @@ export default function AttractionItem({
               </button>
             </div>
             
-            {/* Move to Day and Position Controls */}
+            {/* Move to Day and Reorder Controls */}
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div className="form-control">
                 <label className="label py-1">
@@ -84,20 +90,30 @@ export default function AttractionItem({
               
               <div className="form-control">
                 <label className="label py-1">
-                  <span className="label-text text-sm">Position</span>
+                  <span className="label-text text-sm">Reorder</span>
                 </label>
-                <input
-                  type="number"
-                  {...register(`activities.${index}.order_index`, {
-                    valueAsNumber: true,
-                    min: 0,
-                    max: maxPositionForDate
-                  })}
-                  className="input input-bordered input-sm"
-                  placeholder="0"
-                  min="0"
-                  max={maxPositionForDate}
-                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={onMoveUp}
+                    disabled={isFirst}
+                    className="btn btn-sm btn-outline flex-1"
+                    title="Move up"
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                    Up
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onMoveDown}
+                    disabled={isLast}
+                    className="btn btn-sm btn-outline flex-1"
+                    title="Move down"
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                    Down
+                  </button>
+                </div>
               </div>
             </div>
             

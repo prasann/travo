@@ -106,6 +106,44 @@ export default function AttractionSection({
     setValue('activities', updatedActivities);
   };
   
+  const handleMoveUp = (index: number, date: string) => {
+    const updatedActivities = [...activities];
+    const itemsForDate = visibleActivities.filter(a => a.date === date);
+    const currentItem = updatedActivities[index];
+    const currentPosition = itemsForDate.findIndex(a => a === currentItem);
+    
+    if (currentPosition > 0) {
+      const prevItem = itemsForDate[currentPosition - 1];
+      const prevIndex = updatedActivities.findIndex(a => a === prevItem);
+      
+      // Swap order_index values
+      const tempOrder = updatedActivities[index].order_index;
+      updatedActivities[index].order_index = updatedActivities[prevIndex].order_index;
+      updatedActivities[prevIndex].order_index = tempOrder;
+      
+      setValue('activities', updatedActivities);
+    }
+  };
+  
+  const handleMoveDown = (index: number, date: string) => {
+    const updatedActivities = [...activities];
+    const itemsForDate = visibleActivities.filter(a => a.date === date);
+    const currentItem = updatedActivities[index];
+    const currentPosition = itemsForDate.findIndex(a => a === currentItem);
+    
+    if (currentPosition < itemsForDate.length - 1) {
+      const nextItem = itemsForDate[currentPosition + 1];
+      const nextIndex = updatedActivities.findIndex(a => a === nextItem);
+      
+      // Swap order_index values
+      const tempOrder = updatedActivities[index].order_index;
+      updatedActivities[index].order_index = updatedActivities[nextIndex].order_index;
+      updatedActivities[nextIndex].order_index = tempOrder;
+      
+      setValue('activities', updatedActivities);
+    }
+  };
+  
   // Filter out deleted activities for display
   const visibleActivities = activities.filter(a => !a._deleted);
   
@@ -130,12 +168,11 @@ export default function AttractionSection({
             {Object.entries(activitiesByDate)
               .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
               .map(([date, items]) => {
-                const maxPosition = items.length - 1;
                 return (
                   <div key={date}>
                     <h3 className="font-semibold text-lg mb-3">{date}</h3>
                     <div className="space-y-3">
-                      {items.map(({ activity, index }) => (
+                      {items.map(({ activity, index }, positionInDate) => (
                         <AttractionItem
                           key={activity.id || index}
                           activity={activity}
@@ -143,8 +180,11 @@ export default function AttractionSection({
                           register={register}
                           watch={watch}
                           onDelete={() => handleDeleteActivity(index)}
+                          onMoveUp={() => handleMoveUp(index, date)}
+                          onMoveDown={() => handleMoveDown(index, date)}
+                          isFirst={positionInDate === 0}
+                          isLast={positionInDate === items.length - 1}
                           availableDates={availableDates}
-                          maxPositionForDate={maxPosition}
                         />
                       ))}
                     </div>

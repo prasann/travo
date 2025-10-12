@@ -66,3 +66,27 @@ export async function deleteActivity(id: string): Promise<Result<void>> {
     await db.activities.delete(id);
   });
 }
+
+/**
+ * Bulk update activities (for reordering)
+ * Updates order_index for multiple activities
+ */
+export async function bulkUpdateActivities(
+  updates: Array<{ id: string; order_index: number }>
+): Promise<Result<void>> {
+  return wrapDatabaseOperation(async () => {
+    // Update each activity in a transaction
+    await db.transaction('rw', db.activities, async () => {
+      for (const update of updates) {
+        const activity = await db.activities.get(update.id);
+        
+        if (activity) {
+          await db.activities.update(update.id, {
+            order_index: update.order_index,
+            updated_at: new Date().toISOString()
+          });
+        }
+      }
+    });
+  });
+}

@@ -112,7 +112,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
       // Import DB operations dynamically to avoid server-side issues
       const { updateTrip } = await import('@/lib/db/operations/trips');
       const { createHotel, deleteHotel } = await import('@/lib/db/operations/hotels');
-      const { createActivity, deleteActivity } = await import('@/lib/db/operations/activities');
+      const { createActivity, deleteActivity, bulkUpdateActivities } = await import('@/lib/db/operations/activities');
       
       // Update trip basic info
       const tripResult = await updateTrip({
@@ -152,6 +152,8 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
       }
       
       // Handle activity changes
+      const reorderedActivities: Array<{ id: string; order_index: number }> = [];
+      
       for (const activity of data.activities) {
         if (activity._deleted && activity.id) {
           // Delete existing activity
@@ -170,8 +172,18 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             order_index: activity.order_index,
             notes: activity.notes,
           });
+        } else if (activity.id) {
+          // Track activities with updated order_index for bulk update
+          reorderedActivities.push({
+            id: activity.id,
+            order_index: activity.order_index
+          });
         }
-        // Note: Activity updates not implemented in MVP (Phase 1-4)
+      }
+      
+      // Bulk update order_index for reordered activities
+      if (reorderedActivities.length > 0) {
+        await bulkUpdateActivities(reorderedActivities);
       }
       
       setSuccessMessage('Trip saved successfully!');

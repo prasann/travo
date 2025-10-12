@@ -9,8 +9,23 @@
 
 import { useState } from 'react';
 import { UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove
+} from '@dnd-kit/sortable';
 import type { TripEditFormData, ActivityEditFormData } from '@/types/editMode';
 import PlusCodeInput from './PlusCodeInput';
+import SortableAttractionItem from './SortableAttractionItem';
 
 interface AttractionSectionProps {
   register: UseFormRegister<TripEditFormData>;
@@ -31,6 +46,12 @@ export default function AttractionSection({
   const [newActivity, setNewActivity] = useState<Partial<ActivityEditFormData>>({});
   const [plusCode, setPlusCode] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  
+  // Setup sensors for drag-and-drop (both mouse and touch)
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(TouchSensor)
+  );
   
   const handlePlusCodeSuccess = (result: { name: string; address: string }) => {
     setNewActivity(prev => ({
@@ -90,6 +111,44 @@ export default function AttractionSection({
     setValue('activities', updatedActivities);
   };
   
+  const handleDragEnd = (event: DragEndEvent, date: string) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) {
+      return;
+    }
+    
+    // Get activities for this specific date
+    const dateActivities = visibleActivities.filter(a => a.date === date);
+    const activeIndex = dateActivities.findIndex(a => (a.id || `temp-${activities.indexOf(a)}`) === active.id);
+    const overIndex = dateActivities.findIndex(a => (a.id || `temp-${activities.indexOf(a)}`) === over.id);
+    
+    if (activeIndex === -1 || overIndex === -1) {
+      return;
+    }
+    
+    // Reorder the activities for this date
+    const reorderedDateActivities = arrayMove(dateActivities, activeIndex, overIndex);
+    
+    // Recalculate order_index to be sequential
+    reorderedDateActivities.forEach((activity, idx) => {
+      activity.order_index = idx;
+    });
+    
+    // Update the full activities array
+    const updatedActivities = activities.map(activity => {
+      if (activity.date === date && !activity._deleted) {
+        const reordered = reorderedDateActivities.find(a => 
+          (a.id && a.id === activity.id) || (a.name === activity.name && a.plus_code === activity.plus_code)
+        );
+        return reordered || activity;
+      }
+      return activity;
+    });
+    
+    setValue('activities', updatedActivities, { shouldDirty: true });
+  };
+  
   // Filter out deleted activities for display
   const visibleActivities = activities.filter(a => !a._deleted);
   
@@ -116,86 +175,28 @@ export default function AttractionSection({
               .map(([date, items]) => (
                 <div key={date}>
                   <h3 className="font-semibold text-lg mb-3">{date}</h3>
-                  <div className="space-y-3">
-                    {items.map(({ activity, index }) => (
-                      <div key={activity.id || index} className="card bg-base-200">
-                        <div className="card-body p-4">
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              {/* Read-only name and address */}
-                              <h4 className="font-semibold">{activity.name}</h4>
-                              {activity.address && (
-                                <p className="text-sm text-base-content/60">{activity.address}</p>
-                              )}
-                              {activity.plus_code && (
-                                <p className="text-xs text-base-content/50 mt-1">Plus Code: {activity.plus_code}</p>
-                              )}
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteActivity(index)}
-                              className="btn btn-error btn-xs"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                          
-                          {/* Editable fields */}
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-                            <div className="form-control">
-                              <label className="label py-1">
-                                <span className="label-text text-sm">City</span>
-                              </label>
-                              <input
-                                type="text"
-                                {...register(`activities.${index}.city`)}
-                                className="input input-bordered input-sm"
-                                placeholder="Tokyo"
-                              />
-                            </div>
-                            
-                            <div className="form-control">
-                              <label className="label py-1">
-                                <span className="label-text text-sm">Start Time</span>
-                              </label>
-                              <input
-                                type="time"
-                                {...register(`activities.${index}.start_time`)}
-                                className="input input-bordered input-sm"
-                              />
-                            </div>
-                            
-                            <div className="form-control">
-                              <label className="label py-1">
-                                <span className="label-text text-sm">Duration (minutes)</span>
-                              </label>
-                              <input
-                                type="number"
-                                {...register(`activities.${index}.duration_minutes`, {
-                                  valueAsNumber: true
-                                })}
-                                className="input input-bordered input-sm"
-                                placeholder="120"
-                                min="0"
-                              />
-                            </div>
-                          </div>
-                          
-                          <div className="form-control mt-3">
-                            <label className="label py-1">
-                              <span className="label-text text-sm">Notes</span>
-                            </label>
-                            <textarea
-                              {...register(`activities.${index}.notes`)}
-                              className="textarea textarea-bordered textarea-sm"
-                              rows={2}
-                              placeholder="Activity notes..."
-                            />
-                          </div>
-                        </div>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={(event) => handleDragEnd(event, date)}
+                  >
+                    <SortableContext
+                      items={items.map(({ activity, index }) => activity.id || `temp-${index}`)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="space-y-3">
+                        {items.map(({ activity, index }) => (
+                          <SortableAttractionItem
+                            key={activity.id || index}
+                            activity={activity}
+                            index={index}
+                            register={register}
+                            onDelete={() => handleDeleteActivity(index)}
+                          />
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </SortableContext>
+                  </DndContext>
                 </div>
               ))}
           </div>

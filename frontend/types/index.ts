@@ -193,6 +193,9 @@ export interface Hotel {
   /** City name (used for grouping) */
   city?: string;
   
+  /** Google Maps Plus Code for location */
+  plus_code?: string;
+  
   /** Check-in timestamp with timezone (ISO 8601 with timezone) */
   check_in_time?: string;
   

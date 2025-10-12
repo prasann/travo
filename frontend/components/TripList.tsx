@@ -3,8 +3,11 @@
 import { TripCard } from './TripCard'
 import type { TripIndex } from '@/types'
 
+// Trip can be either TripIndex or a database Trip (both have same core fields)
+type TripLike = Pick<TripIndex, 'id' | 'name' | 'start_date' | 'end_date' | 'updated_at'>;
+
 export interface TripListProps {
-  trips: TripIndex[]
+  trips: TripLike[]
   isLoading?: boolean
 }
 

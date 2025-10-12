@@ -3,7 +3,7 @@
  * Feature: Enhanced Trip Data Model & Itinerary Management
  */
 
-import { Hotel as HotelIcon } from 'lucide-react';
+import { Hotel as HotelIcon, MapPin } from 'lucide-react';
 import type { Hotel } from '@/types';
 import { formatTime } from '@/lib/dateTime';
 import { TimelineCard } from './TimelineCard';
@@ -36,7 +36,7 @@ export function HotelCard({ hotel }: HotelCardProps) {
     </>
   );
   
-  const details = (hotel.confirmation_number || hotel.phone || hotel.notes) ? (
+  const details = (hotel.confirmation_number || hotel.phone || hotel.notes || hotel.plus_code) ? (
     <>
       {hotel.confirmation_number && (
         <p className="text-xs sm:text-sm text-base-content/60">
@@ -50,6 +50,15 @@ export function HotelCard({ hotel }: HotelCardProps) {
       
       {hotel.notes && (
         <p className="text-xs sm:text-sm mt-2 text-base-content/80">{hotel.notes}</p>
+      )}
+      
+      {hotel.plus_code && (
+        <div className="flex items-center gap-2 mt-2">
+          <MapPin className="w-3 h-3 text-base-content/40" />
+          <p className="text-xs text-base-content/60 font-mono">
+            {hotel.plus_code}
+          </p>
+        </div>
       )}
     </>
   ) : undefined;

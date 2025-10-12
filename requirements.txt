@@ -1,10 +1,11 @@
-I need to add a better data model for trips.
-Typically these trips start from home, and i go to multiple cities and return home.
-I need to hold the flight details, hotel details based on the dates.
-For each day in the trip i would like to plan for some sightseeing or activities.
-I would also like to hold some recommendations for restaurants in each city.
-These aren't part of my itinerary but i would like to have them handy.
-In the future i'm planning to add google maps integration to show the places on a map.
-also i would like to have an image for sightseeing places.
-For travel information i would like to hold the flight info, times, airline, flight number, etc.
-For hotel info i would like to hold the hotel name, address, checkin and checkout times. reservation id etc
+- Let's introduce a local database using IndexDB
+- We will need this to perform, edit and add new data to our app.
+- For now, let's load this JSON into the DB at the start of the app.
+- then we will read from the DB instead of the JSON file. and perform operations on the DB.
+- JSON is merely a seed data for the DB.
+- eventually we will add a sync mechanism to sync the local DB with a remote DB. (Supabase)
+- For now, let's focus on getting the local DB working.
+- once this is done, we will work on UI part for adding/editing/deleting data. that's not a scope for now.
+- we will use Dexie.js as a wrapper around IndexDB to make it easier to work.   
+- ensure to keep the data layer separate from the UI layer.
+- in future, i might directly make calls to Supabase, and UI layer should not be affected by this change.

@@ -9,25 +9,9 @@
 
 import { useState } from 'react';
 import { UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-  DragStartEvent,
-  DragOverlay
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  arrayMove
-} from '@dnd-kit/sortable';
 import type { TripEditFormData, ActivityEditFormData } from '@/types/editMode';
 import PlusCodeInput from './PlusCodeInput';
-import SortableAttractionItem from './SortableAttractionItem';
+import AttractionItem from './SortableAttractionItem';
 
 interface AttractionSectionProps {
   register: UseFormRegister<TripEditFormData>;
@@ -48,23 +32,21 @@ export default function AttractionSection({
   const [newActivity, setNewActivity] = useState<Partial<ActivityEditFormData>>({});
   const [plusCode, setPlusCode] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
   
-  // Setup sensors for drag-and-drop with activation constraints
-  // This prevents conflicts with scrolling and clicking
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // 8px of movement required before drag starts
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250, // 250ms hold before drag starts
-        tolerance: 5, // 5px of movement tolerance
-      },
-    })
-  );
+  // Get all unique dates from trip range
+  const getAllDates = (): string[] => {
+    const dates: string[] = [];
+    const start = new Date(tripStartDate);
+    const end = new Date(tripEndDate);
+    
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      dates.push(d.toISOString().split('T')[0]);
+    }
+    
+    return dates;
+  };
+  
+  const availableDates = getAllDates();
   
   const handlePlusCodeSuccess = (result: { name: string; address: string }) => {
     setNewActivity(prev => ({
@@ -111,11 +93,6 @@ export default function AttractionSection({
     setShowAddForm(false);
   };
   
-  const handleDragStart = (event: DragStartEvent) => {
-    console.log('🎯 Drag started:', event.active.id);
-    setActiveId(event.active.id as string);
-  };
-  
   const handleDeleteActivity = (index: number) => {
     const updatedActivities = [...activities];
     
@@ -127,126 +104,6 @@ export default function AttractionSection({
     }
     
     setValue('activities', updatedActivities);
-  };
-  
-  const handleMoveUp = (globalIndex: number, date: string) => {
-    // Get activities for this date
-    const dateActivitiesWithIndices = activities
-      .map((a, idx) => ({ activity: a, globalIndex: idx }))
-      .filter(item => item.activity.date === date && !item.activity._deleted);
-    
-    const currentLocalIndex = dateActivitiesWithIndices.findIndex(item => item.globalIndex === globalIndex);
-    
-    // Can't move up if already first
-    if (currentLocalIndex <= 0) return;
-    
-    // Swap with previous item
-    const reordered = [...dateActivitiesWithIndices];
-    [reordered[currentLocalIndex - 1], reordered[currentLocalIndex]] = 
-      [reordered[currentLocalIndex], reordered[currentLocalIndex - 1]];
-    
-    // Update order_index
-    const updatedActivities = [...activities];
-    reordered.forEach((item, newIdx) => {
-      updatedActivities[item.globalIndex] = {
-        ...updatedActivities[item.globalIndex],
-        order_index: newIdx
-      };
-    });
-    
-    setValue('activities', updatedActivities, { shouldDirty: true });
-  };
-  
-  const handleMoveDown = (globalIndex: number, date: string) => {
-    // Get activities for this date
-    const dateActivitiesWithIndices = activities
-      .map((a, idx) => ({ activity: a, globalIndex: idx }))
-      .filter(item => item.activity.date === date && !item.activity._deleted);
-    
-    const currentLocalIndex = dateActivitiesWithIndices.findIndex(item => item.globalIndex === globalIndex);
-    
-    // Can't move down if already last
-    if (currentLocalIndex >= dateActivitiesWithIndices.length - 1) return;
-    
-    // Swap with next item
-    const reordered = [...dateActivitiesWithIndices];
-    [reordered[currentLocalIndex], reordered[currentLocalIndex + 1]] = 
-      [reordered[currentLocalIndex + 1], reordered[currentLocalIndex]];
-    
-    // Update order_index
-    const updatedActivities = [...activities];
-    reordered.forEach((item, newIdx) => {
-      updatedActivities[item.globalIndex] = {
-        ...updatedActivities[item.globalIndex],
-        order_index: newIdx
-      };
-    });
-    
-    setValue('activities', updatedActivities, { shouldDirty: true });
-  };
-  
-  const handleDragEnd = (event: DragEndEvent, date: string) => {
-    const { active, over } = event;
-    
-    console.log('🏁 Drag ended:', { activeId: active.id, overId: over?.id, date });
-    
-    setActiveId(null);
-    
-    if (!over || active.id === over.id) {
-      console.log('❌ No valid drop target or dropped on self');
-      return;
-    }
-    
-    // Get all activities (including deleted) and find indices
-    const activeGlobalIndex = activities.findIndex((a, idx) => {
-      const itemId = a.id || `temp-${idx}`;
-      return itemId === active.id;
-    });
-    const overGlobalIndex = activities.findIndex((a, idx) => {
-      const itemId = a.id || `temp-${idx}`;
-      return itemId === over.id;
-    });
-    
-    if (activeGlobalIndex === -1 || overGlobalIndex === -1) {
-      console.log('❌ Could not find activity indices:', { activeGlobalIndex, overGlobalIndex });
-      return;
-    }
-    
-    console.log('✅ Found activities:', { 
-      activeGlobalIndex, 
-      overGlobalIndex,
-      activeActivity: activities[activeGlobalIndex]?.name,
-      overActivity: activities[overGlobalIndex]?.name 
-    });
-    
-    // Only reorder within the same date
-    if (activities[activeGlobalIndex].date !== date || activities[overGlobalIndex].date !== date) {
-      console.log('❌ Activities not in same date group');
-      return;
-    }
-    
-    // Get activities for this date only (with their global indices)
-    const dateActivitiesWithIndices = activities
-      .map((a, idx) => ({ activity: a, globalIndex: idx }))
-      .filter(item => item.activity.date === date && !item.activity._deleted);
-    
-    const activeLocalIndex = dateActivitiesWithIndices.findIndex(item => item.globalIndex === activeGlobalIndex);
-    const overLocalIndex = dateActivitiesWithIndices.findIndex(item => item.globalIndex === overGlobalIndex);
-    
-    // Reorder within date
-    const reordered = arrayMove(dateActivitiesWithIndices, activeLocalIndex, overLocalIndex);
-    
-    // Create new activities array with updated order_index
-    const updatedActivities = [...activities];
-    reordered.forEach((item, newIdx) => {
-      updatedActivities[item.globalIndex] = {
-        ...updatedActivities[item.globalIndex],
-        order_index: newIdx
-      };
-    });
-    
-    console.log('💾 Saving reordered activities');
-    setValue('activities', updatedActivities, { shouldDirty: true });
   };
   
   // Filter out deleted activities for display
@@ -272,41 +129,28 @@ export default function AttractionSection({
           <div className="space-y-6 mb-6">
             {Object.entries(activitiesByDate)
               .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
-              .map(([date, items]) => (
-                <div key={date}>
-                  <h3 className="font-semibold text-lg mb-3">{date}</h3>
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragStart={handleDragStart}
-                    onDragEnd={(event) => handleDragEnd(event, date)}
-                  >
-                    <SortableContext
-                      items={items.map(({ activity, index }) => {
-                        return activity.id || `temp-${index}`;
-                      })}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      <div className="space-y-3">
-                        {items.map(({ activity, index }, localIndex) => (
-                          <SortableAttractionItem
-                            key={activity.id || index}
-                            activity={activity}
-                            index={index}
-                            register={register}
-                            watch={watch}
-                            onDelete={() => handleDeleteActivity(index)}
-                            onMoveUp={() => handleMoveUp(index, date)}
-                            onMoveDown={() => handleMoveDown(index, date)}
-                            isFirst={localIndex === 0}
-                            isLast={localIndex === items.length - 1}
-                          />
-                        ))}
-                      </div>
-                    </SortableContext>
-                  </DndContext>
-                </div>
-              ))}
+              .map(([date, items]) => {
+                const maxPosition = items.length - 1;
+                return (
+                  <div key={date}>
+                    <h3 className="font-semibold text-lg mb-3">{date}</h3>
+                    <div className="space-y-3">
+                      {items.map(({ activity, index }) => (
+                        <AttractionItem
+                          key={activity.id || index}
+                          activity={activity}
+                          index={index}
+                          register={register}
+                          watch={watch}
+                          onDelete={() => handleDeleteActivity(index)}
+                          availableDates={availableDates}
+                          maxPositionForDate={maxPosition}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
           </div>
         )}
         

@@ -7,94 +7,33 @@
 
 'use client';
 
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { UseFormRegister, UseFormWatch } from 'react-hook-form';
 import type { TripEditFormData, ActivityEditFormData } from '@/types/editMode';
-import { GripVertical, Lock, ChevronUp, ChevronDown } from 'lucide-react';
+import { Lock } from 'lucide-react';
 
-interface SortableAttractionItemProps {
+interface AttractionItemProps {
   activity: ActivityEditFormData;
   index: number;
   register: UseFormRegister<TripEditFormData>;
   watch: UseFormWatch<TripEditFormData>;
   onDelete: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  isFirst: boolean;
-  isLast: boolean;
+  availableDates: string[];
+  maxPositionForDate: number;
 }
 
-export default function SortableAttractionItem({
+export default function AttractionItem({
   activity,
   index,
   register,
   watch,
   onDelete,
-  onMoveUp,
-  onMoveDown,
-  isFirst,
-  isLast
-}: SortableAttractionItemProps) {
-  // Use consistent ID generation
-  const itemId = activity.id || `temp-${index}`;
-  
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: itemId });
-  
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-  
+  availableDates,
+  maxPositionForDate
+}: AttractionItemProps) {
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`card bg-base-200 ${isDragging ? 'shadow-2xl' : ''}`}
-    >
+    <div className="card bg-base-200">
       <div className="card-body p-4">
-        <div className="flex gap-2 items-start">
-          {/* Reorder Controls */}
-          <div className="flex flex-col gap-1">
-            {/* Up/Down Buttons */}
-            <button
-              type="button"
-              onClick={onMoveUp}
-              disabled={isFirst}
-              className="btn btn-ghost btn-xs btn-square"
-              title="Move up"
-            >
-              <ChevronUp className="h-3 w-3" />
-            </button>
-            <button
-              type="button"
-              onClick={onMoveDown}
-              disabled={isLast}
-              className="btn btn-ghost btn-xs btn-square"
-              title="Move down"
-            >
-              <ChevronDown className="h-3 w-3" />
-            </button>
-          </div>
-          
-          {/* Drag Handle (optional - for desktop users who prefer it) */}
-          <div
-            className="btn btn-ghost btn-sm btn-square cursor-grab active:cursor-grabbing mt-1 hidden sm:flex"
-            {...attributes}
-            {...listeners}
-            title="Drag to reorder"
-          >
-            <GripVertical className="h-4 w-4 text-base-content/60" />
-          </div>
-          
+        <div className="flex gap-3 items-start">
           {/* Content */}
           <div className="flex-1">
             <div className="flex justify-between items-start">
@@ -123,6 +62,43 @@ export default function SortableAttractionItem({
               >
                 Delete
               </button>
+            </div>
+            
+            {/* Move to Day and Position Controls */}
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <div className="form-control">
+                <label className="label py-1">
+                  <span className="label-text text-sm">Move to Day</span>
+                </label>
+                <select
+                  {...register(`activities.${index}.date`)}
+                  className="select select-bordered select-sm"
+                >
+                  {availableDates.map((date) => (
+                    <option key={date} value={date}>
+                      {date}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-control">
+                <label className="label py-1">
+                  <span className="label-text text-sm">Position</span>
+                </label>
+                <input
+                  type="number"
+                  {...register(`activities.${index}.order_index`, {
+                    valueAsNumber: true,
+                    min: 0,
+                    max: maxPositionForDate
+                  })}
+                  className="input input-bordered input-sm"
+                  placeholder="0"
+                  min="0"
+                  max={maxPositionForDate}
+                />
+              </div>
             </div>
             
             {/* Notes field */}

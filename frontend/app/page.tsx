@@ -1,8 +1,9 @@
 import { TripList } from '@/components/TripList'
-import tripsData from '@/data/trips.json'
+import { loadTripIndex } from '@/lib/tripLoader'
 
-export default function HomePage() {
-  const trips = tripsData.trips
+export default async function HomePage() {
+  const tripIndex = await loadTripIndex()
+  const trips = tripIndex.trips
 
   return (
     <main className="min-h-screen">

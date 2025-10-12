@@ -1,10 +1,10 @@
 'use client'
 
 import { TripCard } from './TripCard'
-import type { Trip } from '@/types'
+import type { TripIndex } from '@/types'
 
 export interface TripListProps {
-  trips: Trip[]
+  trips: TripIndex[]
   isLoading?: boolean
 }
 

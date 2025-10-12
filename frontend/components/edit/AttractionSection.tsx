@@ -16,7 +16,9 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
-  DragEndEvent
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -46,6 +48,7 @@ export default function AttractionSection({
   const [newActivity, setNewActivity] = useState<Partial<ActivityEditFormData>>({});
   const [plusCode, setPlusCode] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [activeId, setActiveId] = useState<string | null>(null);
   
   // Setup sensors for drag-and-drop with activation constraints
   // This prevents conflicts with scrolling and clicking
@@ -106,6 +109,10 @@ export default function AttractionSection({
     setNewActivity({});
     setPlusCode('');
     setShowAddForm(false);
+  };
+  
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
   };
   
   const handleDeleteActivity = (index: number) => {
@@ -180,17 +187,21 @@ export default function AttractionSection({
   const handleDragEnd = (event: DragEndEvent, date: string) => {
     const { active, over } = event;
     
+    setActiveId(null);
+    
     if (!over || active.id === over.id) {
       return;
     }
     
     // Get all activities (including deleted) and find indices
-    const activeGlobalIndex = activities.findIndex(a => 
-      (a.id && a.id === active.id) || `temp-${activities.indexOf(a)}` === active.id
-    );
-    const overGlobalIndex = activities.findIndex(a => 
-      (a.id && a.id === over.id) || `temp-${activities.indexOf(a)}` === over.id
-    );
+    const activeGlobalIndex = activities.findIndex((a, idx) => {
+      const itemId = a.id || `temp-${idx}`;
+      return itemId === active.id;
+    });
+    const overGlobalIndex = activities.findIndex((a, idx) => {
+      const itemId = a.id || `temp-${idx}`;
+      return itemId === over.id;
+    });
     
     if (activeGlobalIndex === -1 || overGlobalIndex === -1) {
       return;
@@ -253,10 +264,13 @@ export default function AttractionSection({
                   <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
+                    onDragStart={handleDragStart}
                     onDragEnd={(event) => handleDragEnd(event, date)}
                   >
                     <SortableContext
-                      items={items.map(({ activity, index }) => activity.id || `temp-${index}`)}
+                      items={items.map(({ activity, index }) => {
+                        return activity.id || `temp-${index}`;
+                      })}
                       strategy={verticalListSortingStrategy}
                     >
                       <div className="space-y-3">

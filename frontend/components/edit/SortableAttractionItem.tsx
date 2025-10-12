@@ -36,6 +36,9 @@ export default function SortableAttractionItem({
   isFirst,
   isLast
 }: SortableAttractionItemProps) {
+  // Use consistent ID generation
+  const itemId = activity.id || `temp-${index}`;
+  
   const {
     attributes,
     listeners,
@@ -43,7 +46,7 @@ export default function SortableAttractionItem({
     transform,
     transition,
     isDragging
-  } = useSortable({ id: activity.id || `temp-${index}` });
+  } = useSortable({ id: itemId });
   
   const style = {
     transform: CSS.Transform.toString(transform),

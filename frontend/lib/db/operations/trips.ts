@@ -6,7 +6,7 @@
  */
 
 import { db } from '../schema';
-import type { Trip, TripWithPlaces, TripWithRelations, Result } from '../models';
+import type { Trip, TripWithPlaces, TripWithRelations, TripUpdate, Result } from '../models';
 import { wrapDatabaseOperation, createNotFoundError } from '../errors';
 
 /**
@@ -106,5 +106,29 @@ export async function getTripWithRelations(id: string): Promise<Result<TripWithR
       activities,
       restaurants
     };
+  });
+}
+
+/**
+ * Update an existing trip
+ * Only updates provided fields, leaves others unchanged
+ * Automatically updates updated_at timestamp
+ */
+export async function updateTrip(update: TripUpdate): Promise<Result<void>> {
+  return wrapDatabaseOperation(async () => {
+    const { id, ...updates } = update;
+    
+    // Verify trip exists and is not deleted
+    const existingTrip = await db.trips.get(id);
+    
+    if (!existingTrip || existingTrip.deleted) {
+      throw createNotFoundError('Trip', id);
+    }
+    
+    // Update the trip with new timestamp
+    await db.trips.update(id, {
+      ...updates,
+      updated_at: new Date().toISOString()
+    });
   });
 }

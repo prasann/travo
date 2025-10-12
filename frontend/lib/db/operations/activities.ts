@@ -7,9 +7,10 @@
  * CRUD operations for DailyActivity entities
  */
 
+import { v4 as uuidv4 } from 'uuid';
 import { db } from '../schema';
-import type { DailyActivity, Result } from '../models';
-import { wrapDatabaseOperation } from '../errors';
+import type { DailyActivity, ActivityInput, Result } from '../models';
+import { wrapDatabaseOperation, createNotFoundError } from '../errors';
 
 /**
  * Get all activities for a trip
@@ -30,5 +31,38 @@ export async function getActivitiesByTripId(tripId: string): Promise<Result<Dail
     });
     
     return activities;
+  });
+}
+
+/**
+ * Create a new activity
+ * Automatically generates ID and timestamp
+ */
+export async function createActivity(input: ActivityInput): Promise<Result<DailyActivity>> {
+  return wrapDatabaseOperation(async () => {
+    const activity: DailyActivity = {
+      id: uuidv4(),
+      updated_at: new Date().toISOString(),
+      ...input
+    };
+    
+    await db.activities.add(activity);
+    
+    return activity;
+  });
+}
+
+/**
+ * Delete an activity by ID
+ */
+export async function deleteActivity(id: string): Promise<Result<void>> {
+  return wrapDatabaseOperation(async () => {
+    const activity = await db.activities.get(id);
+    
+    if (!activity) {
+      throw createNotFoundError('Activity', id);
+    }
+    
+    await db.activities.delete(id);
   });
 }

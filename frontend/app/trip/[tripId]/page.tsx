@@ -59,7 +59,12 @@ export default function TripPage({ params }: TripPageProps) {
       <div className="container mx-auto max-w-4xl">
         {/* Trip Header */}
         <div className="mb-4 sm:mb-6">
-          <h1 className="text-2xl sm:text-4xl font-bold mb-1">{trip.name}</h1>
+          <div className="flex justify-between items-start mb-1">
+            <h1 className="text-2xl sm:text-4xl font-bold">{trip.name}</h1>
+            <a href={`/trip/${tripId}/edit`} className="btn btn-primary btn-sm">
+              Edit Trip
+            </a>
+          </div>
           <p className="text-base-content/60 text-sm sm:text-base">
             {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
           </p>

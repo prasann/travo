@@ -17,6 +17,7 @@ import CategoryNav from './CategoryNav';
 import NotesSection from './NotesSection';
 import HotelSection from './HotelSection';
 import AttractionSection from './AttractionSection';
+import FlightSection from './FlightSection';
 
 interface EditModeLayoutProps {
   tripId: string;
@@ -111,8 +112,9 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
     try {
       // Import DB operations dynamically to avoid server-side issues
       const { updateTrip } = await import('@/lib/db/operations/trips');
-      const { createHotel, deleteHotel } = await import('@/lib/db/operations/hotels');
-      const { createActivity, deleteActivity, bulkUpdateActivities } = await import('@/lib/db/operations/activities');
+      const { createHotel, updateHotel, deleteHotel } = await import('@/lib/db/operations/hotels');
+      const { createActivity, updateActivity, deleteActivity, bulkUpdateActivities } = await import('@/lib/db/operations/activities');
+      const { updateFlight } = await import('@/lib/db/operations/flights');
       
       // Update trip basic info
       const tripResult = await updateTrip({
@@ -147,12 +149,17 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             phone: hotel.phone,
             notes: hotel.notes,
           });
+        } else if (hotel.id) {
+          // Update existing hotel (Phase 6 - notes support)
+          await updateHotel(hotel.id, {
+            notes: hotel.notes,
+          });
         }
-        // Note: Hotel updates not implemented in MVP (Phase 1-4)
       }
       
       // Handle activity changes
       const reorderedActivities: Array<{ id: string; order_index: number }> = [];
+      const updatedActivities: Array<{ id: string; notes: string | null }> = [];
       
       for (const activity of data.activities) {
         if (activity._deleted && activity.id) {
@@ -178,12 +185,34 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             id: activity.id,
             order_index: activity.order_index
           });
+          
+          // Track notes updates (Phase 6)
+          updatedActivities.push({
+            id: activity.id,
+            notes: activity.notes ?? null
+          });
         }
       }
       
       // Bulk update order_index for reordered activities
       if (reorderedActivities.length > 0) {
         await bulkUpdateActivities(reorderedActivities);
+      }
+      
+      // Update activity notes (Phase 6)
+      for (const activity of updatedActivities) {
+        await updateActivity(activity.id, {
+          notes: activity.notes ?? undefined,
+        });
+      }
+      
+      // Update flight notes (Phase 6)
+      for (const flight of data.flights) {
+        if (flight.id) {
+          await updateFlight(flight.id, {
+            notes: flight.notes ?? undefined,
+          });
+        }
       }
       
       setSuccessMessage('Trip saved successfully!');
@@ -412,14 +441,12 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             </div>
           )}
           
-          {/* Flights Section (Placeholder) */}
+          {/* Flights Section */}
           {activeCategory === 'flights' && (
-            <div className="card bg-base-100 shadow-xl mb-6">
-              <div className="card-body">
-                <h2 className="card-title">Flights</h2>
-                <p className="text-base-content/60">Flight editing coming in next phase...</p>
-              </div>
-            </div>
+            <FlightSection
+              register={register}
+              watch={watch}
+            />
           )}
           
           {/* Hotels Section */}

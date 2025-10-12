@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import type { TripEditFormData, HotelEditFormData } from '@/types/editMode';
 import PlusCodeInput from './PlusCodeInput';
+import { Lock } from 'lucide-react';
 
 interface HotelSectionProps {
   register: UseFormRegister<TripEditFormData>;
@@ -92,12 +93,20 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                 <div className="card-body">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      {/* Read-only name and address */}
-                      <h3 className="font-semibold">{hotel.name}</h3>
-                      <p className="text-sm text-base-content/60">{hotel.address}</p>
-                      {hotel.plus_code && (
-                        <p className="text-xs text-base-content/50 mt-1">Plus Code: {hotel.plus_code}</p>
-                      )}
+                      {/* Read-only name and address with lock icon */}
+                      <div className="flex items-start gap-2">
+                        <Lock className="w-4 h-4 text-base-content/40 mt-0.5" />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-base-content/70">{hotel.name}</h3>
+                          <p className="text-sm text-base-content/50">{hotel.address}</p>
+                          {hotel.plus_code && (
+                            <p className="text-xs text-base-content/40 mt-1">Plus Code: {hotel.plus_code}</p>
+                          )}
+                          <p className="text-xs text-base-content/40 mt-1 italic">
+                            To change name or address, delete and re-add with correct Plus Code
+                          </p>
+                        </div>
+                      </div>
                     </div>
                     <button
                       type="button"
@@ -172,9 +181,14 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                   <div className="form-control mt-4">
                     <label className="label">
                       <span className="label-text">Notes</span>
+                      <span className="label-text-alt">
+                        {(watch(`hotels.${index}.notes`) || '').length}/2000
+                      </span>
                     </label>
                     <textarea
-                      {...register(`hotels.${index}.notes`)}
+                      {...register(`hotels.${index}.notes`, {
+                        maxLength: { value: 2000, message: 'Notes cannot exceed 2000 characters' }
+                      })}
                       className="textarea textarea-bordered"
                       rows={2}
                       placeholder="Hotel notes..."
@@ -285,10 +299,18 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                   <div className="form-control mt-4">
                     <label className="label">
                       <span className="label-text">Notes</span>
+                      <span className="label-text-alt">
+                        {(newHotel.notes || '').length}/2000
+                      </span>
                     </label>
                     <textarea
                       value={newHotel.notes || ''}
-                      onChange={(e) => setNewHotel(prev => ({ ...prev, notes: e.target.value }))}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.length <= 2000) {
+                          setNewHotel(prev => ({ ...prev, notes: value }));
+                        }
+                      }}
                       className="textarea textarea-bordered"
                       rows={2}
                       placeholder="Hotel notes..."

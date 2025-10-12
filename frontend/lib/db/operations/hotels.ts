@@ -46,6 +46,33 @@ export async function createHotel(input: HotelInput): Promise<Result<Hotel>> {
 }
 
 /**
+ * Update a hotel's properties
+ * Automatically updates timestamp
+ */
+export async function updateHotel(
+  id: string,
+  updates: Partial<Omit<Hotel, 'id' | 'trip_id' | 'updated_at'>>
+): Promise<Result<Hotel>> {
+  return wrapDatabaseOperation(async () => {
+    const hotel = await db.hotels.get(id);
+    
+    if (!hotel) {
+      throw createNotFoundError('Hotel', id);
+    }
+    
+    const updatedHotel: Hotel = {
+      ...hotel,
+      ...updates,
+      updated_at: new Date().toISOString()
+    };
+    
+    await db.hotels.put(updatedHotel);
+    
+    return updatedHotel;
+  });
+}
+
+/**
  * Delete a hotel by ID
  */
 export async function deleteHotel(id: string): Promise<Result<void>> {

@@ -237,21 +237,21 @@
 
 ### Implementation for User Story 4
 
-- [ ] **T025** [US4] Add notes field to HotelSection in `frontend/components/edit/HotelSection.tsx`
+- [x] **T025** [US4] Add notes field to HotelSection in `frontend/components/edit/HotelSection.tsx`
   - Add textarea for notes per hotel
   - Integrate with React Hook Form
   - Validation: max 2000 characters
   - Character count display
   - DaisyUI textarea styling
 
-- [ ] **T026** [US4] Add notes field to AttractionSection in `frontend/components/edit/AttractionSection.tsx`
+- [x] **T026** [US4] Add notes field to AttractionSection in `frontend/components/edit/AttractionSection.tsx`
   - Add textarea for notes per attraction
   - Integrate with React Hook Form
   - Validation: max 2000 characters
   - Character count display
   - DaisyUI textarea styling
 
-- [ ] **T027** [P] [US4] Create FlightSection component in `frontend/components/edit/FlightSection.tsx`
+- [x] **T027** [P] [US4] Create FlightSection component in `frontend/components/edit/FlightSection.tsx`
   - Display list of existing flights from trip data
   - Each flight: display flight number, airports, times (read-only for now)
   - Add/edit notes field per flight (primary focus)
@@ -260,19 +260,19 @@
   - Character count display
   - DaisyUI styling
 
-- [ ] **T028** [US4] Implement hotel notes save in EditModeLayout
+- [x] **T028** [US4] Implement hotel notes save in EditModeLayout
   - Extract notes from hotel form fields
   - Call `updateHotel(id, {notes})` for hotels with changed notes
   - Handle errors from update operations
   - Include in success message
 
-- [ ] **T029** [US4] Implement attraction notes save in EditModeLayout
+- [x] **T029** [US4] Implement attraction notes save in EditModeLayout
   - Extract notes from attraction form fields
   - Call `updateActivity(id, {notes})` for attractions with changed notes
   - Handle errors from update operations
   - Include in success message
 
-- [ ] **T030** [US4] Implement flight notes save in EditModeLayout
+- [x] **T030** [US4] Implement flight notes save in EditModeLayout
   - Extract notes from flight form fields
   - Call `updateFlight(id, {notes})` from `lib/db/operations/flights.ts`
   - Handle errors from update operations
@@ -290,21 +290,21 @@
 
 ### Implementation for User Story 5
 
-- [ ] **T031** [US5] Make auto-populated fields read-only in HotelSection
+- [x] **T031** [US5] Make auto-populated fields read-only in HotelSection
   - Name field: disabled or read-only if populated from API
   - Address field: disabled or read-only if populated from API
   - Visual indication (grayed out, lock icon)
   - Tooltip explaining why fields are read-only
   - Guidance text: "To change, delete and re-add with correct Plus Code"
 
-- [ ] **T032** [US5] Make auto-populated fields read-only in AttractionSection
+- [x] **T032** [US5] Make auto-populated fields read-only in AttractionSection
   - Name field: disabled or read-only if populated from API
   - Location field: disabled or read-only if populated from API
   - Visual indication (grayed out, lock icon)
   - Tooltip explaining why fields are read-only
   - Guidance text: "To change, delete and re-add with correct Plus Code"
 
-- [ ] **T033** [US5] Add visual distinction between editable and read-only fields
+- [x] **T033** [US5] Add visual distinction between editable and read-only fields
   - Use DaisyUI disabled input styles
   - Add lock icon for read-only fields
   - Different background color for read-only fields

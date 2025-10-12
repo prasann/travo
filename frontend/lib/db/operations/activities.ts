@@ -53,6 +53,33 @@ export async function createActivity(input: ActivityInput): Promise<Result<Daily
 }
 
 /**
+ * Update an activity's properties
+ * Automatically updates timestamp
+ */
+export async function updateActivity(
+  id: string,
+  updates: Partial<Omit<DailyActivity, 'id' | 'trip_id' | 'date' | 'updated_at'>>
+): Promise<Result<DailyActivity>> {
+  return wrapDatabaseOperation(async () => {
+    const activity = await db.activities.get(id);
+    
+    if (!activity) {
+      throw createNotFoundError('Activity', id);
+    }
+    
+    const updatedActivity: DailyActivity = {
+      ...activity,
+      ...updates,
+      updated_at: new Date().toISOString()
+    };
+    
+    await db.activities.put(updatedActivity);
+    
+    return updatedActivity;
+  });
+}
+
+/**
  * Delete an activity by ID
  */
 export async function deleteActivity(id: string): Promise<Result<void>> {

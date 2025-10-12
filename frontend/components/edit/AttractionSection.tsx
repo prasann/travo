@@ -191,6 +191,7 @@ export default function AttractionSection({
                             activity={activity}
                             index={index}
                             register={register}
+                            watch={watch}
                             onDelete={() => handleDeleteActivity(index)}
                           />
                         ))}

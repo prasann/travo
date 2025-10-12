@@ -9,14 +9,15 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { UseFormRegister } from 'react-hook-form';
+import { UseFormRegister, UseFormWatch } from 'react-hook-form';
 import type { TripEditFormData, ActivityEditFormData } from '@/types/editMode';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Lock } from 'lucide-react';
 
 interface SortableAttractionItemProps {
   activity: ActivityEditFormData;
   index: number;
   register: UseFormRegister<TripEditFormData>;
+  watch: UseFormWatch<TripEditFormData>;
   onDelete: () => void;
 }
 
@@ -24,6 +25,7 @@ export default function SortableAttractionItem({
   activity,
   index,
   register,
+  watch,
   onDelete
 }: SortableAttractionItemProps) {
   const {
@@ -63,14 +65,22 @@ export default function SortableAttractionItem({
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                {/* Read-only name and address */}
-                <h4 className="font-semibold">{activity.name}</h4>
-                {activity.address && (
-                  <p className="text-sm text-base-content/60">{activity.address}</p>
-                )}
-                {activity.plus_code && (
-                  <p className="text-xs text-base-content/50 mt-1">Plus Code: {activity.plus_code}</p>
-                )}
+                {/* Read-only name and address with lock icon */}
+                <div className="flex items-start gap-2">
+                  <Lock className="w-3 h-3 text-base-content/40 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm text-base-content/70">{activity.name}</h4>
+                    {activity.address && (
+                      <p className="text-xs text-base-content/50">{activity.address}</p>
+                    )}
+                    {activity.plus_code && (
+                      <p className="text-xs text-base-content/40 mt-0.5">Plus Code: {activity.plus_code}</p>
+                    )}
+                    <p className="text-xs text-base-content/40 mt-0.5 italic">
+                      To change name or address, delete and re-add with correct Plus Code
+                    </p>
+                  </div>
+                </div>
               </div>
               <button
                 type="button"
@@ -125,9 +135,14 @@ export default function SortableAttractionItem({
             <div className="form-control mt-3">
               <label className="label py-1">
                 <span className="label-text text-sm">Notes</span>
+                <span className="label-text-alt text-xs">
+                  {(watch(`activities.${index}.notes`) || '').length}/2000
+                </span>
               </label>
               <textarea
-                {...register(`activities.${index}.notes`)}
+                {...register(`activities.${index}.notes`, {
+                  maxLength: { value: 2000, message: 'Notes cannot exceed 2000 characters' }
+                })}
                 className="textarea textarea-bordered textarea-sm"
                 rows={2}
                 placeholder="Activity notes..."

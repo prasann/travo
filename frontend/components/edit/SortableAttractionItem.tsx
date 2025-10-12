@@ -11,7 +11,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { UseFormRegister, UseFormWatch } from 'react-hook-form';
 import type { TripEditFormData, ActivityEditFormData } from '@/types/editMode';
-import { GripVertical, Lock } from 'lucide-react';
+import { GripVertical, Lock, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface SortableAttractionItemProps {
   activity: ActivityEditFormData;
@@ -19,6 +19,10 @@ interface SortableAttractionItemProps {
   register: UseFormRegister<TripEditFormData>;
   watch: UseFormWatch<TripEditFormData>;
   onDelete: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  isFirst: boolean;
+  isLast: boolean;
 }
 
 export default function SortableAttractionItem({
@@ -26,7 +30,11 @@ export default function SortableAttractionItem({
   index,
   register,
   watch,
-  onDelete
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast
 }: SortableAttractionItemProps) {
   const {
     attributes,
@@ -51,12 +59,36 @@ export default function SortableAttractionItem({
     >
       <div className="card-body p-4">
         <div className="flex gap-2 items-start">
-          {/* Drag Handle */}
+          {/* Reorder Controls */}
+          <div className="flex flex-col gap-1">
+            {/* Up/Down Buttons */}
+            <button
+              type="button"
+              onClick={onMoveUp}
+              disabled={isFirst}
+              className="btn btn-ghost btn-xs btn-square"
+              title="Move up"
+            >
+              <ChevronUp className="h-3 w-3" />
+            </button>
+            <button
+              type="button"
+              onClick={onMoveDown}
+              disabled={isLast}
+              className="btn btn-ghost btn-xs btn-square"
+              title="Move down"
+            >
+              <ChevronDown className="h-3 w-3" />
+            </button>
+          </div>
+          
+          {/* Drag Handle (optional - for desktop users who prefer it) */}
           <button
             type="button"
-            className="btn btn-ghost btn-sm btn-square cursor-grab active:cursor-grabbing mt-1"
+            className="btn btn-ghost btn-sm btn-square cursor-grab active:cursor-grabbing mt-1 hidden sm:flex"
             {...attributes}
             {...listeners}
+            title="Drag to reorder"
           >
             <GripVertical className="h-4 w-4 text-base-content/60" />
           </button>

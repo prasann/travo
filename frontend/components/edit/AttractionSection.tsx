@@ -47,10 +47,20 @@ export default function AttractionSection({
   const [plusCode, setPlusCode] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   
-  // Setup sensors for drag-and-drop (both mouse and touch)
+  // Setup sensors for drag-and-drop with activation constraints
+  // This prevents conflicts with scrolling and clicking
   const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(TouchSensor)
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px of movement required before drag starts
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250, // 250ms hold before drag starts
+        tolerance: 5, // 5px of movement tolerance
+      },
+    })
   );
   
   const handlePlusCodeSuccess = (result: { name: string; address: string }) => {
@@ -109,6 +119,62 @@ export default function AttractionSection({
     }
     
     setValue('activities', updatedActivities);
+  };
+  
+  const handleMoveUp = (globalIndex: number, date: string) => {
+    // Get activities for this date
+    const dateActivitiesWithIndices = activities
+      .map((a, idx) => ({ activity: a, globalIndex: idx }))
+      .filter(item => item.activity.date === date && !item.activity._deleted);
+    
+    const currentLocalIndex = dateActivitiesWithIndices.findIndex(item => item.globalIndex === globalIndex);
+    
+    // Can't move up if already first
+    if (currentLocalIndex <= 0) return;
+    
+    // Swap with previous item
+    const reordered = [...dateActivitiesWithIndices];
+    [reordered[currentLocalIndex - 1], reordered[currentLocalIndex]] = 
+      [reordered[currentLocalIndex], reordered[currentLocalIndex - 1]];
+    
+    // Update order_index
+    const updatedActivities = [...activities];
+    reordered.forEach((item, newIdx) => {
+      updatedActivities[item.globalIndex] = {
+        ...updatedActivities[item.globalIndex],
+        order_index: newIdx
+      };
+    });
+    
+    setValue('activities', updatedActivities, { shouldDirty: true });
+  };
+  
+  const handleMoveDown = (globalIndex: number, date: string) => {
+    // Get activities for this date
+    const dateActivitiesWithIndices = activities
+      .map((a, idx) => ({ activity: a, globalIndex: idx }))
+      .filter(item => item.activity.date === date && !item.activity._deleted);
+    
+    const currentLocalIndex = dateActivitiesWithIndices.findIndex(item => item.globalIndex === globalIndex);
+    
+    // Can't move down if already last
+    if (currentLocalIndex >= dateActivitiesWithIndices.length - 1) return;
+    
+    // Swap with next item
+    const reordered = [...dateActivitiesWithIndices];
+    [reordered[currentLocalIndex], reordered[currentLocalIndex + 1]] = 
+      [reordered[currentLocalIndex + 1], reordered[currentLocalIndex]];
+    
+    // Update order_index
+    const updatedActivities = [...activities];
+    reordered.forEach((item, newIdx) => {
+      updatedActivities[item.globalIndex] = {
+        ...updatedActivities[item.globalIndex],
+        order_index: newIdx
+      };
+    });
+    
+    setValue('activities', updatedActivities, { shouldDirty: true });
   };
   
   const handleDragEnd = (event: DragEndEvent, date: string) => {
@@ -194,7 +260,7 @@ export default function AttractionSection({
                       strategy={verticalListSortingStrategy}
                     >
                       <div className="space-y-3">
-                        {items.map(({ activity, index }) => (
+                        {items.map(({ activity, index }, localIndex) => (
                           <SortableAttractionItem
                             key={activity.id || index}
                             activity={activity}
@@ -202,6 +268,10 @@ export default function AttractionSection({
                             register={register}
                             watch={watch}
                             onDelete={() => handleDeleteActivity(index)}
+                            onMoveUp={() => handleMoveUp(index, date)}
+                            onMoveDown={() => handleMoveDown(index, date)}
+                            isFirst={localIndex === 0}
+                            isLast={localIndex === items.length - 1}
                           />
                         ))}
                       </div>

@@ -1,13 +1,13 @@
 # Implementation Plan: Local Database Layer with IndexedDB
 
-**Branch**: `005-let-s-introduce` | **Date**: 2025-10-12 | **Spec**: [spec.md](./spec.md)
+**Branch**: `005-let-s-introduce` | **Date**: 2025-10-12 (Revised) | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/005-let-s-introduce/spec.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: Plan revised on 2025-10-12 to incorporate enhanced data model from merged main branch (005-need-to-better feature).
 
 ## Summary
 
-Introduce a local IndexedDB database layer as the primary data source for the Travo application, replacing direct JSON file reads. The data layer provides a complete CRUD API for Trip and Place entities, supporting soft delete/restore operations. Implementation uses Dexie.js as an IndexedDB wrapper and maintains complete separation from UI components to enable future migration to Supabase without UI changes. The initial JSON data serves as seed data loaded on first launch. Focus is on building functional data layer interfaces without UI integration—UI binding will be implemented in a future phase.
+Introduce a local IndexedDB database layer as the primary data source for the Travo application, replacing direct JSON file reads. The database now supports an **enhanced data model** with multiple entity types including Trip, Flight, Hotel, DailyActivity, and RestaurantRecommendation. Implementation uses Dexie.js as an IndexedDB wrapper and maintains complete separation from UI components to enable future migration to Supabase without UI changes. Each trip is stored in a separate JSON file (seed data) and loaded on first launch. Focus is on building functional data layer interfaces without UI integration—UI binding already exists from merged main branch.
 
 ## Technical Context
 
@@ -17,16 +17,19 @@ Introduce a local IndexedDB database layer as the primary data source for the Tr
   - Dexie.js 4.x (IndexedDB wrapper - to be added)
   - Next.js 15.5.4
   - React 19.1.0
+  - DaisyUI 5.2.0 + Tailwind CSS 4.1.14
   - TypeScript 5.x
 
 **Storage**: IndexedDB (browser-native, persistent local storage)  
 **Testing**: Jest + React Testing Library (existing setup) + Dexie testing utilities  
 **Target Platform**: Modern browsers (Chrome 90+, Firefox 90+, Safari 14+, Edge 90+) with IndexedDB support  
 **Project Type**: Web application (frontend-only, client-side database)  
+
 **Performance Goals**: 
-  - Database operations complete within 500ms for datasets up to 100 trips with 500 places
+  - Database operations complete within 500ms for datasets up to 100 trips
   - Initial database load within 2 seconds
   - Non-blocking async operations
+  - Support 50+ activities, 5+ flights, 3+ hotels per trip
 
 **Constraints**: 
   - Offline-first architecture (no network dependency)
@@ -34,12 +37,13 @@ Introduce a local IndexedDB database layer as the primary data source for the Tr
   - Data layer must be UI-agnostic
   - Browser storage quota typically 50MB+ per origin
   - Simple schema without strict validation initially
+  - One JSON file per trip (seed data in `/frontend/data/trips/`)
 
 **Scale/Scope**: 
-  - Support up to 1000 trips with 5000 total places
-  - 2 entity types (Trip, Place)
-  - 7 core operations (init, seed, read, create, update, soft-delete, restore)
-  - Data layer interfaces only - no UI integration in this phase
+  - Support up to 1000 trips with complex nested data
+  - **9+ entity types**: Trip, Flight, FlightLeg, Hotel, DailyActivity, Place, RestaurantRecommendation, TripIndex
+  - Core operations (init, seed, read, create, update, soft-delete, restore)
+  - Data layer interfaces only - UI integration already exists from merged main branch
 
 ## Constitution Check
 
@@ -57,8 +61,8 @@ Introduce a local IndexedDB database layer as the primary data source for the Tr
 
 ### Principle III: Minimalist User Experience ✅ PASS
 - **Status**: Fully Compliant
-- **Evidence**: Data layer only - no UI changes, maintains simplicity
-- **Impact**: Zero UI complexity added in this phase
+- **Evidence**: Data layer only - UI already exists from merged main, maintains simplicity
+- **Impact**: Zero new UI complexity in this phase
 
 ### Principle IV: Component-Driven Development ✅ PASS
 - **Status**: Fully Compliant
@@ -77,9 +81,9 @@ Introduce a local IndexedDB database layer as the primary data source for the Tr
 
 ### Technology Constraints ✅ PASS
 - **Frontend Stack**: React + TypeScript + Next.js ✅
-- **UI Framework**: ShadCN + Tailwind (no changes needed) ✅
+- **UI Framework**: DaisyUI + Tailwind CSS (no changes needed) ✅
 - **Storage**: IndexedDB via Dexie.js ✅
-- **Location Data**: Not applicable to this feature ✅
+- **Location Data**: Plus Codes in enhanced model ✅
 - **Cross-Platform**: Web app only ✅
 
 ### Development Standards ✅ PASS
@@ -88,7 +92,9 @@ Introduce a local IndexedDB database layer as the primary data source for the Tr
 - **Data Model**: UUID primary keys, updated_at timestamps included ✅
 - **Performance**: 500ms targets specified ✅
 
-**Overall Status**: ✅ ALL GATES PASSED - Proceed to Phase 0
+**Overall Status**: ✅ ALL GATES PASSED - Proceed to implementation
+
+**Revision Note**: Enhanced data model from merged main branch (005-need-to-better) fully aligns with constitution principles. Complexity justified by user requirements for comprehensive trip planning.
 
 ## Project Structure
 
@@ -112,83 +118,104 @@ frontend/                         # Next.js application root
 │   └── db/                      # NEW: Database layer (this feature)
 │       ├── index.ts            # Public API exports
 │       ├── schema.ts           # Dexie schema definitions
-│       ├── models.ts           # TypeScript interfaces for Trip/Place
+│       ├── models.ts           # TypeScript interfaces (DB layer)
 │       ├── seed.ts             # Seed data initialization
-│       └── operations/         # CRUD operations organized by entity
+│       ├── init.ts             # Database initialization
+│       ├── validation.ts       # Validation utilities
+│       ├── errors.ts           # Error handling utilities
+│       └── operations/         # CRUD operations by entity
 │           ├── trips.ts        # Trip CRUD operations
-│           └── places.ts       # Place CRUD operations
-├── data/
-│   └── trips.json              # EXISTING: Seed data source
+│           ├── flights.ts      # NEW: Flight CRUD operations
+│           ├── hotels.ts       # NEW: Hotel CRUD operations
+│           ├── activities.ts   # NEW: Activity CRUD operations
+│           ├── restaurants.ts  # NEW: Restaurant CRUD operations
+│           └── places.ts       # Place CRUD operations (legacy)
 ├── types/
-│   └── index.ts                # EXISTING: Shared types (may import from db/models.ts)
-├── components/                  # EXISTING: No changes
-├── app/                        # EXISTING: No changes  
+│   └── index.ts                # EXISTING: Enhanced types from main
+├── data/
+│   ├── trip-index.json         # EXISTING: Trip index from main
+│   └── trips/                  # EXISTING: One JSON per trip from main
+│       ├── 123e4567-*.json
+│       ├── 456def78-*.json
+│       └── 987f6543-*.json
+├── components/                  # EXISTING: UI components from main
+│   ├── FlightCard.tsx          # From merged main
+│   ├── HotelCard.tsx           # From merged main
+│   ├── ActivityCard.tsx        # From merged main
+│   ├── RestaurantList.tsx      # From merged main
+│   ├── TripTimeline.tsx        # From merged main
+│   └── ...                     # Other existing components
+├── app/                        # EXISTING: Next.js App Router
+│   ├── page.tsx                # Trip list page
+│   └── trip/[tripId]/
+│       └── page.tsx            # Trip detail page (uses merged UI)
 └── __tests__/                  # NEW: Tests for database layer
     └── db/
         ├── schema.test.ts
         ├── trips.test.ts
-        └── places.test.ts
+        ├── flights.test.ts
+        ├── hotels.test.ts
+        ├── activities.test.ts
+        └── restaurants.test.ts
 ```
 
-**Structure Decision**: Web application structure with frontend-only implementation. Database layer isolated in `frontend/lib/db/` directory following Next.js conventions. All database logic contained in this module with clear public API through `index.ts`. Operations separated by entity (trips, places) for maintainability. Existing UI components remain unchanged - they will import from `lib/db` in future when UI integration is implemented.
+**Structure Decision**: Web application structure with frontend-only implementation. Database layer isolated in `frontend/lib/db/` directory following Next.js conventions. **Enhanced from merged main**: Now supports 9+ entity types instead of just Trip/Place. All database logic contained in this module with clear public API through `index.ts`. Operations separated by entity type for maintainability. **UI components already exist from merged main** - they will be connected to database layer in future phase.
 
 ## Complexity Tracking
 
 No constitution violations detected. All principles compliant.
 
----
-
-## Phase 0: Research Complete ✅
-
-**Output**: `research.md`
-
-**Key Decisions**:
-1. Dexie.js 4.x selected as IndexedDB wrapper
-2. Simple schema with UUID primary keys and soft delete support
-3. Check-and-load seed data strategy with validation
-4. Basic required field and format validation only
-5. User-facing errors with no internal logging
-6. Unit tests with fake-indexeddb for Jest
-7. Separate TypeScript interfaces from Dexie schema
-
-**Dependencies Identified**:
-- Dexie.js 4.x (IndexedDB wrapper)
-- uuid (UUID generation)
-- fake-indexeddb (testing)
-- @types/uuid (TypeScript definitions)
+**Enhanced Model Justification**: The expanded entity model (9+ types vs original 2) came from merged main branch (005-need-to-better feature) which was user-requested and already has working UI. This complexity serves real user needs for comprehensive trip planning with flights, hotels, activities, and restaurants.
 
 ---
 
-## Phase 1: Design & Contracts Complete ✅
+## Implementation Status & Revision Notes
 
-**Outputs**:
-- `data-model.md` - Complete entity specifications with ERD, schemas, and query patterns
-- `contracts/interfaces.ts` - TypeScript interfaces for all types and operations
-- `quickstart.md` - Developer guide with examples and patterns
-- `.github/copilot-instructions.md` - Updated with new technology stack
+### Completed (Pre-Merge)
+✅ **Phase 0**: Research complete (`research.md`)
+✅ **Phase 1**: Design complete (`data-model.md`, `contracts/interfaces.ts`, `quickstart.md`)
+✅ **Database Infrastructure**: Dexie.js setup with simple Trip/Place model
+✅ **Seed Operations**: Basic seed loading for single JSON file
+✅ **Read Operations**: getAllTrips, getTripById, getTripWithPlaces
 
-**Design Highlights**:
-- **Two entities**: Trip (with soft delete) and Place (with trip relationship)
-- **Database**: TravoLocalDB version 1 using Dexie
-- **Schema**: Simple required fields, UUIDs, timestamps for sync readiness
-- **API**: Complete CRUD operations with Result<T> pattern for type-safe errors
-- **Performance**: Indexed queries targeting <500ms for typical datasets
+### Incoming from Main (005-need-to-better)
+🆕 **Enhanced Data Model**: 9+ entity types in `/frontend/types/index.ts`
+🆕 **UI Components**: FlightCard, HotelCard, ActivityCard, RestaurantList, TripTimeline
+🆕 **Multi-File Storage**: One JSON per trip in `/frontend/data/trips/`
+🆕 **Trip Index**: Separate index file for list view optimization
 
-**Constitution Re-check**: ✅ ALL GATES STILL PASSING
+### Remaining Work (Post-Merge)
+
+**Must Reconcile**:
+1. **Update schema** (`frontend/lib/db/schema.ts`) to support all 9+ entities
+2. **Merge type definitions** (`frontend/lib/db/models.ts` + `frontend/types/index.ts`)
+3. **Update seed loader** to read from per-trip JSON files instead of single file
+4. **Extend CRUD operations** to cover Flight, Hotel, Activity, Restaurant entities
+5. **Update data-model.md** to document enhanced entity relationships
+6. **Revise tasks.md** with new implementation tasks
+
+**Keep Unchanged**:
+- Core database initialization logic
+- Error handling patterns
+- Validation utilities
+- Result<T> pattern for type-safe operations
+- Soft delete implementation on Trip entity
 
 ---
 
 ## Next Steps
 
-**Phase 2 (Not included in /speckit.plan)**:
-Run `/speckit.tasks` to generate implementation tasks from this plan.
+**Immediate Actions**:
+1. ✅ Update `plan.md` with enhanced model context (this file)
+2. ⏭️ Update `data-model.md` with all entity types and relationships
+3. ⏭️ Reconcile `contracts/interfaces.ts` with `frontend/types/index.ts`
+4. ⏭️ Update `tasks.md` with revised implementation sequence
 
-**Implementation Sequence**:
-1. Install dependencies (Dexie.js, uuid, fake-indexeddb)
-2. Create data models and TypeScript interfaces
-3. Implement Dexie schema and database initialization
-4. Implement seed data loader with validation
-5. Implement Trip CRUD operations
-6. Implement Place CRUD operations
-7. Write comprehensive tests
-8. Update existing components to use database layer (future phase)
+**Phase 2 Tasks** (To be generated):
+Run `/speckit.tasks` to generate updated implementation tasks incorporating the enhanced model.
+
+**Implementation Priority**:
+1. Schema expansion (support all entity types)
+2. Seed loader update (per-trip JSON files)
+3. CRUD operations for new entities (Flight, Hotel, Activity, Restaurant)
+4. UI integration (connect existing components to database layer)

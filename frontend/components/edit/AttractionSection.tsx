@@ -147,15 +147,17 @@ export default function AttractionSection({
   // Filter out deleted activities for display
   const visibleActivities = activities.filter(a => !a._deleted);
   
-  // Group activities by date
-  const activitiesByDate = visibleActivities.reduce((acc, activity, index) => {
+  // Group activities by date with ACTUAL indices from full activities array
+  const activitiesByDate = activities.reduce((acc, activity, actualIndex) => {
+    if (activity._deleted) return acc;
+    
     const date = activity.date;
     if (!acc[date]) {
       acc[date] = [];
     }
-    acc[date].push({ activity, index });
+    acc[date].push({ activity, actualIndex });
     return acc;
-  }, {} as Record<string, Array<{ activity: ActivityEditFormData; index: number }>>);
+  }, {} as Record<string, Array<{ activity: ActivityEditFormData; actualIndex: number }>>);
   
   return (
     <div className="card bg-base-100 shadow-xl">
@@ -172,16 +174,16 @@ export default function AttractionSection({
                   <div key={date}>
                     <h3 className="font-semibold text-lg mb-3">{date}</h3>
                     <div className="space-y-3">
-                      {items.map(({ activity, index }, positionInDate) => (
+                      {items.map(({ activity, actualIndex }, positionInDate) => (
                         <AttractionItem
-                          key={activity.id || index}
+                          key={activity.id || actualIndex}
                           activity={activity}
-                          index={index}
+                          index={actualIndex}
                           register={register}
                           watch={watch}
-                          onDelete={() => handleDeleteActivity(index)}
-                          onMoveUp={() => handleMoveUp(index, date)}
-                          onMoveDown={() => handleMoveDown(index, date)}
+                          onDelete={() => handleDeleteActivity(actualIndex)}
+                          onMoveUp={() => handleMoveUp(actualIndex, date)}
+                          onMoveDown={() => handleMoveDown(actualIndex, date)}
                           isFirst={positionInDate === 0}
                           isLast={positionInDate === items.length - 1}
                           availableDates={availableDates}

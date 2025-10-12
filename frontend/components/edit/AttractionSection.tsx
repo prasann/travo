@@ -130,10 +130,14 @@ export default function AttractionSection({
     
     // Swap order_index values
     const tempOrder = updatedActivities[currentIdx].order_index;
+    console.log("currentIdx", currentIdx)
+    console.log("nextIdx", nextIdx)
+    console.log("temp", tempOrder)
     updatedActivities[currentIdx].order_index = updatedActivities[nextIdx].order_index;
     updatedActivities[nextIdx].order_index = tempOrder;
     
     setValue('activities', updatedActivities);
+    console.log("updated", updatedActivities)
   };
   
   // Filter out deleted activities for display
@@ -150,6 +154,11 @@ export default function AttractionSection({
     acc[date].push({ activity, actualIndex });
     return acc;
   }, {} as Record<string, Array<{ activity: ActivityEditFormData; actualIndex: number }>>);
+  
+  // Sort items within each date by order_index
+  Object.values(activitiesByDate).forEach(items => {
+    items.sort((a, b) => a.activity.order_index - b.activity.order_index);
+  });
   
   return (
     <div className="card bg-base-100 shadow-xl">

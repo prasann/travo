@@ -44,13 +44,13 @@ export interface HotelEditFormData {
   /** Hotel ID (undefined for new hotels) */
   id?: string;
   
-  /** Hotel name (read-only after Plus Code lookup) */
+  /** Hotel name (read-only after Google Maps lookup) */
   name?: string;
   
-  /** Hotel address (read-only after Plus Code lookup) */
+  /** Hotel address (read-only after Google Maps lookup) */
   address?: string;
   
-  /** Plus Code used for lookup (read-only) */
+  /** Plus Code from Google Maps (read-only) */
   plus_code?: string;
   
   /** City name */
@@ -82,13 +82,13 @@ export interface ActivityEditFormData {
   /** Activity ID (undefined for new activities) */
   id?: string;
   
-  /** Activity name (read-only after Plus Code lookup) */
+  /** Activity name (read-only after Google Maps lookup) */
   name: string;
   
-  /** Activity location/address (read-only after Plus Code lookup) */
+  /** Activity location/address (read-only after Google Maps lookup) */
   address?: string;
   
-  /** Plus Code used for lookup (read-only) */
+  /** Plus Code from Google Maps (read-only) */
   plus_code?: string;
   
   /** City name */
@@ -154,10 +154,10 @@ export interface FlightEditFormData {
 export type EditCategory = 'info' | 'flights' | 'hotels' | 'attractions' | 'notes';
 
 /**
- * UI state for Plus Code input component
+ * UI state for Maps Link input component
  */
-export interface PlusCodeInputState {
-  /** Current Plus Code value */
+export interface MapsLinkInputState {
+  /** Current Maps URL value */
   value: string;
   
   /** Whether lookup is in progress */

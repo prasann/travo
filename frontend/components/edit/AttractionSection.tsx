@@ -10,7 +10,7 @@
 import { useState } from 'react';
 import { UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import type { TripEditFormData, ActivityEditFormData } from '@/types/editMode';
-import PlusCodeInput from './PlusCodeInput';
+import MapsLinkInput from './MapsLinkInput';
 import AttractionItem from './SortableAttractionItem';
 
 interface AttractionSectionProps {
@@ -30,7 +30,7 @@ export default function AttractionSection({
 }: AttractionSectionProps) {
   const activities = watch('activities') || [];
   const [newActivity, setNewActivity] = useState<Partial<ActivityEditFormData>>({});
-  const [plusCode, setPlusCode] = useState('');
+  const [mapsUrl, setMapsUrl] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   
   // Get all unique dates from trip range
@@ -48,17 +48,23 @@ export default function AttractionSection({
   
   const availableDates = getAllDates();
   
-  const handlePlusCodeSuccess = (result: { name: string; address: string }) => {
+  const handleMapsLinkSuccess = (result: { 
+    name: string; 
+    address: string;
+    plusCode?: string;
+    city?: string;
+  }) => {
     setNewActivity(prev => ({
       ...prev,
       name: result.name,
       address: result.address,
-      plus_code: plusCode
+      plus_code: result.plusCode,
+      city: result.city
     }));
   };
   
-  const handlePlusCodeError = (error: string) => {
-    console.error('Plus Code lookup error:', error);
+  const handleMapsLinkError = (error: string) => {
+    console.error('Maps link lookup error:', error);
   };
   
   const handleAddActivity = () => {
@@ -89,7 +95,7 @@ export default function AttractionSection({
     
     // Reset form
     setNewActivity({});
-    setPlusCode('');
+    setMapsUrl('');
     setShowAddForm(false);
   };
   
@@ -209,12 +215,12 @@ export default function AttractionSection({
             <div className="card-body">
               <h3 className="font-semibold mb-4">Add New Attraction</h3>
               
-              {/* Plus Code Lookup */}
-              <PlusCodeInput
-                value={plusCode}
-                onChange={setPlusCode}
-                onLookupSuccess={handlePlusCodeSuccess}
-                onLookupError={handlePlusCodeError}
+              {/* Google Maps Link Lookup */}
+              <MapsLinkInput
+                value={mapsUrl}
+                onChange={setMapsUrl}
+                onLookupSuccess={handleMapsLinkSuccess}
+                onLookupError={handleMapsLinkError}
               />
               
               {/* Show populated fields after lookup */}
@@ -307,7 +313,7 @@ export default function AttractionSection({
                       onClick={() => {
                         setShowAddForm(false);
                         setNewActivity({});
-                        setPlusCode('');
+                        setMapsUrl('');
                       }}
                       className="btn btn-ghost btn-sm"
                     >

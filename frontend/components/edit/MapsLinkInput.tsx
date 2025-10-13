@@ -1,34 +1,39 @@
 /**
- * Plus Code Input Component
+ * Google Maps Link Input Component
  * 
  * Feature: 006-edit-mode-for
- * Purpose: Input field for Google Plus Codes with lookup functionality
+ * Purpose: Input field for Google Maps URLs with place lookup functionality
  */
 
 'use client';
 
 import { useState } from 'react';
-import { lookupPlusCode } from '@/lib/services/plusCodeService';
-import type { PlusCodeInputState } from '@/types/editMode';
+import { searchPlace } from '@/lib/services/placeSearchService';
+import type { MapsLinkInputState } from '@/types/editMode';
 
-interface PlusCodeInputProps {
+interface MapsLinkInputProps {
   value: string;
   onChange: (value: string) => void;
-  onLookupSuccess: (result: { name: string; address: string }) => void;
+  onLookupSuccess: (result: { 
+    name: string; 
+    address: string;
+    plusCode?: string;
+    city?: string;
+  }) => void;
   onLookupError: (error: string) => void;
   disabled?: boolean;
   label?: string;
 }
 
-export default function PlusCodeInput({
+export default function MapsLinkInput({
   value,
   onChange,
   onLookupSuccess,
   onLookupError,
   disabled = false,
-  label = 'Plus Code'
-}: PlusCodeInputProps) {
-  const [state, setState] = useState<PlusCodeInputState>({
+  label = 'Google Maps Link'
+}: MapsLinkInputProps) {
+  const [state, setState] = useState<MapsLinkInputState>({
     value: '',
     loading: false,
     error: undefined,
@@ -36,19 +41,24 @@ export default function PlusCodeInput({
   });
   
   const handleLookup = async () => {
-    if (!value || value.trim().length < 4) {
-      setState(prev => ({ ...prev, error: 'Plus Code is too short' }));
-      onLookupError('Plus Code is too short');
+    if (!value || value.trim().length < 10) {
+      setState(prev => ({ ...prev, error: 'Please paste a Google Maps link' }));
+      onLookupError('Please paste a Google Maps link');
       return;
     }
     
     setState(prev => ({ ...prev, loading: true, error: undefined }));
     
-    const result = await lookupPlusCode(value);
+    const result = await searchPlace(value);
     
     if (result.success && result.name && result.address) {
       setState(prev => ({ ...prev, loading: false, error: undefined }));
-      onLookupSuccess({ name: result.name, address: result.address });
+      onLookupSuccess({ 
+        name: result.name, 
+        address: result.address,
+        plusCode: result.plusCode,
+        city: result.city
+      });
     } else {
       const errorMessage = result.error || 'Unknown error occurred';
       setState(prev => ({
@@ -80,20 +90,20 @@ export default function PlusCodeInput({
       <label className="label">
         <span className="label-text">{label}</span>
         <span className="label-text-alt text-xs text-base-content/60">
-          e.g., "MP52+Q6 Shibuya, Tokyo" or "8Q7XMP52+Q6"
+          Paste Google Maps share link
         </span>
       </label>
       
       <div className="join">
         <input
-          type="text"
+          type="url"
           value={value}
-          onChange={(e) => onChange(e.target.value.toUpperCase())}
+          onChange={(e) => onChange(e.target.value)}
           onKeyPress={handleKeyPress}
           className="input input-bordered join-item flex-1"
-          placeholder="MP52+Q6 Shibuya, Tokyo"
+          placeholder="https://maps.app.goo.gl/xxx"
           disabled={isDisabled}
-          maxLength={50}
+          maxLength={500}
         />
         <button
           type="button"
@@ -121,7 +131,7 @@ export default function PlusCodeInput({
       {state.disabled && (
         <label className="label">
           <span className="label-text-alt text-warning">
-            Plus Code lookup disabled due to API quota exceeded
+            Place search disabled due to API quota exceeded
           </span>
         </label>
       )}

@@ -92,10 +92,10 @@ function transformHotelToFirestore(hotel: Hotel): FirestoreHotel {
     trip_id: hotel.trip_id,
     name: hotel.name || 'Hotel',
     address: hotel.address || '',
-    city: hotel.city,
-    plus_code: hotel.plus_code,
-    check_in_date: hotel.check_in_time?.split('T')[0] || '', // Extract date from timestamp
-    check_out_date: hotel.check_out_time?.split('T')[0] || '', // Extract date from timestamp
+    plus_code: hotel.plus_code || undefined,
+    city: hotel.city || undefined,
+    check_in_date: hotel.check_in_time?.split('T')[0] || '',
+    check_out_date: hotel.check_out_time?.split('T')[0] || '',
     updated_by: hotel.updated_by,
     updated_at: hotel.updated_at,
   };
@@ -118,14 +118,14 @@ function transformActivityToFirestore(activity: DailyActivity): FirestoreDailyAc
   return {
     id: activity.id,
     trip_id: activity.trip_id,
-    name: activity.name,
-    date: activity.date,
+    name: activity.name || '',
+    date: activity.date || '',
     time_of_day,
-    city: activity.city,
-    plus_code: activity.plus_code,
-    address: activity.address,
-    notes: activity.notes,
-    order_index: activity.order_index,
+    city: activity.city || undefined,
+    plus_code: activity.plus_code || undefined,
+    address: activity.address || undefined,
+    notes: activity.notes || undefined,
+    order_index: activity.order_index ?? 0,
     updated_by: activity.updated_by,
     updated_at: activity.updated_at,
   };
@@ -138,15 +138,24 @@ function transformRestaurantToFirestore(restaurant: RestaurantRecommendation): F
   return {
     id: restaurant.id,
     trip_id: restaurant.trip_id,
-    name: restaurant.name,
-    city: restaurant.city,
-    cuisine_type: restaurant.cuisine_type,
-    address: restaurant.address,
-    plus_code: restaurant.plus_code,
-    notes: restaurant.notes,
+    name: restaurant.name || '',
+    address: restaurant.address || undefined,
+    plus_code: restaurant.plus_code || undefined,
+    city: restaurant.city || undefined,
+    cuisine_type: restaurant.cuisine_type || undefined,
+    notes: restaurant.notes || undefined,
     updated_by: restaurant.updated_by,
     updated_at: restaurant.updated_at,
   };
+}
+
+// Remove undefined fields from an object (Firestore rejects explicit undefined)
+function sanitize<T extends Record<string, any>>(obj: T): T {
+  const cleaned: Record<string, any> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined) cleaned[k] = v;
+  }
+  return cleaned as T;
 }
 
 /**
@@ -179,7 +188,7 @@ export async function pushTripToFirestore(trip: Trip, userEmail: string): Promis
       firestoreTrip.user_access = [...firestoreTrip.user_access, userEmail];
     }
     
-    await setDoc(tripRef, firestoreTrip);
+  await setDoc(tripRef, sanitize(firestoreTrip));
     console.log(`[Sync] ✅ Trip pushed successfully: ${trip.id}`);
   } catch (error) {
     console.error(`[Sync] ❌ Failed to push trip ${trip.id}:`, error);
@@ -213,7 +222,7 @@ export async function pushFlightToFirestore(
     firestoreFlight.updated_by = userEmail;
     firestoreFlight.updated_at = new Date().toISOString();
     
-    await setDoc(flightRef, firestoreFlight);
+  await setDoc(flightRef, sanitize(firestoreFlight));
     console.log(`[Sync] ✅ Flight pushed successfully: ${flight.id}`);
   } catch (error) {
     console.error(`[Sync] ❌ Failed to push flight ${flight.id}:`, error);
@@ -247,7 +256,7 @@ export async function pushHotelToFirestore(
     firestoreHotel.updated_by = userEmail;
     firestoreHotel.updated_at = new Date().toISOString();
     
-    await setDoc(hotelRef, firestoreHotel);
+  await setDoc(hotelRef, sanitize(firestoreHotel));
     console.log(`[Sync] ✅ Hotel pushed successfully: ${hotel.id}`);
   } catch (error) {
     console.error(`[Sync] ❌ Failed to push hotel ${hotel.id}:`, error);
@@ -281,7 +290,7 @@ export async function pushActivityToFirestore(
     firestoreActivity.updated_by = userEmail;
     firestoreActivity.updated_at = new Date().toISOString();
     
-    await setDoc(activityRef, firestoreActivity);
+  await setDoc(activityRef, sanitize(firestoreActivity));
     console.log(`[Sync] ✅ Activity pushed successfully: ${activity.id}`);
   } catch (error) {
     console.error(`[Sync] ❌ Failed to push activity ${activity.id}:`, error);
@@ -315,7 +324,7 @@ export async function pushRestaurantToFirestore(
     firestoreRestaurant.updated_by = userEmail;
     firestoreRestaurant.updated_at = new Date().toISOString();
     
-    await setDoc(restaurantRef, firestoreRestaurant);
+  await setDoc(restaurantRef, sanitize(firestoreRestaurant));
     console.log(`[Sync] ✅ Restaurant pushed successfully: ${restaurant.id}`);
   } catch (error) {
     console.error(`[Sync] ❌ Failed to push restaurant ${restaurant.id}:`, error);

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import LoginButton from './LoginButton'
 
 export interface NavigationProps {
   title: string
@@ -26,6 +27,9 @@ export function Navigation({
         </div>
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{title}</h1>
+        </div>
+        <div className="flex-none">
+          <LoginButton />
         </div>
       </div>
     </header>

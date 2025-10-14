@@ -1,0 +1,8 @@
+# Dependency directories
+node_modules/
+
+# Service account credentials (NEVER commit this!)
+service-account.json
+
+# Generated files
+firestore-upload/

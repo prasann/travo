@@ -8,6 +8,7 @@
 import { db } from '../schema';
 import type { Trip, TripWithPlaces, TripWithRelations, TripUpdate, Result } from '../models';
 import { wrapDatabaseOperation, createNotFoundError } from '../errors';
+import { addToQueue } from '@/lib/sync/SyncQueue';
 
 /**
  * Get all active trips (excludes soft-deleted)
@@ -113,8 +114,9 @@ export async function getTripWithRelations(id: string): Promise<Result<TripWithR
  * Update an existing trip
  * Only updates provided fields, leaves others unchanged
  * Automatically updates updated_at timestamp
+ * Queues update for sync to Firestore
  */
-export async function updateTrip(update: TripUpdate): Promise<Result<void>> {
+export async function updateTrip(update: TripUpdate, userEmail?: string): Promise<Result<void>> {
   return wrapDatabaseOperation(async () => {
     const { id, ...updates } = update;
     
@@ -125,10 +127,68 @@ export async function updateTrip(update: TripUpdate): Promise<Result<void>> {
       throw createNotFoundError('Trip', id);
     }
     
-    // Update the trip with new timestamp
-    await db.trips.update(id, {
+    // Update metadata
+    const now = new Date().toISOString();
+    const updatedData = {
       ...updates,
-      updated_at: new Date().toISOString()
+      updated_at: now,
+      ...(userEmail && { updated_by: userEmail })
+    };
+    
+    // Update the trip in IndexedDB
+    await db.trips.update(id, updatedData);
+    
+    // Get the updated trip for sync queue
+    const updatedTrip = await db.trips.get(id);
+    if (!updatedTrip) {
+      throw createNotFoundError('Trip', id);
+    }
+    
+    // Queue for sync to Firestore
+    await addToQueue({
+      entity_type: 'trip',
+      entity_id: id,
+      operation: 'update',
+      data: updatedTrip
     });
+    
+    console.log(`[DB] Trip updated and queued for sync: ${id}`);
+  });
+}
+
+/**
+ * Soft delete a trip (sets deleted flag)
+ * Also queues delete operation for Firestore sync
+ */
+export async function deleteTrip(id: string, userEmail?: string): Promise<Result<void>> {
+  return wrapDatabaseOperation(async () => {
+    // Verify trip exists
+    const existingTrip = await db.trips.get(id);
+    
+    if (!existingTrip) {
+      throw createNotFoundError('Trip', id);
+    }
+    
+    if (existingTrip.deleted) {
+      // Already deleted, nothing to do
+      return;
+    }
+    
+    // Soft delete the trip
+    const now = new Date().toISOString();
+    await db.trips.update(id, {
+      deleted: true,
+      updated_at: now,
+      ...(userEmail && { updated_by: userEmail })
+    });
+    
+    // Queue for sync to Firestore
+    await addToQueue({
+      entity_type: 'trip',
+      entity_id: id,
+      operation: 'delete'
+    });
+    
+    console.log(`[DB] Trip deleted and queued for sync: ${id}`);
   });
 }

@@ -1,0 +1,12 @@
+{
+  "name": "travo-seed",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Seed data and scripts for uploading test data to Firestore",
+  "scripts": {
+    "upload": "node upload.js"
+  },
+  "devDependencies": {
+    "firebase-admin": "^13.5.0"
+  }
+}

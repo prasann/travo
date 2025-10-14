@@ -3,24 +3,37 @@
 /**
  * Database Provider for Travo
  * 
- * Feature: 005-let-s-introduce
- * Date: 2025-10-12
+ * Feature: 005-let-s-introduce (Enhanced Model)
+ * Feature: Firebase Integration (Phase 3 - Pull Sync)
+ * Date: 2025-10-14
  * 
- * Initializes IndexedDB database on client-side app startup
+ * Initializes IndexedDB database on client-side app startup.
+ * Waits for auth state before initializing to support Firestore sync.
  */
 
 import { useEffect, useState } from 'react';
 import { initializeDatabase } from '@/lib/db';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
+  const { user, loading: authLoading } = useAuth();
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Wait for auth to finish loading before initializing database
+    if (authLoading) {
+      console.log('[DatabaseProvider] Waiting for auth...');
+      return;
+    }
+
     async function init() {
       console.log('[DatabaseProvider] Initializing database...');
+      console.log('[DatabaseProvider] User:', user?.email || 'not authenticated');
       
-      const result = await initializeDatabase();
+      // Pass user email to enable Firestore sync if authenticated
+      const userEmail = user?.email || undefined;
+      const result = await initializeDatabase(userEmail);
       
       if (result.success) {
         console.log('[DatabaseProvider] ✓ Database initialized successfully');
@@ -32,15 +45,21 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     }
 
     init();
-  }, []);
+  }, [user, authLoading]);
 
   // Show loading state while initializing
   if (!isInitialized && !error) {
+    const loadingMessage = authLoading 
+      ? 'Checking authentication...'
+      : user 
+        ? 'Syncing your trips...'
+        : 'Loading app...';
+    
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg"></div>
-          <p className="mt-4 text-base-content/70">Loading trip data...</p>
+          <p className="mt-4 text-base-content/70">{loadingMessage}</p>
         </div>
       </div>
     );

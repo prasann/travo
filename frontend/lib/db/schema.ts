@@ -1,8 +1,9 @@
 /**
  * Dexie Database Schema for Travo Local Database
  * 
- * Feature: 005-let-s-introduce
- * Date: 2025-10-12 (Enhanced Model - Schema v2)
+ * Feature: 005-let-s-introduce (Enhanced Model - Schema v2)
+ * Feature: Firebase Integration (Schema v3 - Sharing & Sync)
+ * Date: 2025-10-14
  */
 
 import Dexie, { type EntityTable } from 'dexie';
@@ -13,14 +14,15 @@ import type {
   FlightLeg, 
   Hotel, 
   DailyActivity, 
-  RestaurantRecommendation 
+  RestaurantRecommendation,
+  SyncQueueEntry
 } from './models';
 
 /**
  * TravoDatabase - IndexedDB database wrapper using Dexie
  * 
  * Database: TravoLocalDB
- * Version: 2 (Enhanced with flights, hotels, activities, restaurants)
+ * Version: 4 (Added sync queue for push sync)
  */
 export class TravoDatabase extends Dexie {
   // Declare table types
@@ -31,6 +33,7 @@ export class TravoDatabase extends Dexie {
   hotels!: EntityTable<Hotel, 'id'>;
   activities!: EntityTable<DailyActivity, 'id'>;
   restaurants!: EntityTable<RestaurantRecommendation, 'id'>;
+  syncQueue!: EntityTable<SyncQueueEntry, 'id'>;
 
   constructor() {
     super('TravoLocalDB');
@@ -67,6 +70,88 @@ export class TravoDatabase extends Dexie {
       
       // Restaurants table - indexes for trip relationship, city grouping, sync
       restaurants: 'id, trip_id, city, updated_at'
+    });
+    
+    // Define schema version 3 (Firebase integration - sharing and sync)
+    this.version(3).stores({
+      // Trips table - add user_access for multi-index on user_access array
+      trips: 'id, deleted, updated_at, start_date, end_date, *user_access',
+      
+      // Places table - add updated_by field (no new indexes)
+      places: 'id, trip_id, order_index, updated_at',
+      
+      // Flights table - add updated_by field (no new indexes)
+      flights: 'id, trip_id, departure_time, updated_at',
+      
+      // Flight Legs table - no changes (inherits from flights)
+      flightLegs: 'id, flight_id, [flight_id+leg_number]',
+      
+      // Hotels table - add updated_by field (no new indexes)
+      hotels: 'id, trip_id, check_in_time, city, updated_at',
+      
+      // Activities table - add updated_by field (no new indexes)
+      activities: 'id, trip_id, date, [trip_id+date+order_index], city, updated_at',
+      
+      // Restaurants table - add updated_by field (no new indexes)
+      restaurants: 'id, trip_id, city, updated_at'
+    }).upgrade(async (trans) => {
+      // Migration from v2 to v3: Add sharing and sync fields
+      console.log('Migrating database from v2 to v3...');
+      
+      // Add user_access and updated_by to all trips
+      await trans.table('trips').toCollection().modify((trip: any) => {
+        if (!trip.user_access) {
+          trip.user_access = []; // Initialize as empty array (will be populated on first sync)
+        }
+        if (!trip.updated_by) {
+          trip.updated_by = 'local'; // Mark as local-only data
+        }
+      });
+      
+      // Add updated_by to all flights
+      await trans.table('flights').toCollection().modify((flight: any) => {
+        if (!flight.updated_by) {
+          flight.updated_by = 'local';
+        }
+      });
+      
+      // Add updated_by to all hotels
+      await trans.table('hotels').toCollection().modify((hotel: any) => {
+        if (!hotel.updated_by) {
+          hotel.updated_by = 'local';
+        }
+      });
+      
+      // Add updated_by to all activities
+      await trans.table('activities').toCollection().modify((activity: any) => {
+        if (!activity.updated_by) {
+          activity.updated_by = 'local';
+        }
+      });
+      
+      // Add updated_by to all restaurants
+      await trans.table('restaurants').toCollection().modify((restaurant: any) => {
+        if (!restaurant.updated_by) {
+          restaurant.updated_by = 'local';
+        }
+      });
+      
+      console.log('Database migration to v3 complete!');
+    });
+    
+    // Define schema version 4 (Push sync - sync queue)
+    this.version(4).stores({
+      // Keep all v3 tables unchanged
+      trips: 'id, deleted, updated_at, start_date, end_date, *user_access',
+      places: 'id, trip_id, order_index, updated_at',
+      flights: 'id, trip_id, departure_time, updated_at',
+      flightLegs: 'id, flight_id, [flight_id+leg_number]',
+      hotels: 'id, trip_id, check_in_time, city, updated_at',
+      activities: 'id, trip_id, date, [trip_id+date+order_index], city, updated_at',
+      restaurants: 'id, trip_id, city, updated_at',
+      
+      // NEW: Sync queue table for tracking pending Firestore operations
+      syncQueue: 'id, entity_type, entity_id, created_at, retries'
     });
   }
 }

@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { db } from '../schema';
 import type { DailyActivity, ActivityInput, Result } from '../models';
 import { wrapDatabaseOperation, createNotFoundError } from '../errors';
+import { addToQueue } from '@/lib/sync/SyncQueue';
 
 /**
  * Get all activities for a trip
@@ -37,16 +38,30 @@ export async function getActivitiesByTripId(tripId: string): Promise<Result<Dail
 /**
  * Create a new activity
  * Automatically generates ID and timestamp
+ * Queues creation for Firestore sync
  */
-export async function createActivity(input: ActivityInput): Promise<Result<DailyActivity>> {
+export async function createActivity(input: ActivityInput, userEmail?: string): Promise<Result<DailyActivity>> {
   return wrapDatabaseOperation(async () => {
+    const now = new Date().toISOString();
     const activity: DailyActivity = {
       id: uuidv4(),
-      updated_at: new Date().toISOString(),
-      ...input
+      ...input,
+      updated_at: now,
+      updated_by: userEmail || 'local'
     };
     
     await db.activities.add(activity);
+    
+    // Queue for sync to Firestore
+    await addToQueue({
+      entity_type: 'activity',
+      entity_id: activity.id,
+      operation: 'create',
+      data: activity,
+      trip_id: activity.trip_id
+    });
+    
+    console.log(`[DB] Activity created and queued for sync: ${activity.id}`);
     
     return activity;
   });
@@ -55,10 +70,12 @@ export async function createActivity(input: ActivityInput): Promise<Result<Daily
 /**
  * Update an activity's properties
  * Automatically updates timestamp
+ * Queues update for Firestore sync
  */
 export async function updateActivity(
   id: string,
-  updates: Partial<Omit<DailyActivity, 'id' | 'trip_id' | 'date' | 'updated_at'>>
+  updates: Partial<Omit<DailyActivity, 'id' | 'trip_id' | 'date' | 'updated_at'>>,
+  userEmail?: string
 ): Promise<Result<DailyActivity>> {
   return wrapDatabaseOperation(async () => {
     const activity = await db.activities.get(id);
@@ -67,13 +84,26 @@ export async function updateActivity(
       throw createNotFoundError('Activity', id);
     }
     
+    const now = new Date().toISOString();
     const updatedActivity: DailyActivity = {
       ...activity,
       ...updates,
-      updated_at: new Date().toISOString()
+      updated_at: now,
+      ...(userEmail && { updated_by: userEmail })
     };
     
     await db.activities.put(updatedActivity);
+    
+    // Queue for sync to Firestore
+    await addToQueue({
+      entity_type: 'activity',
+      entity_id: id,
+      operation: 'update',
+      data: updatedActivity,
+      trip_id: updatedActivity.trip_id
+    });
+    
+    console.log(`[DB] Activity updated and queued for sync: ${id}`);
     
     return updatedActivity;
   });
@@ -81,6 +111,7 @@ export async function updateActivity(
 
 /**
  * Delete an activity by ID
+ * Queues delete operation for Firestore sync
  */
 export async function deleteActivity(id: string): Promise<Result<void>> {
   return wrapDatabaseOperation(async () => {
@@ -91,29 +122,58 @@ export async function deleteActivity(id: string): Promise<Result<void>> {
     }
     
     await db.activities.delete(id);
+    
+    // Queue for sync to Firestore
+    await addToQueue({
+      entity_type: 'activity',
+      entity_id: id,
+      operation: 'delete',
+      trip_id: activity.trip_id
+    });
+    
+    console.log(`[DB] Activity deleted and queued for sync: ${id}`);
   });
 }
 
 /**
  * Bulk update activities (for reordering)
  * Updates order_index for multiple activities
+ * Queues each update for Firestore sync
  */
 export async function bulkUpdateActivities(
-  updates: Array<{ id: string; order_index: number }>
+  updates: Array<{ id: string; order_index: number }>,
+  userEmail?: string
 ): Promise<Result<void>> {
   return wrapDatabaseOperation(async () => {
+    const now = new Date().toISOString();
+    
     // Update each activity in a transaction
     await db.transaction('rw', db.activities, async () => {
       for (const update of updates) {
         const activity = await db.activities.get(update.id);
         
         if (activity) {
-          await db.activities.update(update.id, {
+          const updatedActivity = {
+            ...activity,
             order_index: update.order_index,
-            updated_at: new Date().toISOString()
+            updated_at: now,
+            ...(userEmail && { updated_by: userEmail })
+          };
+          
+          await db.activities.put(updatedActivity);
+          
+          // Queue for sync to Firestore
+          await addToQueue({
+            entity_type: 'activity',
+            entity_id: update.id,
+            operation: 'update',
+            data: updatedActivity,
+            trip_id: activity.trip_id
           });
         }
       }
     });
+    
+    console.log(`[DB] ${updates.length} activities reordered and queued for sync`);
   });
 }

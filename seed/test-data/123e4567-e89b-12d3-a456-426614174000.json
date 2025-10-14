@@ -1,0 +1,188 @@
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "name": "Tokyo Spring Adventure",
+  "description": "7-day journey to experience cherry blossom season in Japan",
+  "start_date": "2025-04-01",
+  "end_date": "2025-04-07",
+  "home_location": "San Francisco",
+  "updated_at": "2025-10-11T10:00:00.000Z",
+  "flights": [
+    {
+      "id": "flight-001",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "airline": "United Airlines",
+      "flight_number": "UA837",
+      "departure_time": "2025-04-01T11:00:00-07:00",
+      "arrival_time": "2025-04-02T14:30:00+09:00",
+      "departure_location": "San Francisco (SFO)",
+      "arrival_location": "Tokyo Narita (NRT)",
+      "confirmation_number": "ABC123XYZ",
+      "notes": "Premium economy seats, meal preference: vegetarian"
+    },
+    {
+      "id": "flight-002",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "airline": "United Airlines",
+      "flight_number": "UA838",
+      "departure_time": "2025-04-07T16:00:00+09:00",
+      "arrival_time": "2025-04-07T09:30:00-07:00",
+      "departure_location": "Tokyo Narita (NRT)",
+      "arrival_location": "San Francisco (SFO)",
+      "confirmation_number": "ABC123XYZ"
+    }
+  ],
+  "hotels": [
+    {
+      "id": "hotel-001",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "name": "Tokyo Grand Hotel",
+      "address": "1-2-3 Shinjuku, Shinjuku-ku, Tokyo 160-0022",
+      "city": "Tokyo",
+      "check_in_time": "2025-04-02T15:00:00+09:00",
+      "check_out_time": "2025-04-07T11:00:00+09:00",
+      "confirmation_number": "HTL789456",
+      "phone": "+81-3-1234-5678",
+      "notes": "Non-smoking room, high floor preference"
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity-001",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "name": "Tokyo Skytree",
+      "date": "2025-04-02",
+      "start_time": "2025-04-02T16:00:00+09:00",
+      "duration_minutes": 120,
+      "order_index": 0,
+      "city": "Tokyo",
+      "plus_code": "8Q7XQX4R+33",
+      "address": "1 Chome-1-2 Oshiage, Sumida City, Tokyo",
+      "image_url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=sample",
+      "notes": "Visit around sunset for best views. Buy tickets online to skip queue."
+    },
+    {
+      "id": "activity-002",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "name": "Senso-ji Temple",
+      "date": "2025-04-03",
+      "start_time": "2025-04-03T09:00:00+09:00",
+      "duration_minutes": 90,
+      "order_index": 0,
+      "city": "Tokyo",
+      "plus_code": "8Q7XPM8F+33",
+      "address": "2 Chome-3-1 Asakusa, Taito City, Tokyo",
+      "image_url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=sample2",
+      "notes": "Arrive early to avoid crowds. Check out Nakamise shopping street."
+    },
+    {
+      "id": "activity-003",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "name": "Ueno Park Cherry Blossoms",
+      "date": "2025-04-03",
+      "start_time": "2025-04-03T13:00:00+09:00",
+      "duration_minutes": 180,
+      "order_index": 1,
+      "city": "Tokyo",
+      "plus_code": "8Q7XPP6H+22",
+      "address": "Uenokoen, Taito City, Tokyo",
+      "notes": "Peak cherry blossom season. Bring picnic blanket for hanami."
+    },
+    {
+      "id": "activity-004",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "name": "Meiji Shrine",
+      "date": "2025-04-04",
+      "start_time": "2025-04-04T10:00:00+09:00",
+      "duration_minutes": 60,
+      "order_index": 0,
+      "city": "Tokyo",
+      "plus_code": "8Q7XPMHP+88",
+      "address": "1-1 Yoyogikamizonocho, Shibuya City, Tokyo",
+      "notes": "Peaceful shrine in forested area. Free admission."
+    },
+    {
+      "id": "activity-005",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "name": "Shibuya Crossing",
+      "date": "2025-04-04",
+      "start_time": "2025-04-04T18:00:00+09:00",
+      "duration_minutes": 30,
+      "order_index": 1,
+      "city": "Tokyo",
+      "plus_code": "8Q7XPM5F+44",
+      "address": "2 Chome-2-1 Dogenzaka, Shibuya City, Tokyo",
+      "notes": "Watch from Starbucks 2nd floor for best view. Most crowded around 6-7pm."
+    },
+    {
+      "id": "activity-006",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "name": "TeamLab Borderless",
+      "date": "2025-04-05",
+      "start_time": "2025-04-05T14:00:00+09:00",
+      "duration_minutes": 180,
+      "order_index": 0,
+      "city": "Tokyo",
+      "plus_code": "8Q7XPP3M+66",
+      "address": "1-3-8 Aomi, Koto City, Tokyo",
+      "notes": "Digital art museum. Book tickets in advance - sells out quickly!"
+    },
+    {
+      "id": "activity-007",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "name": "Tsukiji Outer Market",
+      "date": "2025-04-06",
+      "start_time": "2025-04-06T08:00:00+09:00",
+      "duration_minutes": 120,
+      "order_index": 0,
+      "city": "Tokyo",
+      "plus_code": "8Q7XPP4J+88",
+      "address": "4 Chome-16 Tsukiji, Chuo City, Tokyo",
+      "notes": "Fresh sushi breakfast. Arrive early for best selection."
+    }
+  ],
+  "restaurants": [
+    {
+      "id": "restaurant-001",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "name": "Ichiran Ramen",
+      "city": "Tokyo",
+      "cuisine_type": "Japanese (Ramen)",
+      "address": "1-22-7 Jinnan, Shibuya City, Tokyo",
+      "plus_code": "8Q7XPM5F+11",
+      "notes": "Famous tonkotsu ramen chain. Open 24 hours, no reservation needed. Try the extra-rich broth!"
+    },
+    {
+      "id": "restaurant-002",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "name": "Sushi Dai",
+      "city": "Tokyo",
+      "cuisine_type": "Japanese (Sushi)",
+      "address": "5 Chome-2-1 Tsukiji, Chuo City, Tokyo",
+      "notes": "Legendary sushi spot. Expect 2-3 hour wait. Opens at 5am. Cash only."
+    },
+    {
+      "id": "restaurant-003",
+      "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+      "updated_at": "2025-10-11T10:00:00.000Z",
+      "name": "Gonpachi Nishi-Azabu",
+      "city": "Tokyo",
+      "cuisine_type": "Japanese (Izakaya)",
+      "address": "1-13-11 Nishi-Azabu, Minato City, Tokyo",
+      "phone": "+81-3-5771-0170",
+      "website": "https://www.gonpachi.jp",
+      "notes": "Featured in Kill Bill movie. Reservations recommended for dinner."
+    }
+  ]
+}

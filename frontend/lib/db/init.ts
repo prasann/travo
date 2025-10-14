@@ -1,14 +1,16 @@
 /**
  * Database Initialization Logic for Travo
  * 
- * Feature: 005-let-s-introduce
- * Date: 2025-10-12
+ * Feature: 005-let-s-introduce (Enhanced Model)
+ * Feature: Firebase Integration (Phase 3 - Pull Sync)
+ * Date: 2025-10-14
  */
 
 import { db } from './schema';
 import type { Result } from './models';
 import { wrapDatabaseOperation } from './errors';
 import { loadSeedData } from './seed';
+import { syncTripsFromFirestore } from '@/lib/firebase/sync';
 
 /**
  * Check if the database has been initialized with data
@@ -28,13 +30,25 @@ export async function isInitialized(): Promise<boolean> {
 }
 
 /**
- * Initialize the database
- * Opens the database connection, ensures schema is created,
- * and loads seed data if database is empty
+ * Initialize the database with Firestore sync support
+ * 
+ * If user is authenticated:
+ *  - Opens database connection
+ *  - Pulls trips from Firestore for the user
+ *  - Saves to IndexedDB
+ * 
+ * If user is not authenticated:
+ *  - Opens database connection only
+ *  - Does not load any data (user must log in)
+ * 
+ * @param userEmail Optional user email for Firestore sync
  */
-export async function initializeDatabase(): Promise<Result<void>> {
+export async function initializeDatabase(userEmail?: string): Promise<Result<void>> {
   return wrapDatabaseOperation(async () => {
+    console.log('[DB Init] Initializing database...');
+    
     // Opening the database will automatically create tables based on schema
+    // and run any pending migrations (e.g., v2 -> v3)
     await db.open();
     
     // Verify all tables exist by checking if we can access them
@@ -44,17 +58,46 @@ export async function initializeDatabase(): Promise<Result<void>> {
     await db.hotels.count();
     await db.activities.count();
     await db.restaurants.count();
+    await db.places.count(); // Backward compatibility
     
-    // Places table maintained for backward compatibility
-    await db.places.count();
-    
-    // Load seed data if database is empty
-    const initialized = await isInitialized();
-    if (!initialized) {
-      const seedResult = await loadSeedData();
-      if (!seedResult.success) {
-        throw new Error(seedResult.error.message);
+    // If user is authenticated, sync from Firestore
+    if (userEmail) {
+      console.log(`[DB Init] User authenticated: ${userEmail}`);
+      
+      // Check if we already have data
+      const hasData = await isInitialized();
+      if (hasData) {
+        console.log('[DB Init] Database already has data, skipping initial sync');
+        return;
+      }
+      
+      // Pull trips from Firestore
+      console.log('[DB Init] Pulling trips from Firestore...');
+      const syncResult = await syncTripsFromFirestore(userEmail);
+      
+      if (!syncResult.success) {
+        console.error('[DB Init] Failed to sync from Firestore:', syncResult.error.message);
+        // Don't throw - allow app to continue even if sync fails
+        // User can retry or add trips manually
+      } else {
+        console.log(`[DB Init] Successfully synced ${syncResult.data} trips from Firestore`);
+      }
+    } else {
+      console.log('[DB Init] No user authenticated, skipping Firestore sync');
+      
+      // For development/testing: load seed data if database is empty and no user
+      if (process.env.NODE_ENV === 'development') {
+        const hasData = await isInitialized();
+        if (!hasData) {
+          console.log('[DB Init] Loading seed data for development...');
+          const seedResult = await loadSeedData();
+          if (!seedResult.success) {
+            console.warn('[DB Init] Failed to load seed data:', seedResult.error.message);
+          }
+        }
       }
     }
+    
+    console.log('[DB Init] Database initialization complete');
   });
 }

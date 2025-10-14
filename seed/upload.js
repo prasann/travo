@@ -21,13 +21,17 @@ const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
 
-// Get user email from command line
+// Get user email and optional trip file from command line
 const userEmail = process.argv[2];
+const tripFile = process.argv[3]; // Optional: specific trip file to upload
 
 if (!userEmail) {
   console.error('❌ Error: Please provide your email address');
-  console.log('\nUsage: npm run upload YOUR_EMAIL@example.com');
-  console.log('Example: npm run upload pvenkat4ever@gmail.com\n');
+  console.log('\nUsage: npm run upload YOUR_EMAIL@example.com [TRIP_FILE]');
+  console.log('\nExamples:');
+  console.log('  npm run upload pvenkat4ever@gmail.com');
+  console.log('  npm run upload pvenkat4ever@gmail.com 456def78-9abc-def0-1234-567890abcdef.json');
+  console.log('  npm run upload pvenkat4ever@gmail.com my-new-trip.json\n');
   process.exit(1);
 }
 
@@ -69,22 +73,42 @@ try {
 const db = admin.firestore();
 
 // Read test data
-const testDataPath = path.join(__dirname, 'test-data/123e4567-e89b-12d3-a456-426614174000.json');
+const defaultTripFile = '123e4567-e89b-12d3-a456-426614174000.json'; // Tokyo trip
+const selectedTripFile = tripFile || defaultTripFile;
+const testDataPath = path.join(__dirname, 'test-data', selectedTripFile);
 
 if (!fs.existsSync(testDataPath)) {
   console.error('❌ Test data file not found:', testDataPath);
+  console.log('\n💡 Available trip files:');
+  const testDataDir = path.join(__dirname, 'test-data');
+  if (fs.existsSync(testDataDir)) {
+    const files = fs.readdirSync(testDataDir).filter(f => f.endsWith('.json'));
+    files.forEach(file => console.log(`   - ${file}`));
+  }
+  console.log('');
   process.exit(1);
 }
 
 const testData = JSON.parse(fs.readFileSync(testDataPath, 'utf8'));
-console.log(`📖 Loaded test data: ${testData.name}\n`);
+console.log(`📖 Loaded test data: ${testData.name} (${selectedTripFile})\n`);
+
+// Helper function to remove undefined fields (Firestore doesn't accept undefined)
+function cleanObject(obj) {
+  const cleaned = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined && value !== null) {
+      cleaned[key] = value;
+    }
+  }
+  return cleaned;
+}
 
 // Transform data to Firestore format
 function transformToFirestoreFormat(trip, userEmail) {
   const now = new Date().toISOString();
   
   return {
-    trip: {
+    trip: cleanObject({
       id: trip.id,
       name: trip.name,
       destination: trip.description || 'Tokyo',
@@ -94,15 +118,15 @@ function transformToFirestoreFormat(trip, userEmail) {
       updated_by: userEmail,
       updated_at: now,
       created_at: now
-    },
-    flights: trip.flights.map((flight, index) => ({
+    }),
+    flights: trip.flights.map((flight, index) => cleanObject({
       id: flight.id,
       trip_id: trip.id,
       direction: index === 0 ? 'outbound' : 'return',
       updated_by: userEmail,
       updated_at: now
     })),
-    hotels: trip.hotels.map(hotel => ({
+    hotels: trip.hotels.map(hotel => cleanObject({
       id: hotel.id,
       trip_id: trip.id,
       name: hotel.name,
@@ -123,7 +147,7 @@ function transformToFirestoreFormat(trip, userEmail) {
         else if (hour >= 21 || hour < 6) timeOfDay = 'night';
       }
       
-      return {
+      return cleanObject({
         id: activity.id,
         trip_id: trip.id,
         name: activity.name,
@@ -136,9 +160,9 @@ function transformToFirestoreFormat(trip, userEmail) {
         order_index: activity.order_index,
         updated_by: userEmail,
         updated_at: now
-      };
+      });
     }),
-    restaurants: trip.restaurants.map(restaurant => ({
+    restaurants: trip.restaurants.map(restaurant => cleanObject({
       id: restaurant.id,
       trip_id: trip.id,
       name: restaurant.name,

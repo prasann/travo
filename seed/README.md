@@ -36,12 +36,19 @@ npm install
 Run the script with your email (will be added to `user_access` array):
 
 ```bash
-npm run upload YOUR_EMAIL@example.com
+npm run upload YOUR_EMAIL@example.com [TRIP_FILE]
 ```
 
-Example:
+Examples:
 ```bash
+# Upload default trip (Tokyo)
 npm run upload pvenkat4ever@gmail.com
+
+# Upload specific trip file
+npm run upload pvenkat4ever@gmail.com 456def78-9abc-def0-1234-567890abcdef.json
+
+# Upload your own trip
+npm run upload pvenkat4ever@gmail.com my-paris-trip.json
 ```
 
 This will:

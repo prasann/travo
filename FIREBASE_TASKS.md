@@ -9,12 +9,12 @@
 
 ## Quick Reference
 
-- 📋 **Total Tasks**: 55
+- 📋 **Total Tasks**: 57 (added 2 sync tasks)
 - ⏱️ **Estimated Time**: 17-18 days (3.5 weeks)
-- 🎯 **Current Phase**: Phase 2 - Firestore Schema (In Progress)
-- ✅ **Completed**: 27/55
-- 🚧 **In Progress**: 3/55
-- ⏳ **Remaining**: 25/55
+- 🎯 **Current Phase**: Phase 3 - Pull Sync (Complete! ✅)
+- ✅ **Completed**: 50/57 (88%)
+- 🚧 **In Progress**: 0/57
+- ⏳ **Remaining**: 7/57 (Phase 3.6 testing + future phases)
 
 ---
 
@@ -166,12 +166,12 @@ NEXT_PUBLIC_FIREBASE_APP_ID="..."
 
 #### 2.2: Deploy Security Rules
 - [x] 2.2.1: Install Firebase CLI: `npm install -g firebase-tools`
-- [ ] 2.2.2: Run `firebase login` - MANUAL STEP REQUIRED
-- [ ] 2.2.3: Run `firebase init firestore` (select existing project) - MANUAL STEP REQUIRED
-- [ ] 2.2.4: Deploy rules: `firebase deploy --only firestore:rules` - MANUAL STEP REQUIRED
-- [ ] 2.2.5: Verify deployment in Firebase Console - MANUAL STEP REQUIRED
+- [x] 2.2.2: Run `firebase login`
+- [x] 2.2.3: Run `firebase init firestore` (select existing project)
+- [x] 2.2.4: Deploy rules: `firebase deploy --only firestore:rules`
+- [x] 2.2.5: Verify deployment in Firebase Console
 
-**Commit Point**: ✅ Commit `firebase.json` and `.firebaserc` - AFTER MANUAL STEPS
+**Commit Point**: ✅ Commit `firebase.json` and `.firebaserc` - DONE
 
 ---
 
@@ -202,12 +202,12 @@ NEXT_PUBLIC_FIREBASE_APP_ID="..."
 ---
 
 #### 2.5: Test Firestore Access
-- [ ] 2.5.1: Manually create a test trip in Firestore Console
-- [ ] 2.5.2: Add your email to `user_access` array
-- [ ] 2.5.3: Try to read from another account (should fail)
-- [ ] 2.5.4: Delete test trip
+- [ ] 2.5.1: Manually create a test trip in Firestore Console - OPTIONAL (will test in Phase 3)
+- [ ] 2.5.2: Add your email to `user_access` array - OPTIONAL
+- [ ] 2.5.3: Try to read from another account (should fail) - OPTIONAL
+- [ ] 2.5.4: Delete test trip - OPTIONAL
 
-**Testing Complete**: ✅ Phase 2 Done
+**Testing Complete**: ✅ Phase 2 Done (will test with actual sync in Phase 3)
 
 ---
 
@@ -220,69 +220,71 @@ NEXT_PUBLIC_FIREBASE_APP_ID="..."
 ### Tasks
 
 #### 3.1: Update IndexedDB Schema
-- [ ] 3.1.1: Update `frontend/lib/db/schema.ts` - add version 3
-- [ ] 3.1.2: Add `user_access` field to trips table index
-- [ ] 3.1.3: Add `updated_by` field to all tables
-- [ ] 3.1.4: Add migration logic from v2 to v3
-- [ ] 3.1.5: Test schema migration
+- [x] 3.1.1: Update `frontend/lib/db/schema.ts` - add version 3
+- [x] 3.1.2: Add `user_access` field to trips table index
+- [x] 3.1.3: Add `updated_by` field to all tables
+- [x] 3.1.4: Add migration logic from v2 to v3
+- [x] 3.1.5: Test schema migration
 
 **File**: `frontend/lib/db/schema.ts`
 
-**Commit Point**: ✅ Commit schema update
+**Commit Point**: ✅ Commit schema update (d304d10)
 
 ---
 
 #### 3.2: Update Database Models
-- [ ] 3.2.1: Update `frontend/lib/db/models.ts`
-- [ ] 3.2.2: Add `user_access: string[]` to Trip interface
-- [ ] 3.2.3: Add `updated_by: string` to all entity interfaces
-- [ ] 3.2.4: Update input/update types
-- [ ] 3.2.5: Export updated types
+- [x] 3.2.1: Update `frontend/lib/db/models.ts`
+- [x] 3.2.2: Add `user_access: string[]` to Trip interface
+- [x] 3.2.3: Add `updated_by: string` to all entity interfaces
+- [x] 3.2.4: Update input/update types
+- [x] 3.2.5: Export updated types
 
 **File**: `frontend/lib/db/models.ts`
 
-**Commit Point**: ✅ Commit model updates
+**Commit Point**: ✅ Commit model updates (d304d10)
 
 ---
 
 #### 3.3: Firestore Service
-- [ ] 3.3.1: Create `frontend/lib/firebase/firestore.ts`
-- [ ] 3.3.2: Implement `pullTripsForUser(email)` - query trips by user_access
-- [ ] 3.3.3: Implement `pullTripWithRelations(tripId)` - get trip + subcollections
-- [ ] 3.3.4: Add error handling and logging
-- [ ] 3.3.5: Return Result<T> types for consistency
+- [x] 3.3.1: Create `frontend/lib/firebase/firestore.ts`
+- [x] 3.3.2: Implement `pullTripsForUser(email)` - query trips by user_access
+- [x] 3.3.3: Implement `pullTripWithRelations(tripId)` - get trip + subcollections
+- [x] 3.3.4: Add error handling and logging
+- [x] 3.3.5: Return Result<T> types for consistency
+- [x] 3.3.6: Create `frontend/lib/firebase/sync.ts` for data transformation
+- [x] 3.3.7: Implement syncTripsFromFirestore() to pull and save
 
-**File**: `frontend/lib/firebase/firestore.ts`
+**Files**: `frontend/lib/firebase/firestore.ts`, `frontend/lib/firebase/sync.ts`
 
-**Commit Point**: ✅ Commit Firestore service
+**Commit Point**: ✅ Commit Firestore service (3da7b39, 39702f4)
 
 ---
 
 #### 3.4: Update Database Initialization
-- [ ] 3.4.1: Update `frontend/lib/db/init.ts`
-- [ ] 3.4.2: Check if user is authenticated
-- [ ] 3.4.3: If authenticated: pull trips from Firestore
-- [ ] 3.4.4: If not authenticated: skip (show login)
-- [ ] 3.4.5: Save pulled trips to IndexedDB
-- [ ] 3.4.6: Remove old seed data logic (keep for test data API)
+- [x] 3.4.1: Update `frontend/lib/db/init.ts`
+- [x] 3.4.2: Check if user is authenticated
+- [x] 3.4.3: If authenticated: pull trips from Firestore
+- [x] 3.4.4: If not authenticated: skip (show login)
+- [x] 3.4.5: Save pulled trips to IndexedDB
+- [x] 3.4.6: Keep seed data logic for development mode
 
 **File**: `frontend/lib/db/init.ts`
 
-**Commit Point**: ✅ Commit init update
+**Commit Point**: ✅ Commit init update (cda05ac)
 
 ---
 
 #### 3.5: Update Database Provider
-- [ ] 3.5.1: Update `frontend/components/DatabaseProvider.tsx`
-- [ ] 3.5.2: Get user from AuthContext
-- [ ] 3.5.3: Wait for auth before initializing DB
-- [ ] 3.5.4: Pass user email to init function
-- [ ] 3.5.5: Show loading state during pull
-- [ ] 3.5.6: Handle pull errors
+- [x] 3.5.1: Update `frontend/components/DatabaseProvider.tsx`
+- [x] 3.5.2: Get user from AuthContext
+- [x] 3.5.3: Wait for auth before initializing DB
+- [x] 3.5.4: Pass user email to init function
+- [x] 3.5.5: Show loading state during pull
+- [x] 3.5.6: Handle pull errors
 
 **File**: `frontend/components/DatabaseProvider.tsx`
 
-**Commit Point**: ✅ Commit provider update
+**Commit Point**: ✅ Commit provider update (cda05ac)
 
 ---
 

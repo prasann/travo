@@ -11,10 +11,10 @@
 
 - 📋 **Total Tasks**: 55
 - ⏱️ **Estimated Time**: 17-18 days (3.5 weeks)
-- 🎯 **Current Phase**: Phase 1 - Authentication (In Progress)
-- ✅ **Completed**: 17/55
-- 🚧 **In Progress**: 1/55
-- ⏳ **Remaining**: 37/55
+- 🎯 **Current Phase**: Phase 2 - Firestore Schema (In Progress)
+- ✅ **Completed**: 27/55
+- 🚧 **In Progress**: 3/55
+- ⏳ **Remaining**: 25/55
 
 ---
 
@@ -152,52 +152,52 @@ NEXT_PUBLIC_FIREBASE_APP_ID="..."
 ### Tasks
 
 #### 2.1: Security Rules
-- [ ] 2.1.1: Create `firestore.rules` in project root
-- [ ] 2.1.2: Add helper function `hasAccess(tripId)`
-- [ ] 2.1.3: Add trip-level read/write rules (check `user_access` array)
-- [ ] 2.1.4: Add subcollection rules (inherit trip access)
-- [ ] 2.1.5: Test rules don't allow unauthenticated access
+- [x] 2.1.1: Create `firestore.rules` in project root
+- [x] 2.1.2: Add helper function `hasAccess(tripId)`
+- [x] 2.1.3: Add trip-level read/write rules (check `user_access` array)
+- [x] 2.1.4: Add subcollection rules (inherit trip access)
+- [x] 2.1.5: Test rules don't allow unauthenticated access
 
 **File**: `firestore.rules`
 
-**Commit Point**: ✅ Commit security rules
+**Commit Point**: ✅ Commit security rules - DONE
 
 ---
 
 #### 2.2: Deploy Security Rules
-- [ ] 2.2.1: Install Firebase CLI: `npm install -g firebase-tools`
-- [ ] 2.2.2: Run `firebase login`
-- [ ] 2.2.3: Run `firebase init firestore` (select existing project)
-- [ ] 2.2.4: Deploy rules: `firebase deploy --only firestore:rules`
-- [ ] 2.2.5: Verify deployment in Firebase Console
+- [x] 2.2.1: Install Firebase CLI: `npm install -g firebase-tools`
+- [ ] 2.2.2: Run `firebase login` - MANUAL STEP REQUIRED
+- [ ] 2.2.3: Run `firebase init firestore` (select existing project) - MANUAL STEP REQUIRED
+- [ ] 2.2.4: Deploy rules: `firebase deploy --only firestore:rules` - MANUAL STEP REQUIRED
+- [ ] 2.2.5: Verify deployment in Firebase Console - MANUAL STEP REQUIRED
 
-**Commit Point**: ✅ Commit `firebase.json` and `.firebaserc`
+**Commit Point**: ✅ Commit `firebase.json` and `.firebaserc` - AFTER MANUAL STEPS
 
 ---
 
 #### 2.3: Firestore TypeScript Types
-- [ ] 2.3.1: Create `frontend/lib/firebase/schema.ts`
-- [ ] 2.3.2: Define Firestore document types (Trip, Flight, Hotel, etc.)
-- [ ] 2.3.3: Add `user_access: string[]` field to Trip type
-- [ ] 2.3.4: Add `updated_by: string` field to all types
-- [ ] 2.3.5: Export all Firestore types
+- [x] 2.3.1: Create `frontend/lib/firebase/schema.ts`
+- [x] 2.3.2: Define Firestore document types (Trip, Flight, Hotel, etc.)
+- [x] 2.3.3: Add `user_access: string[]` field to Trip type
+- [x] 2.3.4: Add `updated_by: string` field to all types
+- [x] 2.3.5: Export all Firestore types
 
 **File**: `frontend/lib/firebase/schema.ts`
 
-**Commit Point**: ✅ Commit Firestore types
+**Commit Point**: ✅ Commit Firestore types - DONE
 
 ---
 
 #### 2.4: Firestore Converters
-- [ ] 2.4.1: Create `frontend/lib/firebase/converter.ts`
-- [ ] 2.4.2: Implement converters for each entity type
-- [ ] 2.4.3: Handle timestamp conversions (Firestore Timestamp ↔ ISO string)
-- [ ] 2.4.4: Add validation helpers
-- [ ] 2.4.5: Export converters
+- [x] 2.4.1: Create `frontend/lib/firebase/converter.ts`
+- [x] 2.4.2: Implement converters for each entity type
+- [x] 2.4.3: Handle timestamp conversions (Firestore Timestamp ↔ ISO string)
+- [x] 2.4.4: Add validation helpers
+- [x] 2.4.5: Export converters
 
 **File**: `frontend/lib/firebase/converter.ts`
 
-**Commit Point**: ✅ Commit converters
+**Commit Point**: ✅ Commit converters - DONE
 
 ---
 

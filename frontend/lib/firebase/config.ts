@@ -17,15 +17,6 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
 };
 
-// Debug: Log what we're getting
-console.log('🔍 Firebase Config Debug:', {
-  config: firebaseConfig,
-  hasApiKey: !!firebaseConfig.apiKey,
-  hasAuthDomain: !!firebaseConfig.authDomain,
-  hasProjectId: !!firebaseConfig.projectId,
-  apiKeyFirst4: firebaseConfig.apiKey?.substring(0, 4),
-});
-
 /**
  * Validates that all required Firebase configuration values are present
  */

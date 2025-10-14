@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import LoginButton from './LoginButton'
+import { SyncStatus } from './SyncStatus'
 
 export interface NavigationProps {
   title: string
@@ -28,7 +29,8 @@ export function Navigation({
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{title}</h1>
         </div>
-        <div className="flex-none">
+        <div className="flex-none flex items-center gap-2">
+          <SyncStatus />
           <LoginButton />
         </div>
       </div>

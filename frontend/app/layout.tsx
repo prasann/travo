@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ACTIVE_THEME } from "@/config/theme";
 import { DatabaseProvider } from "@/components/DatabaseProvider";
+import { SyncProvider } from "@/components/SyncProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
@@ -19,7 +20,9 @@ export default function RootLayout({
       <body className="antialiased" suppressHydrationWarning>
         <AuthProvider>
           <DatabaseProvider>
-            {children}
+            <SyncProvider>
+              {children}
+            </SyncProvider>
           </DatabaseProvider>
         </AuthProvider>
       </body>

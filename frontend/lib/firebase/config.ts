@@ -1,85 +1,79 @@
+'use client';
+
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 
 /**
  * Firebase configuration from environment variables
+ * Using 'use client' directive to ensure this runs only on client side
  */
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
 };
 
+// Debug: Log what we're getting
+console.log('🔍 Firebase Config Debug:', {
+  config: firebaseConfig,
+  hasApiKey: !!firebaseConfig.apiKey,
+  hasAuthDomain: !!firebaseConfig.authDomain,
+  hasProjectId: !!firebaseConfig.projectId,
+  apiKeyFirst4: firebaseConfig.apiKey?.substring(0, 4),
+});
+
 /**
- * Validates that all required Firebase environment variables are present
+ * Validates that all required Firebase configuration values are present
  */
 function validateFirebaseConfig(): void {
-  const requiredEnvVars = [
-    'NEXT_PUBLIC_FIREBASE_API_KEY',
-    'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
-    'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
-    'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
-    'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
-    'NEXT_PUBLIC_FIREBASE_APP_ID',
+  const requiredFields = [
+    { key: 'apiKey', value: firebaseConfig.apiKey },
+    { key: 'authDomain', value: firebaseConfig.authDomain },
+    { key: 'projectId', value: firebaseConfig.projectId },
+    { key: 'storageBucket', value: firebaseConfig.storageBucket },
+    { key: 'messagingSenderId', value: firebaseConfig.messagingSenderId },
+    { key: 'appId', value: firebaseConfig.appId },
   ];
 
-  const missingVars = requiredEnvVars.filter(
-    (varName) => {
-      const value = process.env[varName];
-      return !value || value === '' || value === 'undefined';
-    }
+  const missingFields = requiredFields.filter(
+    field => !field.value || field.value === '' || field.value === 'undefined'
   );
 
-  if (missingVars.length > 0) {
-    console.error('Missing Firebase environment variables:', missingVars);
-    console.error('Current env values:', {
-      NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? '✓ Set' : '✗ Missing',
-      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ? '✓ Set' : '✗ Missing',
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ? '✓ Set' : '✗ Missing',
-      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ? '✓ Set' : '✗ Missing',
-      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ? '✓ Set' : '✗ Missing',
-      NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ? '✓ Set' : '✗ Missing',
-    });
+  if (missingFields.length > 0) {
+    const missingKeys = missingFields.map(f => f.key);
+    console.error('Missing Firebase configuration fields:', missingKeys);
+    console.error('Current config:', firebaseConfig);
+    console.error('\n⚠️  Firebase Setup Required:');
+    console.error('1. Ensure frontend/.env.local exists');
+    console.error('2. Add all NEXT_PUBLIC_FIREBASE_* variables (without quotes)');
+    console.error('3. Restart the dev server completely (kill process and restart)');
+    console.error('4. Clear browser cache or try incognito mode\n');
+    
     throw new Error(
-      `Missing required Firebase environment variables: ${missingVars.join(', ')}\n` +
-      'Please ensure frontend/.env.local contains all required NEXT_PUBLIC_FIREBASE_* variables.\n' +
-      'After updating .env.local, restart the dev server completely.'
+      `Missing required Firebase configuration: ${missingKeys.join(', ')}\n` +
+      'Check the console for setup instructions.'
     );
   }
 }
 
+// Validate configuration before initializing
+validateFirebaseConfig();
+
 /**
  * Initialize Firebase app (singleton pattern)
+ * This only runs on client side due to 'use client' directive
  */
 let app: FirebaseApp;
-
-// Only initialize if we're in the browser and have valid config
-if (typeof window !== 'undefined') {
-  validateFirebaseConfig();
-  
-  if (getApps().length === 0) {
-    app = initializeApp(firebaseConfig);
-  } else {
-    app = getApps()[0];
-  }
+if (getApps().length === 0) {
+  console.log('🔥 Initializing Firebase app...');
+  app = initializeApp(firebaseConfig);
 } else {
-  // Server-side: create a placeholder that will be replaced on client
-  if (getApps().length === 0) {
-    // Only initialize if we have valid config (for build time)
-    const hasValidConfig = Object.values(firebaseConfig).every(val => val && val !== 'undefined');
-    if (hasValidConfig) {
-      app = initializeApp(firebaseConfig);
-    } else {
-      // Placeholder that will be initialized on client
-      app = {} as FirebaseApp;
-    }
-  } else {
-    app = getApps()[0];
-  }
+  console.log('♻️  Using existing Firebase app');
+  app = getApps()[0];
 }
 
 /**

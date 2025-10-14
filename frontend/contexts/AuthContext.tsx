@@ -46,6 +46,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    // Check for redirect result first (in case user was redirected back)
+    import('@/lib/firebase/auth').then(({ checkRedirectResult }) => {
+      checkRedirectResult().catch((err) => {
+        console.error('Redirect result error:', err);
+        // Don't set error state for redirect failures, just log them
+      });
+    });
+
     // Subscribe to auth state changes
     const unsubscribe = onAuthStateChanged(
       auth,

@@ -1,5 +1,7 @@
 import {
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   signOut as firebaseSignOut,
   User,
@@ -28,16 +30,45 @@ googleProvider.setCustomParameters({
 });
 
 /**
- * Sign in with Google using popup
+ * Sign in with Google using popup (preferred method)
+ * Falls back to redirect if popup is blocked
  * @returns Promise with user credential
  * @throws Error if sign-in fails
  */
 export async function signInWithGoogle(): Promise<UserCredential> {
   try {
+    console.log('🔐 Attempting Google sign in with popup...');
     const result = await signInWithPopup(auth, googleProvider);
+    console.log('✅ Sign in successful');
+    return result;
+  } catch (error: any) {
+    console.error('❌ Error signing in with Google:', error);
+    
+    // If popup was blocked, try redirect method
+    if (error?.code === 'auth/popup-blocked') {
+      console.log('🔄 Popup blocked, trying redirect method...');
+      await signInWithRedirect(auth, googleProvider);
+      // Redirect happens, so this promise never resolves
+      return new Promise(() => {}); // Keep promise pending
+    }
+    
+    throw error;
+  }
+}
+
+/**
+ * Check for redirect result after page loads
+ * Call this on app initialization
+ */
+export async function checkRedirectResult(): Promise<UserCredential | null> {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result) {
+      console.log('✅ Redirect sign in successful');
+    }
     return result;
   } catch (error) {
-    console.error('Error signing in with Google:', error);
+    console.error('❌ Error getting redirect result:', error);
     throw error;
   }
 }

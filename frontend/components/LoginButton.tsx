@@ -26,9 +26,23 @@ export default function LoginButton() {
     try {
       await signInWithGoogle();
       // User state will be updated by AuthContext
-    } catch (err) {
+    } catch (err: any) {
       console.error('Sign in error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to sign in');
+      
+      // Provide user-friendly error messages
+      let errorMessage = 'Failed to sign in';
+      
+      if (err?.code === 'auth/popup-blocked') {
+        errorMessage = 'Popup was blocked. Please allow popups for this site.';
+      } else if (err?.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign in was cancelled.';
+      } else if (err?.code === 'auth/unauthorized-domain') {
+        errorMessage = 'This domain is not authorized. Please add localhost to Firebase Console.';
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

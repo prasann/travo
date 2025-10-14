@@ -10,7 +10,7 @@
 import { useState } from 'react';
 import { UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import type { TripEditFormData, HotelEditFormData } from '@/types/editMode';
-import PlusCodeInput from './PlusCodeInput';
+import MapsLinkInput from './MapsLinkInput';
 import { Lock } from 'lucide-react';
 
 interface HotelSectionProps {
@@ -216,12 +216,13 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
             <div className="card-body">
               <h3 className="font-semibold mb-4">Add New Hotel</h3>
               
-              {/* Plus Code Lookup */}
-              <PlusCodeInput
+              {/* Maps Link Lookup */}
+              <MapsLinkInput
                 value={plusCode}
                 onChange={setPlusCode}
                 onLookupSuccess={handlePlusCodeSuccess}
                 onLookupError={handlePlusCodeError}
+                label="Google Maps Link or Plus Code"
               />
               
               {/* Show populated fields after lookup */}

@@ -14,14 +14,15 @@ import type {
   FlightLeg, 
   Hotel, 
   DailyActivity, 
-  RestaurantRecommendation 
+  RestaurantRecommendation,
+  SyncQueueEntry
 } from './models';
 
 /**
  * TravoDatabase - IndexedDB database wrapper using Dexie
  * 
  * Database: TravoLocalDB
- * Version: 3 (Added sharing and sync fields for Firebase integration)
+ * Version: 4 (Added sync queue for push sync)
  */
 export class TravoDatabase extends Dexie {
   // Declare table types
@@ -32,6 +33,7 @@ export class TravoDatabase extends Dexie {
   hotels!: EntityTable<Hotel, 'id'>;
   activities!: EntityTable<DailyActivity, 'id'>;
   restaurants!: EntityTable<RestaurantRecommendation, 'id'>;
+  syncQueue!: EntityTable<SyncQueueEntry, 'id'>;
 
   constructor() {
     super('TravoLocalDB');
@@ -135,6 +137,21 @@ export class TravoDatabase extends Dexie {
       });
       
       console.log('Database migration to v3 complete!');
+    });
+    
+    // Define schema version 4 (Push sync - sync queue)
+    this.version(4).stores({
+      // Keep all v3 tables unchanged
+      trips: 'id, deleted, updated_at, start_date, end_date, *user_access',
+      places: 'id, trip_id, order_index, updated_at',
+      flights: 'id, trip_id, departure_time, updated_at',
+      flightLegs: 'id, flight_id, [flight_id+leg_number]',
+      hotels: 'id, trip_id, check_in_time, city, updated_at',
+      activities: 'id, trip_id, date, [trip_id+date+order_index], city, updated_at',
+      restaurants: 'id, trip_id, city, updated_at',
+      
+      // NEW: Sync queue table for tracking pending Firestore operations
+      syncQueue: 'id, entity_type, entity_id, created_at, retries'
     });
   }
 }

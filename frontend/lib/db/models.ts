@@ -369,3 +369,57 @@ export function isDatabaseError(error: DbError): error is DatabaseError {
 export function isNotFoundError(error: DbError): error is NotFoundError {
   return error.type === 'not_found';
 }
+
+// ============================================================================
+// Sync Queue Types (Phase 4: Push Sync)
+// ============================================================================
+
+/**
+ * Types of operations that can be queued for sync
+ */
+export type SyncOperationType = 
+  | 'create'
+  | 'update'
+  | 'delete';
+
+/**
+ * Entity types that can be synced
+ */
+export type SyncEntityType =
+  | 'trip'
+  | 'flight'
+  | 'hotel'
+  | 'activity'
+  | 'restaurant';
+
+/**
+ * Entry in the sync queue for pending Firestore operations
+ */
+export interface SyncQueueEntry {
+  /** Unique queue entry ID */
+  id: string;
+  
+  /** Type of entity being synced */
+  entity_type: SyncEntityType;
+  
+  /** ID of the entity being synced */
+  entity_id: string;
+  
+  /** Type of operation (create/update/delete) */
+  operation: SyncOperationType;
+  
+  /** Entity data (for create/update operations) */
+  data?: any;
+  
+  /** Trip ID for subcollection entities */
+  trip_id?: string;
+  
+  /** When this entry was created */
+  created_at: string;
+  
+  /** Number of retry attempts */
+  retries: number;
+  
+  /** Last error message if sync failed */
+  last_error?: string;
+}

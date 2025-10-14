@@ -28,28 +28,58 @@ function validateFirebaseConfig(): void {
   ];
 
   const missingVars = requiredEnvVars.filter(
-    (varName) => !process.env[varName]
+    (varName) => {
+      const value = process.env[varName];
+      return !value || value === '' || value === 'undefined';
+    }
   );
 
   if (missingVars.length > 0) {
+    console.error('Missing Firebase environment variables:', missingVars);
+    console.error('Current env values:', {
+      NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? '✓ Set' : '✗ Missing',
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ? '✓ Set' : '✗ Missing',
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ? '✓ Set' : '✗ Missing',
+      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ? '✓ Set' : '✗ Missing',
+      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ? '✓ Set' : '✗ Missing',
+      NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ? '✓ Set' : '✗ Missing',
+    });
     throw new Error(
       `Missing required Firebase environment variables: ${missingVars.join(', ')}\n` +
-      'Please ensure frontend/.env.local contains all required NEXT_PUBLIC_FIREBASE_* variables.'
+      'Please ensure frontend/.env.local contains all required NEXT_PUBLIC_FIREBASE_* variables.\n' +
+      'After updating .env.local, restart the dev server completely.'
     );
   }
 }
-
-// Validate configuration
-validateFirebaseConfig();
 
 /**
  * Initialize Firebase app (singleton pattern)
  */
 let app: FirebaseApp;
-if (getApps().length === 0) {
-  app = initializeApp(firebaseConfig);
+
+// Only initialize if we're in the browser and have valid config
+if (typeof window !== 'undefined') {
+  validateFirebaseConfig();
+  
+  if (getApps().length === 0) {
+    app = initializeApp(firebaseConfig);
+  } else {
+    app = getApps()[0];
+  }
 } else {
-  app = getApps()[0];
+  // Server-side: create a placeholder that will be replaced on client
+  if (getApps().length === 0) {
+    // Only initialize if we have valid config (for build time)
+    const hasValidConfig = Object.values(firebaseConfig).every(val => val && val !== 'undefined');
+    if (hasValidConfig) {
+      app = initializeApp(firebaseConfig);
+    } else {
+      // Placeholder that will be initialized on client
+      app = {} as FirebaseApp;
+    }
+  } else {
+    app = getApps()[0];
+  }
 }
 
 /**

@@ -15,36 +15,25 @@ seed/
 └── README.md                 # This file
 ```
 
-## 🚀 Usage
+## 🚀 Quick Start
 
-### Prerequisites
+### Step 1: Install dependencies
 
-1. **Install dependencies:**
-   ```bash
-   cd seed
-   npm install
-   ```
+```bash
+cd seed
+npm install
+```
 
-2. **Authenticate with Firebase:**
-   
-   Option A - Using Firebase CLI (if installed):
-   ```bash
-   firebase login
-   ```
-   
-   Option B - Using gcloud CLI (if installed):
-   ```bash
-   gcloud auth application-default login
-   ```
-   
-   Option C - Using service account key:
-   ```bash
-   export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account-key.json"
-   ```
+### Step 2: Get Firebase Service Account Key
 
-### Upload Test Data
+1. Go to [Firebase Console - Service Accounts](https://console.firebase.google.com/project/travo-32ec12/settings/serviceaccounts/adminsdk)
+2. Click **"Generate new private key"**
+3. Save the downloaded JSON file as `seed/service-account.json`
+4. ⚠️ This file is gitignored - never commit it!
 
-Run the script with your email address (this will be added to the trip's `user_access` array):
+### Step 3: Upload Test Data
+
+Run the script with your email (will be added to `user_access` array):
 
 ```bash
 npm run upload YOUR_EMAIL@example.com
@@ -52,7 +41,7 @@ npm run upload YOUR_EMAIL@example.com
 
 Example:
 ```bash
-npm run upload prasann@example.com
+npm run upload pvenkat4ever@gmail.com
 ```
 
 This will:

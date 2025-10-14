@@ -1,0 +1,16 @@
+[
+  {
+    "id": "flight-001",
+    "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+    "direction": "outbound",
+    "updated_by": "pvenkat4ever@gmail.com",
+    "updated_at": "2025-10-14T07:21:41.236Z"
+  },
+  {
+    "id": "flight-002",
+    "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+    "direction": "return",
+    "updated_by": "pvenkat4ever@gmail.com",
+    "updated_at": "2025-10-14T07:21:41.236Z"
+  }
+]

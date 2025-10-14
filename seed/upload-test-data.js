@@ -27,22 +27,45 @@ if (!userEmail) {
 console.log('🚀 Starting Firestore data upload...');
 console.log(`📧 User email: ${userEmail}`);
 
-// Initialize Firebase Admin
+// Initialize Firebase Admin with user credentials from Firebase CLI
+const { execSync } = require('child_process');
+const os = require('os');
+
 try {
-  // Check if already initialized
-  if (!admin.apps.length) {
-    // Try to use GOOGLE_APPLICATION_CREDENTIALS environment variable
-    admin.initializeApp({
-      projectId: 'travo-32ec12'
-    });
+  console.log('🔑 Checking Firebase CLI authentication...');
+  
+  // Verify Firebase CLI is logged in
+  try {
+    execSync('firebase projects:list', { stdio: 'ignore' });
+  } catch (error) {
+    throw new Error('Not logged in to Firebase CLI. Please run: firebase login');
   }
+  
+  // Look for the Firebase token file
+  const homeDir = os.homedir();
+  const tokenPath = path.join(homeDir, '.config', 'configstore', 'firebase-tools.json');
+  
+  if (!fs.existsSync(tokenPath)) {
+    throw new Error('Firebase token file not found. Please run: firebase login');
+  }
+  
+  console.log('✅ Firebase CLI authentication verified');
+  
+  // Initialize admin SDK with the project
+  // It will use the user's Firebase CLI credentials automatically
+  process.env.FIRESTORE_EMULATOR_HOST = undefined; // Make sure we're not using emulator
+  
+  admin.initializeApp({
+    projectId: 'travo-32ec12'
+  });
+  
   console.log('✅ Firebase Admin initialized');
+  
 } catch (error) {
-  console.error('❌ Failed to initialize Firebase Admin:', error.message);
-  console.log('\n💡 Make sure you have set up Application Default Credentials:');
-  console.log('   gcloud auth application-default login');
-  console.log('\n   Or set GOOGLE_APPLICATION_CREDENTIALS environment variable:');
-  console.log('   export GOOGLE_APPLICATION_CREDENTIALS="path/to/service-account-key.json"');
+  console.error('❌ Authentication failed:', error.message);
+  console.log('\n💡 Please make sure you are logged in with Firebase CLI:');
+  console.log('   firebase login');
+  console.log('\nThen run this script again.');
   process.exit(1);
 }
 

@@ -1,0 +1,36 @@
+[
+  {
+    "id": "restaurant-001",
+    "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+    "name": "Ichiran Ramen",
+    "city": "Tokyo",
+    "cuisine_type": "Japanese (Ramen)",
+    "address": "1-22-7 Jinnan, Shibuya City, Tokyo",
+    "plus_code": "8Q7XPM5F+11",
+    "notes": "Famous tonkotsu ramen chain. Open 24 hours, no reservation needed. Try the extra-rich broth!",
+    "updated_by": "pvenkat4ever@gmail.com",
+    "updated_at": "2025-10-14T07:21:41.236Z"
+  },
+  {
+    "id": "restaurant-002",
+    "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+    "name": "Sushi Dai",
+    "city": "Tokyo",
+    "cuisine_type": "Japanese (Sushi)",
+    "address": "5 Chome-2-1 Tsukiji, Chuo City, Tokyo",
+    "notes": "Legendary sushi spot. Expect 2-3 hour wait. Opens at 5am. Cash only.",
+    "updated_by": "pvenkat4ever@gmail.com",
+    "updated_at": "2025-10-14T07:21:41.236Z"
+  },
+  {
+    "id": "restaurant-003",
+    "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+    "name": "Gonpachi Nishi-Azabu",
+    "city": "Tokyo",
+    "cuisine_type": "Japanese (Izakaya)",
+    "address": "1-13-11 Nishi-Azabu, Minato City, Tokyo",
+    "notes": "Featured in Kill Bill movie. Reservations recommended for dinner.",
+    "updated_by": "pvenkat4ever@gmail.com",
+    "updated_at": "2025-10-14T07:21:41.236Z"
+  }
+]

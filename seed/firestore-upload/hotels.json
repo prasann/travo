@@ -1,0 +1,13 @@
+[
+  {
+    "id": "hotel-001",
+    "trip_id": "123e4567-e89b-12d3-a456-426614174000",
+    "name": "Tokyo Grand Hotel",
+    "address": "1-2-3 Shinjuku, Shinjuku-ku, Tokyo 160-0022",
+    "city": "Tokyo",
+    "check_in_date": "2025-04-02",
+    "check_out_date": "2025-04-07",
+    "updated_by": "pvenkat4ever@gmail.com",
+    "updated_at": "2025-10-14T07:21:41.236Z"
+  }
+]

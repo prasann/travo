@@ -48,23 +48,55 @@ export {
   getAllTrips, 
   getTripById, 
   getTripWithPlaces,
-  getTripWithRelations 
+  getTripWithRelations,
+  updateTrip,
+  deleteTrip
 } from './operations/trips';
 
 // Flight operations
 export { 
   getFlightsByTripId, 
-  getFlightLegsByFlightId 
+  getFlightLegsByFlightId,
+  updateFlight,
+  deleteFlight
 } from './operations/flights';
 
 // Hotel operations
-export { getHotelsByTripId } from './operations/hotels';
+export { 
+  getHotelsByTripId,
+  createHotel,
+  updateHotel,
+  deleteHotel
+} from './operations/hotels';
 
 // Activity operations
-export { getActivitiesByTripId } from './operations/activities';
+export { 
+  getActivitiesByTripId,
+  createActivity,
+  updateActivity,
+  deleteActivity,
+  bulkUpdateActivities
+} from './operations/activities';
 
 // Restaurant operations
-export { getRestaurantsByTripId } from './operations/restaurants';
+export { 
+  getRestaurantsByTripId,
+  createRestaurant,
+  updateRestaurant,
+  deleteRestaurant
+} from './operations/restaurants';
+
+// Sync operations
+export { 
+  processQueue,
+  triggerSync
+} from '../sync/SyncService';
+export {
+  getQueuedEntries,
+  getFailedEntries,
+  getPendingCount,
+  clearQueue
+} from '../sync/SyncQueue';
 
 // Place operations (DEPRECATED - maintained for backward compatibility)
 export { getPlacesByTripId, getPlaceById } from './operations/places';

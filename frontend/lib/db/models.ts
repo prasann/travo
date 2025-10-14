@@ -24,14 +24,50 @@ import type {
   TripIndexFile as TripIndexFileType,
 } from '@/types';
 
-// Re-export base types for convenience
-export type Flight = FlightType;
-export type FlightLeg = FlightLegType;
-export type Hotel = HotelType;
-export type DailyActivity = DailyActivityType;
-export type RestaurantRecommendation = RestaurantRecommendationType;
+// Re-export base types with database extensions for convenience
 export type TripIndex = TripIndexType;
 export type TripIndexFile = TripIndexFileType;
+
+/**
+ * Flight entity with database-specific fields
+ * Extends base Flight type with sync tracking
+ */
+export interface Flight extends FlightType {
+  /** Email of user who last modified this flight */
+  updated_by: string;
+}
+
+/**
+ * FlightLeg entity (no database extensions)
+ */
+export type FlightLeg = FlightLegType;
+
+/**
+ * Hotel entity with database-specific fields
+ * Extends base Hotel type with sync tracking
+ */
+export interface Hotel extends HotelType {
+  /** Email of user who last modified this hotel */
+  updated_by: string;
+}
+
+/**
+ * DailyActivity entity with database-specific fields
+ * Extends base DailyActivity type with sync tracking
+ */
+export interface DailyActivity extends DailyActivityType {
+  /** Email of user who last modified this activity */
+  updated_by: string;
+}
+
+/**
+ * RestaurantRecommendation entity with database-specific fields
+ * Extends base RestaurantRecommendation type with sync tracking
+ */
+export interface RestaurantRecommendation extends RestaurantRecommendationType {
+  /** Email of user who last modified this restaurant */
+  updated_by: string;
+}
 
 // ============================================================================
 // Database-Specific Type Extensions
@@ -39,11 +75,17 @@ export type TripIndexFile = TripIndexFileType;
 
 /**
  * Trip entity with database-specific fields
- * Extends base Trip type with soft delete support
+ * Extends base Trip type with soft delete support and Firebase sync fields
  */
 export interface Trip extends Omit<BaseTripType, 'flights' | 'hotels' | 'activities' | 'restaurants'> {
   /** Soft delete flag (true = deleted, false = active) */
   deleted: boolean;
+  
+  /** Array of user emails with access to this trip (for sharing) */
+  user_access: string[];
+  
+  /** Email of user who last modified this trip */
+  updated_by: string;
 }
 
 /**
@@ -80,12 +122,12 @@ export interface Place {
 /**
  * Input type for creating a new trip (omits generated fields)
  */
-export type TripInput = Omit<Trip, 'id' | 'updated_at' | 'deleted'>;
+export type TripInput = Omit<Trip, 'id' | 'updated_at' | 'deleted' | 'user_access' | 'updated_by'>;
 
 /**
  * Input type for creating a new flight (omits generated fields)
  */
-export type FlightInput = Omit<Flight, 'id' | 'updated_at' | 'legs'>;
+export type FlightInput = Omit<Flight, 'id' | 'updated_at' | 'updated_by' | 'legs'>;
 
 /**
  * Input type for creating a new flight leg (omits generated fields)
@@ -95,17 +137,17 @@ export type FlightLegInput = Omit<FlightLeg, 'id'>;
 /**
  * Input type for creating a new hotel (omits generated fields)
  */
-export type HotelInput = Omit<Hotel, 'id' | 'updated_at'>;
+export type HotelInput = Omit<Hotel, 'id' | 'updated_at' | 'updated_by'>;
 
 /**
  * Input type for creating a new activity (omits generated fields)
  */
-export type ActivityInput = Omit<DailyActivity, 'id' | 'updated_at'>;
+export type ActivityInput = Omit<DailyActivity, 'id' | 'updated_at' | 'updated_by'>;
 
 /**
  * Input type for creating a new restaurant (omits generated fields)
  */
-export type RestaurantInput = Omit<RestaurantRecommendation, 'id' | 'updated_at'>;
+export type RestaurantInput = Omit<RestaurantRecommendation, 'id' | 'updated_at' | 'updated_by'>;
 
 /**
  * Input type for creating a new place (DEPRECATED - omits generated fields)
@@ -119,14 +161,14 @@ export type PlaceInput = Omit<Place, 'id' | 'updated_at'>;
 /**
  * Input type for updating an existing trip (all fields optional except id)
  */
-export type TripUpdate = Partial<Omit<Trip, 'id' | 'updated_at' | 'deleted'>> & {
+export type TripUpdate = Partial<Omit<Trip, 'id' | 'updated_at' | 'deleted' | 'updated_by'>> & {
   id: string;
 };
 
 /**
  * Input type for updating an existing flight (all fields optional except id)
  */
-export type FlightUpdate = Partial<Omit<Flight, 'id' | 'updated_at' | 'legs'>> & {
+export type FlightUpdate = Partial<Omit<Flight, 'id' | 'updated_at' | 'updated_by' | 'legs'>> & {
   id: string;
 };
 
@@ -140,21 +182,21 @@ export type FlightLegUpdate = Partial<Omit<FlightLeg, 'id'>> & {
 /**
  * Input type for updating an existing hotel (all fields optional except id)
  */
-export type HotelUpdate = Partial<Omit<Hotel, 'id' | 'updated_at'>> & {
+export type HotelUpdate = Partial<Omit<Hotel, 'id' | 'updated_at' | 'updated_by'>> & {
   id: string;
 };
 
 /**
  * Input type for updating an existing activity (all fields optional except id)
  */
-export type ActivityUpdate = Partial<Omit<DailyActivity, 'id' | 'updated_at'>> & {
+export type ActivityUpdate = Partial<Omit<DailyActivity, 'id' | 'updated_at' | 'updated_by'>> & {
   id: string;
 };
 
 /**
  * Input type for updating an existing restaurant (all fields optional except id)
  */
-export type RestaurantUpdate = Partial<Omit<RestaurantRecommendation, 'id' | 'updated_at'>> & {
+export type RestaurantUpdate = Partial<Omit<RestaurantRecommendation, 'id' | 'updated_at' | 'updated_by'>> & {
   id: string;
 };
 

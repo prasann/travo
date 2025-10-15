@@ -88,33 +88,6 @@ export interface Trip extends Omit<BaseTripType, 'flights' | 'hotels' | 'activit
   updated_by: string;
 }
 
-/**
- * Legacy Place entity (DEPRECATED - use DailyActivity instead)
- * Maintained for backward compatibility during migration
- */
-export interface Place {
-  /** Unique identifier (UUID v4) */
-  id: string;
-  
-  /** Foreign key reference to parent Trip */
-  trip_id: string;
-  
-  /** Place name/title */
-  name: string;
-  
-  /** Google Plus Code for location (optional, 8 characters) */
-  plus_code?: string;
-  
-  /** User notes about the place (optional) */
-  notes?: string;
-  
-  /** Display order within the trip (0-based index) */
-  order_index: number;
-  
-  /** Last modification timestamp in ISO 8601 format */
-  updated_at: string;
-}
-
 // ============================================================================
 // Input Types (for Create operations - omit generated fields)
 // ============================================================================
@@ -148,11 +121,6 @@ export type ActivityInput = Omit<DailyActivity, 'id' | 'updated_at' | 'updated_b
  * Input type for creating a new restaurant (omits generated fields)
  */
 export type RestaurantInput = Omit<RestaurantRecommendation, 'id' | 'updated_at' | 'updated_by'>;
-
-/**
- * Input type for creating a new place (DEPRECATED - omits generated fields)
- */
-export type PlaceInput = Omit<Place, 'id' | 'updated_at'>;
 
 // ============================================================================
 // Update Types (for Update operations - partial with id required)
@@ -200,13 +168,6 @@ export type RestaurantUpdate = Partial<Omit<RestaurantRecommendation, 'id' | 'up
   id: string;
 };
 
-/**
- * Input type for updating an existing place (DEPRECATED - all fields optional except id)
- */
-export type PlaceUpdate = Partial<Omit<Place, 'id' | 'updated_at'>> & {
-  id: string;
-};
-
 // ============================================================================
 // Query Result Types (with related entities)
 // ============================================================================
@@ -238,15 +199,6 @@ export interface FlightWithLegs extends Flight {
   legs: FlightLeg[];
 }
 
-/**
- * Trip with associated places included (DEPRECATED)
- * Maintained for backward compatibility
- */
-export interface TripWithPlaces extends Trip {
-  /** Array of places belonging to this trip */
-  places: Place[];
-}
-
 // ============================================================================
 // Seed Data Types
 // ============================================================================
@@ -264,20 +216,8 @@ export interface SeedTripFile extends Omit<BaseTripType, 'updated_at'> {
  * DEPRECATED - now using multi-file structure
  */
 export interface SeedData {
-  trips: SeedTrip[];
+  trips: Trip[];
 }
-
-/**
- * Legacy trip structure in seed data (DEPRECATED)
- */
-export interface SeedTrip extends Omit<Trip, 'deleted'> {
-  places: Place[];
-}
-
-/**
- * Legacy place structure in seed data (DEPRECATED)
- */
-export type SeedPlace = Place;
 
 // ============================================================================
 // Error Types

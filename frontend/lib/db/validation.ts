@@ -5,7 +5,7 @@
  * Date: 2025-10-12
  */
 
-import type { TripInput, PlaceInput, ValidationError } from './models';
+import type { TripInput, ValidationError } from './models';
 
 /**
  * Validate UUID format (lenient - just checks it's a non-empty string)
@@ -46,38 +46,6 @@ export function validateTripInput(input: TripInput): ValidationError | null {
     return {
       type: 'validation',
       message: 'Trip validation failed',
-      fields
-    };
-  }
-  
-  return null;
-}
-
-/**
- * Validate place input data (minimal validation)
- * Returns ValidationError if validation fails, null if valid
- */
-export function validatePlaceInput(input: PlaceInput): ValidationError | null {
-  const fields: Record<string, string> = {};
-  
-  // Only validate that required fields exist
-  if (!input.name) {
-    fields.name = 'Place name is required';
-  }
-  
-  if (!input.trip_id) {
-    fields.trip_id = 'Trip ID is required';
-  }
-  
-  if (input.order_index === undefined || input.order_index === null) {
-    fields.order_index = 'Order index is required';
-  }
-  
-  // Return error if any validation failed
-  if (Object.keys(fields).length > 0) {
-    return {
-      type: 'validation',
-      message: 'Place validation failed',
       fields
     };
   }

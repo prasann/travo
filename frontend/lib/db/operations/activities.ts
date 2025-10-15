@@ -10,7 +10,9 @@
 
 import { db } from '../schema';
 import type { DailyActivity, ActivityInput, Result } from '../models';
+import { wrapDatabaseOperation } from '../errors';
 import { getByTripId, createEntity, updateEntity, deleteEntity } from './base';
+import { addToQueue } from '@/lib/sync/SyncQueue';
 
 /**
  * Get all activities for a trip

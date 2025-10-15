@@ -9,7 +9,6 @@
 import Dexie, { type EntityTable } from 'dexie';
 import type { 
   Trip, 
-  Place, 
   Flight, 
   FlightLeg, 
   Hotel, 
@@ -27,7 +26,6 @@ import type {
 export class TravoDatabase extends Dexie {
   // Declare table types
   trips!: EntityTable<Trip, 'id'>;
-  places!: EntityTable<Place, 'id'>;
   flights!: EntityTable<Flight, 'id'>;
   flightLegs!: EntityTable<FlightLeg, 'id'>;
   hotels!: EntityTable<Hotel, 'id'>;
@@ -152,6 +150,22 @@ export class TravoDatabase extends Dexie {
       
       // NEW: Sync queue table for tracking pending Firestore operations
       syncQueue: 'id, entity_type, entity_id, created_at, retries'
+    });
+    
+    // Define schema version 5 (Remove deprecated places table)
+    this.version(5).stores({
+      trips: 'id, deleted, updated_at, start_date, end_date, *user_access',
+      places: null, // Remove places table
+      flights: 'id, trip_id, departure_time, updated_at',
+      flightLegs: 'id, flight_id, [flight_id+leg_number]',
+      hotels: 'id, trip_id, check_in_time, city, updated_at',
+      activities: 'id, trip_id, date, [trip_id+date+order_index], city, updated_at',
+      restaurants: 'id, trip_id, city, updated_at',
+      syncQueue: 'id, entity_type, entity_id, created_at, retries'
+    }).upgrade(async (trans) => {
+      console.log('[Migration] Removing deprecated places table from v4 to v5...');
+      // No data migration needed - places table was already deprecated and unused
+      console.log('[Migration] Deprecated places table removed successfully');
     });
   }
 }

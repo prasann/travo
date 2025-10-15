@@ -144,13 +144,12 @@ export async function clearLocalData(): Promise<Result<void>> {
   try {
     console.log('[Sync] Clearing all local data...');
     
-    await db.transaction('rw', [db.trips, db.flights, db.hotels, db.activities, db.restaurants, db.places], async () => {
+    await db.transaction('rw', [db.trips, db.flights, db.hotels, db.activities, db.restaurants], async () => {
       await db.trips.clear();
       await db.flights.clear();
       await db.hotels.clear();
       await db.activities.clear();
       await db.restaurants.clear();
-      await db.places.clear();
     });
     
     console.log('[Sync] Local data cleared successfully');

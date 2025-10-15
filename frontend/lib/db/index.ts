@@ -11,7 +11,6 @@
 // Re-export types
 export type {
   Trip,
-  Place,
   Flight,
   FlightLeg,
   Hotel,
@@ -19,9 +18,6 @@ export type {
   RestaurantRecommendation,
   TripInput,
   TripUpdate,
-  PlaceInput,
-  PlaceUpdate,
-  TripWithPlaces,
   TripWithRelations,
   DbError,
   ValidationError,
@@ -47,7 +43,6 @@ export { initializeDatabase, isInitialized } from './init';
 export { 
   getAllTrips, 
   getTripById, 
-  getTripWithPlaces,
   getTripWithRelations,
   updateTrip,
   deleteTrip
@@ -97,6 +92,3 @@ export {
   getPendingCount,
   clearQueue
 } from '../sync/SyncQueue';
-
-// Place operations (DEPRECATED - maintained for backward compatibility)
-export { getPlacesByTripId, getPlaceById } from './operations/places';

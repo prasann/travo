@@ -58,7 +58,6 @@ export async function initializeDatabase(userEmail?: string): Promise<Result<voi
     await db.hotels.count();
     await db.activities.count();
     await db.restaurants.count();
-    await db.places.count(); // Backward compatibility
     
     // If user is authenticated, sync from Firestore
     if (userEmail) {

@@ -44,35 +44,6 @@ export async function getTripById(id: string): Promise<Result<Trip>> {
 }
 
 /**
- * Get trip with all associated places (DEPRECATED - use getTripWithRelations)
- * Maintained for backward compatibility
- */
-export async function getTripWithPlaces(id: string): Promise<Result<TripWithPlaces>> {
-  return wrapDatabaseOperation(async () => {
-    // Get the trip
-    const trip = await db.trips.get(id);
-    
-    if (!trip || trip.deleted) {
-      throw createNotFoundError('Trip', id);
-    }
-    
-    // Get associated places, sorted by order_index
-    const places = await db.places
-      .where('trip_id')
-      .equals(id)
-      .sortBy('order_index');
-    
-    // Combine into TripWithPlaces
-    const tripWithPlaces: TripWithPlaces = {
-      ...trip,
-      places
-    };
-    
-    return tripWithPlaces;
-  });
-}
-
-/**
  * Get trip with all related entities (Enhanced Model)
  * Combines trip with flights, hotels, activities, and restaurants
  */

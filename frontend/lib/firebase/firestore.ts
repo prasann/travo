@@ -36,7 +36,8 @@ import type {
   FirestoreRestaurant 
 } from './schema';
 import type { Result } from '@/lib/db/models';
-import { ok, err, isOk, unwrap } from '@/lib/db/resultHelpers';
+import { ok, err } from '@/lib/db/errors';
+import { isOk, unwrap } from '@/lib/db/resultHelpers';
 
 /**
  * Trip data with all related entities loaded from Firestore
@@ -126,10 +127,18 @@ export async function pullTripWithRelations(tripId: string): Promise<Result<Fire
     ]);
     
     // Check for errors
-    if (!isOk(flightsResult)) return flightsResult as Result<FirestoreTripWithRelations>;
-    if (!isOk(hotelsResult)) return hotelsResult as Result<FirestoreTripWithRelations>;
-    if (!isOk(activitiesResult)) return activitiesResult as Result<FirestoreTripWithRelations>;
-    if (!isOk(restaurantsResult)) return restaurantsResult as Result<FirestoreTripWithRelations>;
+    if (!isOk(flightsResult)) {
+      return err(flightsResult._unsafeUnwrapErr());
+    }
+    if (!isOk(hotelsResult)) {
+      return err(hotelsResult._unsafeUnwrapErr());
+    }
+    if (!isOk(activitiesResult)) {
+      return err(activitiesResult._unsafeUnwrapErr());
+    }
+    if (!isOk(restaurantsResult)) {
+      return err(restaurantsResult._unsafeUnwrapErr());
+    }
     
     const flights = unwrap(flightsResult);
     const hotels = unwrap(hotelsResult);

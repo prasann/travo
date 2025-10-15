@@ -6,7 +6,7 @@
  */
 
 import { db } from '../schema';
-import type { Trip, TripWithPlaces, TripWithRelations, TripUpdate, Result } from '../models';
+import type { Trip, TripWithRelations, TripUpdate, Result } from '../models';
 import { wrapDatabaseOperation, createNotFoundError } from '../errors';
 import { addToQueue } from '@/lib/sync/SyncQueue';
 

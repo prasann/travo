@@ -15,7 +15,8 @@ import {
   type FirestoreTripWithRelations 
 } from '@/lib/firebase/firestore';
 import type { Result } from '@/lib/db/models';
-import { ok, err, isOk, unwrap, unwrapErr } from '@/lib/db/resultHelpers';
+import { ok, err } from '@/lib/db/errors';
+import { isOk, unwrap, unwrapErr } from '@/lib/db/resultHelpers';
 import { 
   tripFromFirestore,
   flightFromFirestore,
@@ -84,7 +85,7 @@ export async function syncTripsFromFirestore(userEmail: string): Promise<Result<
     // Pull trip list from Firestore
     const tripsResult = await pullTripsForUser(userEmail);
     if (!isOk(tripsResult)) {
-      return tripsResult as Result<number>;
+      return err(tripsResult._unsafeUnwrapErr());
     }
     
     const trips = unwrap(tripsResult);

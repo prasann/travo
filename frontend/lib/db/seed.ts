@@ -123,6 +123,8 @@ function parseTripProperties(seedTrip: SeedTripFile): Trip {
     end_date: seedTrip.end_date,
     home_location: seedTrip.home_location,
     updated_at: seedTrip.updated_at,
+    user_access: [], // Empty for seed data (will be set during Firestore sync)
+    updated_by: 'seed', // Indicate this was from seed data
     deleted: false
   };
 }
@@ -140,6 +142,7 @@ function parseFlights(seedTrip: SeedTripFile): Flight[] {
     id: flight.id,
     trip_id: flight.trip_id,
     updated_at: flight.updated_at,
+    updated_by: 'seed',
     airline: flight.airline,
     flight_number: flight.flight_number,
     departure_time: flight.departure_time,
@@ -183,6 +186,7 @@ function parseHotels(seedTrip: SeedTripFile): Hotel[] {
     id: hotel.id,
     trip_id: hotel.trip_id,
     updated_at: hotel.updated_at,
+    updated_by: 'seed',
     name: hotel.name,
     address: hotel.address,
     city: hotel.city,
@@ -206,6 +210,7 @@ function parseActivities(seedTrip: SeedTripFile): DailyActivity[] {
     id: activity.id,
     trip_id: activity.trip_id,
     updated_at: activity.updated_at,
+    updated_by: 'seed',
     name: activity.name,
     date: activity.date,
     start_time: activity.start_time,
@@ -231,6 +236,7 @@ function parseRestaurants(seedTrip: SeedTripFile): RestaurantRecommendation[] {
     id: restaurant.id,
     trip_id: restaurant.trip_id,
     updated_at: restaurant.updated_at,
+    updated_by: 'seed',
     name: restaurant.name,
     city: restaurant.city,
     cuisine_type: restaurant.cuisine_type,

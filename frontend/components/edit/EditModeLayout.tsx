@@ -322,19 +322,17 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
     <main className="min-h-screen bg-base-200 p-4 sm:p-8">
       <div className="container mx-auto max-w-4xl">
         {/* Header */}
-        <div className="mb-6">
+          <div className="mb-6">
           <div className="flex justify-between items-start mb-2">
             <h1 className="text-2xl sm:text-4xl font-bold">Edit Trip</h1>
             <button
               onClick={() => router.push(`/trip/${tripId}`)}
-              className="btn btn-ghost btn-sm"
+              className="btn btn-ghost"
             >
               Return to View
             </button>
           </div>
-        </div>
-        
-        {/* Success Message */}
+        </div>        {/* Success Message */}
         {successMessage && (
           <div className="alert alert-success mb-4">
             <span>{successMessage}</span>
@@ -371,7 +369,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
                     <input
                       type="text"
                       {...register('name', { required: 'Trip name is required' })}
-                      className="input input-bordered input-sm"
+                      className="input input-bordered"
                       placeholder="My Amazing Trip"
                     />
                     {errors.name && (
@@ -388,7 +386,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
                     </label>
                     <textarea
                       {...register('description')}
-                      className="textarea textarea-bordered textarea-sm"
+                      className="textarea textarea-bordered"
                       placeholder="Brief description of your trip"
                       rows={2}
                     />
@@ -403,7 +401,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
                       <input
                         type="date"
                         {...register('start_date', { required: 'Start date is required' })}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                       />
                       {errors.start_date && (
                         <label className="label py-1">
@@ -419,7 +417,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
                       <input
                         type="date"
                         {...register('end_date', { required: 'End date is required' })}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                       />
                       {errors.end_date && (
                         <label className="label py-1">
@@ -437,7 +435,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
                     <input
                       type="text"
                       {...register('home_location')}
-                      className="input input-bordered input-sm"
+                      className="input input-bordered"
                       placeholder="San Francisco"
                     />
                   </div>

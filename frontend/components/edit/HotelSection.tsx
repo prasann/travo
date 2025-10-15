@@ -111,7 +111,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                     <button
                       type="button"
                       onClick={() => handleDeleteHotel(index)}
-                      className="btn btn-error btn-sm"
+                      className="btn btn-outline btn-error"
                     >
                       Delete
                     </button>
@@ -126,7 +126,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                       <input
                         type="text"
                         {...register(`hotels.${index}.city`)}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                         placeholder="Tokyo"
                       />
                     </div>
@@ -138,7 +138,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                       <input
                         type="text"
                         {...register(`hotels.${index}.confirmation_number`)}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                         placeholder="ABC123456"
                       />
                     </div>
@@ -150,7 +150,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                       <input
                         type="datetime-local"
                         {...register(`hotels.${index}.check_in_time`)}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                       />
                     </div>
                     
@@ -161,7 +161,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                       <input
                         type="datetime-local"
                         {...register(`hotels.${index}.check_out_time`)}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                       />
                     </div>
                     
@@ -172,7 +172,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                       <input
                         type="tel"
                         {...register(`hotels.${index}.phone`)}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                         placeholder="+81 3 1234 5678"
                       />
                     </div>
@@ -189,7 +189,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                       {...register(`hotels.${index}.notes`, {
                         maxLength: { value: 2000, message: 'Notes cannot exceed 2000 characters' }
                       })}
-                      className="textarea textarea-bordered textarea-sm"
+                      className="textarea textarea-bordered"
                       rows={2}
                       placeholder="Hotel notes..."
                     />
@@ -241,7 +241,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                         type="text"
                         value={newHotel.city || ''}
                         onChange={(e) => setNewHotel(prev => ({ ...prev, city: e.target.value }))}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                         placeholder="Tokyo"
                       />
                     </div>
@@ -254,7 +254,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                         type="text"
                         value={newHotel.confirmation_number || ''}
                         onChange={(e) => setNewHotel(prev => ({ ...prev, confirmation_number: e.target.value }))}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                         placeholder="ABC123456"
                       />
                     </div>
@@ -267,7 +267,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                         type="datetime-local"
                         value={newHotel.check_in_time || ''}
                         onChange={(e) => setNewHotel(prev => ({ ...prev, check_in_time: e.target.value }))}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                       />
                     </div>
                     
@@ -279,7 +279,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                         type="datetime-local"
                         value={newHotel.check_out_time || ''}
                         onChange={(e) => setNewHotel(prev => ({ ...prev, check_out_time: e.target.value }))}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                       />
                     </div>
                     
@@ -291,7 +291,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                         type="tel"
                         value={newHotel.phone || ''}
                         onChange={(e) => setNewHotel(prev => ({ ...prev, phone: e.target.value }))}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                         placeholder="+81 3 1234 5678"
                       />
                     </div>
@@ -322,7 +322,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                     <button
                       type="button"
                       onClick={handleAddHotel}
-                      className="btn btn-primary btn-sm"
+                      className="btn btn-primary"
                     >
                       Add Hotel
                     </button>
@@ -333,7 +333,7 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                         setNewHotel({});
                         setPlusCode('');
                       }}
-                      className="btn btn-ghost btn-sm"
+                      className="btn btn-ghost"
                     >
                       Cancel
                     </button>

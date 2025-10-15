@@ -56,7 +56,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   const details = (activity.notes || activity.plus_code) ? (
     <>
       {activity.notes && (
-        <p className="text-xs sm:text-sm">{activity.notes}</p>
+        <p className="text-sm opacity-80">{activity.notes}</p>
       )}
       
       {activity.plus_code && (

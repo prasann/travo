@@ -9,7 +9,7 @@
 import { db } from './schema';
 import type { Result } from './models';
 import { wrapDatabaseOperation } from './errors';
-import { ok, isOk, unwrap, unwrapErr } from './resultHelpers';
+import { isOk, unwrap, unwrapErr } from './resultHelpers';
 import { loadSeedData } from './seed';
 import { syncTripsFromFirestore } from '@/lib/firebase/sync';
 
@@ -99,10 +99,5 @@ export async function initializeDatabase(userEmail?: string): Promise<Result<voi
     }
     
     console.log('[DB Init] Database initialization complete');
-    return ok(undefined);
-  });
-}
-
-export { initializeDatabase, isInitialized };
   });
 }

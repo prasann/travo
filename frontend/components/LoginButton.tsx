@@ -12,7 +12,7 @@ import { signInWithGoogle, signOut } from '@/lib/firebase/auth';
  * @returns Login button component with DaisyUI styling
  */
 export default function LoginButton() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, error: authError } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -148,6 +148,17 @@ export default function LoginButton() {
         )}
       </button>
       
+      {/* Show authorization error from AuthContext (e.g., email not in allowlist) */}
+      {authError && (
+        <div className="alert alert-error text-xs py-2 px-3 max-w-xs">
+          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-4 w-4" fill="none" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{authError.message}</span>
+        </div>
+      )}
+      
+      {/* Show sign-in specific errors */}
       {error && (
         <div className="text-xs text-error">{error}</div>
       )}

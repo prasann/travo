@@ -14,6 +14,7 @@
 import { useEffect, useState } from 'react';
 import { initializeDatabase, isOk, unwrapErr } from '@/lib/db';
 import { useAuth } from '@/contexts/AuthContext';
+import { isEmailAllowed, isAllowlistConfigured } from '@/lib/auth/allowlist';
 
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
@@ -31,7 +32,17 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       console.log('[DatabaseProvider] Initializing database...');
       console.log('[DatabaseProvider] User:', user?.email || 'not authenticated');
       
-      // Pass user email to enable Firestore sync if authenticated
+      // SECURITY: Check allowlist before downloading any data
+      if (user?.email && isAllowlistConfigured()) {
+        if (!isEmailAllowed(user.email)) {
+          console.warn('[DatabaseProvider] 🚫 User not in allowlist, skipping data sync');
+          // Don't initialize database with user email - this prevents Firestore sync
+          // The AuthContext will handle signing the user out
+          return;
+        }
+      }
+      
+      // Pass user email to enable Firestore sync if authenticated and authorized
       const userEmail = user?.email || undefined;
       const result = await initializeDatabase(userEmail);
       

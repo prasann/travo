@@ -3,7 +3,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase/config';
-import { AppUser, toAppUser } from '@/lib/firebase/auth';
+import { AppUser, toAppUser, signOut } from '@/lib/firebase/auth';
+import { isEmailAllowed, isAllowlistConfigured } from '@/lib/auth/allowlist';
 
 /**
  * Auth context state type
@@ -57,10 +58,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Subscribe to auth state changes
     const unsubscribe = onAuthStateChanged(
       auth,
-      (firebaseUser) => {
+      async (firebaseUser) => {
         try {
           if (firebaseUser) {
-            // User is signed in
+            // Check if allowlist is configured
+            if (isAllowlistConfigured()) {
+              // Check if user's email is in the allowlist
+              const userEmail = firebaseUser.email;
+              
+              if (!isEmailAllowed(userEmail)) {
+                console.warn('🚫 Unauthorized email attempted sign in:', userEmail);
+                
+                // Sign out the user immediately
+                await signOut();
+                
+                // Set error state
+                setError(new Error(
+                  'Access denied. Your email is not authorized to use this application. ' +
+                  'Please contact the administrator for access.'
+                ));
+                setFirebaseUser(null);
+                setUser(null);
+                setLoading(false);
+                return;
+              }
+              
+              console.log('✅ Authorized user signed in:', userEmail);
+            } else {
+              console.warn('⚠️ Email allowlist not configured - all users can access the app');
+            }
+            
+            // User is signed in and authorized
             setFirebaseUser(firebaseUser);
             setUser(toAppUser(firebaseUser));
           } else {

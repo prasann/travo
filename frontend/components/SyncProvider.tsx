@@ -10,6 +10,7 @@
 import React, { createContext, useCallback, useContext, useEffect } from 'react';
 import { QueryClient, QueryClientProvider, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
+import { isEmailAllowed, isAllowlistConfigured } from '@/lib/auth/allowlist';
 import { 
   getPendingCount, 
   getFailedEntries, 
@@ -50,6 +51,9 @@ const SyncProviderInternal: React.FC<{ children: React.ReactNode }> = ({ childre
   const userEmail = user?.email || null;
   const queryClient = useQueryClient();
 
+  // SECURITY: Check if user is authorized before enabling sync
+  const isUserAuthorized = userEmail && (!isAllowlistConfigured() || isEmailAllowed(userEmail));
+
   // Query for queue snapshot (pending and failed counts)
   const { data: queueSnapshot } = useQuery({
     queryKey: ['syncQueue', userEmail],
@@ -60,7 +64,7 @@ const SyncProviderInternal: React.FC<{ children: React.ReactNode }> = ({ childre
       ]);
       return { pending, failed: failedEntries.length };
     },
-    enabled: !!userEmail,
+    enabled: !!userEmail && !!isUserAuthorized,
     refetchInterval: POLL_INTERVAL_MS,
   });
 
@@ -75,6 +79,7 @@ const SyncProviderInternal: React.FC<{ children: React.ReactNode }> = ({ childre
   const syncMutation = useMutation({
     mutationFn: async () => {
       if (!userEmail) throw new Error('User not authenticated');
+      if (!isUserAuthorized) throw new Error('User not authorized');
       const result = await triggerSync(userEmail);
       return result;
     },
@@ -96,13 +101,13 @@ const SyncProviderInternal: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Auto-trigger sync when new items are added to queue
   useEffect(() => {
-    if (!userEmail || !queueSnapshot) return;
+    if (!userEmail || !isUserAuthorized || !queueSnapshot) return;
     
     // If there are pending items and we're not currently syncing, trigger sync
     if (queueSnapshot.pending > 0 && !syncMutation.isPending) {
       syncMutation.mutate();
     }
-  }, [queueSnapshot?.pending, userEmail]);
+  }, [queueSnapshot?.pending, userEmail, isUserAuthorized]);
 
   const refreshQueueSnapshot = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: ['syncQueue', userEmail] });

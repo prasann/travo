@@ -29,9 +29,9 @@ if (!userEmail) {
   console.error('❌ Error: Please provide your email address');
   console.log('\nUsage: npm run upload YOUR_EMAIL@example.com [TRIP_FILE]');
   console.log('\nExamples:');
-  console.log('  npm run upload pvenkat4ever@gmail.com');
-  console.log('  npm run upload pvenkat4ever@gmail.com 456def78-9abc-def0-1234-567890abcdef.json');
-  console.log('  npm run upload pvenkat4ever@gmail.com my-new-trip.json\n');
+  console.log('  npm run upload user@example.com');
+  console.log('  npm run upload user@example.com 456def78-9abc-def0-1234-567890abcdef.json');
+  console.log('  npm run upload user@example.com my-new-trip.json\n');
   process.exit(1);
 }
 

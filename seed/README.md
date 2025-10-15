@@ -42,13 +42,13 @@ npm run upload YOUR_EMAIL@example.com [TRIP_FILE]
 Examples:
 ```bash
 # Upload default trip (Tokyo)
-npm run upload pvenkat4ever@gmail.com
+npm run upload your-email@example.com
 
 # Upload specific trip file
-npm run upload pvenkat4ever@gmail.com 456def78-9abc-def0-1234-567890abcdef.json
+npm run upload your-email@example.com 456def78-9abc-def0-1234-567890abcdef.json
 
 # Upload your own trip
-npm run upload pvenkat4ever@gmail.com my-paris-trip.json
+npm run upload your-email@example.com my-paris-trip.json
 ```
 
 This will:

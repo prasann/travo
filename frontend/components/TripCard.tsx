@@ -11,7 +11,7 @@ export interface TripCardProps {
 export function TripCard({ trip }: TripCardProps) {
   return (
     <Link href={`/trip/${trip.id}`}>
-      <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer h-full">
+      <div className="card bg-base-100 shadow-2xl hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-200 cursor-pointer h-full border border-base-300/50 hover:border-primary/30">
         <div className="card-body">
           <h2 className="card-title">{trip.name}</h2>
           <div className="text-xs text-base-content/50">

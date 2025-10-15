@@ -65,7 +65,7 @@ function getDaysBetween(start: string, end: string): string[] {
  * TimelineDot - Small colored dot indicator for timeline items
  */
 const TimelineDot = ({ color }: { color: string }) => (
-  <div className={`absolute -left-[26px] md:-left-[34px] top-4 w-3 h-3 rounded-full ${color} shadow-sm`} />
+  <div className={`absolute -left-[26px] md:-left-[34px] top-4 w-4 h-4 rounded-full ${color} shadow-sm`} />
 );
 
 export function TripTimeline({ trip }: TripTimelineProps) {
@@ -161,7 +161,7 @@ export function TripTimeline({ trip }: TripTimelineProps) {
           <button
             onClick={handlePrev}
             disabled={!canGoPrev}
-            className={`btn btn-sm btn-circle ${!canGoPrev ? 'btn-disabled opacity-30' : 'btn-ghost'}`}
+            className={`btn btn-circle ${!canGoPrev ? 'btn-disabled opacity-30' : 'btn-ghost'}`}
             aria-label="Previous days"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -173,7 +173,7 @@ export function TripTimeline({ trip }: TripTimelineProps) {
               <button
                 key={day.dayNumber}
                 onClick={() => scrollToDay(day.dayNumber)}
-                className={`btn btn-sm whitespace-nowrap transition-all ${
+                className={`btn whitespace-nowrap transition-all ${
                   activeDay === day.dayNumber
                     ? `${day.color.bg} ${day.color.border} ${day.color.text} border-2 font-semibold hover:${day.color.bg}`
                     : `${day.color.bgInactive} ${day.color.textInactive} border border-transparent hover:border-${day.color.border.replace('border-', '')}`
@@ -188,7 +188,7 @@ export function TripTimeline({ trip }: TripTimelineProps) {
           <button
             onClick={handleNext}
             disabled={!canGoNext}
-            className={`btn btn-sm btn-circle ${!canGoNext ? 'btn-disabled opacity-30' : 'btn-ghost'}`}
+            className={`btn btn-circle ${!canGoNext ? 'btn-disabled opacity-30' : 'btn-ghost'}`}
             aria-label="Next days"
           >
             <ChevronRight className="w-4 h-4" />
@@ -235,9 +235,9 @@ export function TripTimeline({ trip }: TripTimelineProps) {
                   ) : (
                     <div className="relative">
                       <TimelineDot color={day.color.dot} />
-                      <div className="card bg-base-100/50 shadow-sm border border-base-300">
+                      <div className="card bg-base-100/50 shadow-lg border border-secondary/30">
                         <div className="card-body p-3 sm:p-4">
-                          <div className="flex items-center gap-3 opacity-60">
+                          <div className="flex items-center gap-3">
                             <HotelIcon className="w-5 h-5 text-secondary" />
                             <span className="text-sm">
                               Staying at <span className="font-semibold">{day.hotelStay.name}</span>

@@ -98,7 +98,7 @@ export default function LoginButton() {
         <button
           onClick={handleSignOut}
           disabled={loading}
-          className="btn btn-ghost btn-sm"
+          className="btn btn-ghost"
         >
           {loading ? (
             <span className="loading loading-spinner loading-xs"></span>
@@ -116,7 +116,7 @@ export default function LoginButton() {
       <button
         onClick={handleSignIn}
         disabled={loading}
-        className="btn btn-primary btn-sm"
+        className="btn btn-primary"
       >
         {loading ? (
           <>

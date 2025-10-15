@@ -28,7 +28,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
       {categories.map((category) => (
         <button
           key={category.id}
-          className={`tab ${activeCategory === category.id ? 'tab-active' : ''}`}
+          className={`tab transition-all duration-200 ${activeCategory === category.id ? 'tab-active border-b-4 border-primary' : ''}`}
           onClick={() => onCategoryChange(category.id)}
           type="button"
         >

@@ -239,7 +239,7 @@ export default function AttractionSection({
                         type="date"
                         value={newActivity.date || ''}
                         onChange={(e) => setNewActivity(prev => ({ ...prev, date: e.target.value }))}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                         min={tripStartDate}
                         max={tripEndDate}
                         required
@@ -254,7 +254,7 @@ export default function AttractionSection({
                         type="text"
                         value={newActivity.city || ''}
                         onChange={(e) => setNewActivity(prev => ({ ...prev, city: e.target.value }))}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                         placeholder="Tokyo"
                       />
                     </div>
@@ -267,7 +267,7 @@ export default function AttractionSection({
                         type="time"
                         value={newActivity.start_time || ''}
                         onChange={(e) => setNewActivity(prev => ({ ...prev, start_time: e.target.value }))}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                       />
                     </div>
                     
@@ -279,7 +279,7 @@ export default function AttractionSection({
                         type="number"
                         value={newActivity.duration_minutes || ''}
                         onChange={(e) => setNewActivity(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) || undefined }))}
-                        className="input input-bordered input-sm"
+                        className="input input-bordered"
                         placeholder="120"
                         min="0"
                       />
@@ -303,7 +303,7 @@ export default function AttractionSection({
                     <button
                       type="button"
                       onClick={handleAddActivity}
-                      className="btn btn-primary btn-sm"
+                      className="btn btn-primary"
                       disabled={!newActivity.date}
                     >
                       Add Attraction
@@ -315,7 +315,7 @@ export default function AttractionSection({
                         setNewActivity({});
                         setMapsUrl('');
                       }}
-                      className="btn btn-ghost btn-sm"
+                      className="btn btn-ghost"
                     >
                       Cancel
                     </button>

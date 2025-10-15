@@ -14,135 +14,14 @@ import {
   pullTripWithRelations,
   type FirestoreTripWithRelations 
 } from '@/lib/firebase/firestore';
-import type { 
-  Trip, 
-  Flight, 
-  FlightLeg,
-  Hotel, 
-  DailyActivity, 
-  RestaurantRecommendation,
-  Result 
-} from '@/lib/db/models';
-import type { 
-  FirestoreTrip, 
-  FirestoreFlight,
-  FirestoreHotel, 
-  FirestoreDailyActivity, 
-  FirestoreRestaurant 
-} from '@/lib/firebase/schema';
-import { Timestamp } from 'firebase/firestore';
-
-/**
- * Transform Firestore Trip to IndexedDB Trip format
- * 
- * Note: Firestore has a simplified schema. Some IndexedDB fields are
- * set to defaults or omitted since they don't exist in Firestore.
- */
-function transformTrip(firestoreTrip: FirestoreTrip): Trip {
-  return {
-    id: firestoreTrip.id,
-    name: firestoreTrip.name,
-    description: `Trip to ${firestoreTrip.destination}`, // Map destination to description
-    start_date: firestoreTrip.start_date,
-    end_date: firestoreTrip.end_date,
-    home_location: undefined, // Not stored in Firestore
-    updated_at: firestoreTrip.updated_at, // Already ISO string
-    deleted: false, // Trips from Firestore are active (not deleted)
-    user_access: firestoreTrip.user_access,
-    updated_by: firestoreTrip.updated_by
-  };
-}
-
-/**
- * Transform Firestore Flight to IndexedDB Flight format
- * 
- * Note: Firestore flight schema is simplified with just direction
- * and legs. Most flight details are in legs (embedded).
- */
-function transformFlight(firestoreFlight: FirestoreFlight): Flight {
-  return {
-    id: firestoreFlight.id,
-    trip_id: firestoreFlight.trip_id,
-    airline: undefined, // Flight details are in legs
-    flight_number: undefined,
-    departure_time: undefined,
-    arrival_time: undefined,
-    departure_location: undefined,
-    arrival_location: undefined,
-    confirmation_number: undefined,
-    notes: `${firestoreFlight.direction} flight`, // Just store the direction
-    updated_at: firestoreFlight.updated_at,
-    updated_by: firestoreFlight.updated_by,
-    legs: [] // Legs are stored separately in IndexedDB
-  };
-}
-
-/**
- * Transform Firestore Hotel to IndexedDB Hotel format
- * 
- * Note: Firestore uses dates (check_in_date/check_out_date) instead of times
- */
-function transformHotel(firestoreHotel: FirestoreHotel): Hotel {
-  return {
-    id: firestoreHotel.id,
-    trip_id: firestoreHotel.trip_id,
-    name: firestoreHotel.name,
-    address: firestoreHotel.address,
-    city: firestoreHotel.city,
-    plus_code: firestoreHotel.plus_code,
-    check_in_time: firestoreHotel.check_in_date, // Use date as time
-    check_out_time: firestoreHotel.check_out_date, // Use date as time
-    confirmation_number: undefined, // Not stored in Firestore
-    phone: undefined, // Not stored in Firestore
-    notes: undefined, // Not stored in Firestore
-    updated_at: firestoreHotel.updated_at,
-    updated_by: firestoreHotel.updated_by
-  };
-}
-
-/**
- * Transform Firestore Activity to IndexedDB Activity format
- * 
- * Note: Firestore uses time_of_day instead of start_time
- */
-function transformActivity(firestoreActivity: FirestoreDailyActivity): DailyActivity {
-  return {
-    id: firestoreActivity.id,
-    trip_id: firestoreActivity.trip_id,
-    name: firestoreActivity.name,
-    date: firestoreActivity.date,
-    start_time: undefined, // Firestore uses time_of_day instead
-    duration_minutes: undefined, // Not stored in Firestore
-    order_index: firestoreActivity.order_index,
-    city: firestoreActivity.city,
-    plus_code: firestoreActivity.plus_code,
-    address: firestoreActivity.address,
-    image_url: undefined, // Not stored in Firestore
-    notes: firestoreActivity.notes,
-    updated_at: firestoreActivity.updated_at,
-    updated_by: firestoreActivity.updated_by
-  };
-}
-
-/**
- * Transform Firestore Restaurant to IndexedDB Restaurant format
- */
-function transformRestaurant(firestoreRestaurant: FirestoreRestaurant): RestaurantRecommendation {
-  return {
-    id: firestoreRestaurant.id,
-    trip_id: firestoreRestaurant.trip_id,
-    name: firestoreRestaurant.name,
-    city: firestoreRestaurant.city,
-    cuisine_type: firestoreRestaurant.cuisine_type,
-    address: firestoreRestaurant.address,
-    plus_code: firestoreRestaurant.plus_code,
-    phone: undefined, // Not stored in Firestore
-    website: undefined, // Not stored in Firestore  
-    notes: firestoreRestaurant.notes,
-    updated_at: firestoreRestaurant.updated_at,
-    updated_by: firestoreRestaurant.updated_by
-  };
-}
+import type { Result } from '@/lib/db/models';
+import { 
+  tripFromFirestore,
+  flightFromFirestore,
+  hotelFromFirestore,
+  activityFromFirestore,
+  restaurantFromFirestore
+} from '@/lib/firebase/converter';
 
 /**
  * Save a trip with all related entities to IndexedDB
@@ -152,12 +31,12 @@ async function saveTripToIndexedDB(tripData: FirestoreTripWithRelations): Promis
   try {
     console.log(`[Sync] Saving trip to IndexedDB: ${tripData.trip.name}`);
     
-    // Transform all entities
-    const trip = transformTrip(tripData.trip);
-    const flights = tripData.flights.map(transformFlight);
-    const hotels = tripData.hotels.map(transformHotel);
-    const activities = tripData.activities.map(transformActivity);
-    const restaurants = tripData.restaurants.map(transformRestaurant);
+    // Transform all entities using bidirectional converters
+    const trip = tripFromFirestore(tripData.trip);
+    const flights = tripData.flights.map(flightFromFirestore);
+    const hotels = tripData.hotels.map(hotelFromFirestore);
+    const activities = tripData.activities.map(activityFromFirestore);
+    const restaurants = tripData.restaurants.map(restaurantFromFirestore);
     
     // Save in a transaction
     await db.transaction('rw', [db.trips, db.flights, db.hotels, db.activities, db.restaurants], async () => {

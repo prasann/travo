@@ -275,6 +275,218 @@ export const restaurantConverter: FirestoreDataConverter<FirestoreRestaurant> = 
 };
 
 // ============================================================================
+// Bidirectional Transformations (IndexedDB ↔ Firestore)
+// ============================================================================
+
+import type {
+  Trip,
+  Flight,
+  Hotel,
+  DailyActivity,
+  RestaurantRecommendation,
+} from '../db/models';
+
+/**
+ * Transform IndexedDB Trip to Firestore Trip format
+ */
+export function tripToFirestore(trip: Trip): FirestoreTrip {
+  return {
+    id: trip.id,
+    name: trip.name,
+    destination: trip.description || trip.name,
+    start_date: trip.start_date,
+    end_date: trip.end_date,
+    user_access: trip.user_access,
+    updated_by: trip.updated_by,
+    updated_at: trip.updated_at,
+    created_at: trip.updated_at,
+  };
+}
+
+/**
+ * Transform Firestore Trip to IndexedDB Trip format
+ */
+export function tripFromFirestore(firestoreTrip: FirestoreTrip): Trip {
+  return {
+    id: firestoreTrip.id,
+    name: firestoreTrip.name,
+    description: `Trip to ${firestoreTrip.destination}`,
+    start_date: firestoreTrip.start_date,
+    end_date: firestoreTrip.end_date,
+    home_location: undefined,
+    updated_at: firestoreTrip.updated_at,
+    deleted: false,
+    user_access: firestoreTrip.user_access,
+    updated_by: firestoreTrip.updated_by,
+  };
+}
+
+/**
+ * Transform IndexedDB Flight to Firestore Flight format
+ */
+export function flightToFirestore(flight: Flight): FirestoreFlight {
+  const direction: 'outbound' | 'return' = 
+    flight.notes?.toLowerCase().includes('return') ? 'return' : 'outbound';
+  
+  return {
+    id: flight.id,
+    trip_id: flight.trip_id,
+    direction,
+    updated_by: flight.updated_by,
+    updated_at: flight.updated_at,
+  };
+}
+
+/**
+ * Transform Firestore Flight to IndexedDB Flight format
+ */
+export function flightFromFirestore(firestoreFlight: FirestoreFlight): Flight {
+  return {
+    id: firestoreFlight.id,
+    trip_id: firestoreFlight.trip_id,
+    airline: undefined,
+    flight_number: undefined,
+    departure_time: undefined,
+    arrival_time: undefined,
+    departure_location: undefined,
+    arrival_location: undefined,
+    confirmation_number: undefined,
+    notes: `${firestoreFlight.direction} flight`,
+    updated_at: firestoreFlight.updated_at,
+    updated_by: firestoreFlight.updated_by,
+    legs: [],
+  };
+}
+
+/**
+ * Transform IndexedDB Hotel to Firestore Hotel format
+ */
+export function hotelToFirestore(hotel: Hotel): FirestoreHotel {
+  return {
+    id: hotel.id,
+    trip_id: hotel.trip_id,
+    name: hotel.name || 'Hotel',
+    address: hotel.address || '',
+    plus_code: hotel.plus_code || undefined,
+    city: hotel.city || undefined,
+    check_in_date: hotel.check_in_time?.split('T')[0] || '',
+    check_out_date: hotel.check_out_time?.split('T')[0] || '',
+    updated_by: hotel.updated_by,
+    updated_at: hotel.updated_at,
+  };
+}
+
+/**
+ * Transform Firestore Hotel to IndexedDB Hotel format
+ */
+export function hotelFromFirestore(firestoreHotel: FirestoreHotel): Hotel {
+  return {
+    id: firestoreHotel.id,
+    trip_id: firestoreHotel.trip_id,
+    name: firestoreHotel.name,
+    address: firestoreHotel.address,
+    city: firestoreHotel.city,
+    plus_code: firestoreHotel.plus_code,
+    check_in_time: firestoreHotel.check_in_date,
+    check_out_time: firestoreHotel.check_out_date,
+    confirmation_number: undefined,
+    phone: undefined,
+    notes: undefined,
+    updated_at: firestoreHotel.updated_at,
+    updated_by: firestoreHotel.updated_by,
+  };
+}
+
+/**
+ * Transform IndexedDB Activity to Firestore Activity format
+ */
+export function activityToFirestore(activity: DailyActivity): FirestoreDailyActivity {
+  let time_of_day: 'morning' | 'afternoon' | 'evening' | 'night' = 'morning';
+  
+  if (activity.start_time) {
+    const hour = new Date(activity.start_time).getHours();
+    if (hour >= 12 && hour < 17) time_of_day = 'afternoon';
+    else if (hour >= 17 && hour < 21) time_of_day = 'evening';
+    else if (hour >= 21 || hour < 6) time_of_day = 'night';
+  }
+  
+  return {
+    id: activity.id,
+    trip_id: activity.trip_id,
+    name: activity.name || '',
+    date: activity.date || '',
+    time_of_day,
+    city: activity.city || undefined,
+    plus_code: activity.plus_code || undefined,
+    address: activity.address || undefined,
+    notes: activity.notes || undefined,
+    order_index: activity.order_index ?? 0,
+    updated_by: activity.updated_by,
+    updated_at: activity.updated_at,
+  };
+}
+
+/**
+ * Transform Firestore Activity to IndexedDB Activity format
+ */
+export function activityFromFirestore(firestoreActivity: FirestoreDailyActivity): DailyActivity {
+  return {
+    id: firestoreActivity.id,
+    trip_id: firestoreActivity.trip_id,
+    name: firestoreActivity.name,
+    date: firestoreActivity.date,
+    start_time: undefined,
+    duration_minutes: undefined,
+    order_index: firestoreActivity.order_index,
+    city: firestoreActivity.city,
+    plus_code: firestoreActivity.plus_code,
+    address: firestoreActivity.address,
+    image_url: undefined,
+    notes: firestoreActivity.notes,
+    updated_at: firestoreActivity.updated_at,
+    updated_by: firestoreActivity.updated_by,
+  };
+}
+
+/**
+ * Transform IndexedDB Restaurant to Firestore Restaurant format
+ */
+export function restaurantToFirestore(restaurant: RestaurantRecommendation): FirestoreRestaurant {
+  return {
+    id: restaurant.id,
+    trip_id: restaurant.trip_id,
+    name: restaurant.name || '',
+    address: restaurant.address || undefined,
+    plus_code: restaurant.plus_code || undefined,
+    city: restaurant.city || undefined,
+    cuisine_type: restaurant.cuisine_type || undefined,
+    notes: restaurant.notes || undefined,
+    updated_by: restaurant.updated_by,
+    updated_at: restaurant.updated_at,
+  };
+}
+
+/**
+ * Transform Firestore Restaurant to IndexedDB Restaurant format
+ */
+export function restaurantFromFirestore(firestoreRestaurant: FirestoreRestaurant): RestaurantRecommendation {
+  return {
+    id: firestoreRestaurant.id,
+    trip_id: firestoreRestaurant.trip_id,
+    name: firestoreRestaurant.name,
+    city: firestoreRestaurant.city,
+    cuisine_type: firestoreRestaurant.cuisine_type,
+    address: firestoreRestaurant.address,
+    plus_code: firestoreRestaurant.plus_code,
+    phone: undefined,
+    website: undefined,
+    notes: firestoreRestaurant.notes,
+    updated_at: firestoreRestaurant.updated_at,
+    updated_by: firestoreRestaurant.updated_by,
+  };
+}
+
+// ============================================================================
 // Validation Helpers
 // ============================================================================
 

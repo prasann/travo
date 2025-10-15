@@ -69,16 +69,6 @@ export function createNotFoundError(entityType: string, id: string): NotFoundErr
 /**
  * Wrap a database operation with error handling
  * Converts exceptions into Result type using neverthrow
- * 
- * @example
- * const result = await wrapDatabaseOperation(async () => {
- *   return await db.trips.get(id);
- * });
- * 
- * result.match(
- *   trip => console.log('Success:', trip),
- *   error => console.error('Error:', error.message)
- * );
  */
 export async function wrapDatabaseOperation<T>(
   operation: () => Promise<T>

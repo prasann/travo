@@ -38,17 +38,6 @@ export {
 
 // Re-export neverthrow utilities for Result handling
 export { ok, err } from './errors';
-export {
-  isOk,
-  isErr,
-  unwrap,
-  unwrapErr,
-  unwrapOr,
-  mapOr,
-  match,
-  tap,
-  combineResults
-} from './resultUtils';
 
 // Initialization
 export { initializeDatabase, isInitialized } from './init';

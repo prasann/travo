@@ -51,6 +51,9 @@
   - Firestore (cloud database)
 
 ### Utilities
+- **@tanstack/react-query 5.90.3** - Data fetching and state management
+- **date-fns 4.1.0** - Date/time formatting and manipulation
+- **lodash 4.17.21** - Utility functions (sorting, data manipulation)
 - **clsx** - Conditional class names
 - **tailwind-merge** - Merge Tailwind classes
 - **uuid** - Generate unique identifiers
@@ -99,6 +102,7 @@ frontend/
 │   │   ├── init.ts               # DB initialization
 │   │   ├── validation.ts         # Data validation
 │   │   └── operations/           # CRUD operations
+│   │       ├── base.ts           # Generic CRUD operations
 │   │       ├── trips.ts          # Trip operations
 │   │       ├── flights.ts        # Flight operations
 │   │       ├── hotels.ts         # Hotel operations
@@ -145,7 +149,7 @@ frontend/
 
 ## Data Architecture
 
-### IndexedDB Schema (Dexie v4)
+### IndexedDB Schema (Dexie v5)
 
 **Database Name**: `TravoLocalDB`
 
@@ -310,16 +314,16 @@ onAuthStateChanged() → User | null
 
 **Push Sync** (IndexedDB → Firestore):
 - Operations queued in `syncQueue` table
-- Background processing via `SyncProvider`
+- Background processing via `SyncProvider` using React Query
 - Automatic triggers:
   - On create/update/delete operations
-  - When app comes into focus (visibility change)
-  - When device comes online
-  - Periodic polling (30 second interval)
+  - When app comes into focus (window focus/visibility change)
+  - When device comes online (network reconnection)
+  - Automatic background polling with exponential backoff
 - Max 3 retries for failed operations
 - Last-write-wins conflict resolution
 
-**Converters**: `lib/firebase/converter.ts` handles type transformations.
+**Converters**: `lib/firebase/converter.ts` provides bidirectional transformations between IndexedDB and Firestore formats.
 
 ---
 
@@ -363,7 +367,9 @@ onAuthStateChanged() → User | null
 
 ### Global State
 - Auth: `AuthContext` (user, loading, error)
-- Sync: `SyncContext` via `useSyncStatus()` hook (pending count, failed count, sync trigger)
+- Sync: React Query manages sync queue state with automatic background refetch
+  - `useSyncStatus()` hook provides pending count, failed count, sync trigger
+  - Automatic cache invalidation and refetch on focus/reconnect
 
 ---
 
@@ -373,17 +379,19 @@ onAuthStateChanged() → User | null
 
 ```typescript
 // 1. Collect all timeline items (flights, hotels, activities)
-// 2. Sort chronologically by timestamp
+// 2. Sort chronologically using lodash orderBy with custom sort key
 // 3. Group by date (YYYY-MM-DD)
 // 4. Assign day numbers (1, 2, 3...)
 // 5. Assign colors (cycle through palette)
 // 6. Add hotel continuity (check-in vs. staying indicators)
 ```
 
-**Sorting Priority**:
+**Sorting Priority** (using `lodash.orderBy`):
 1. Items with timestamps → sort by timestamp
 2. Items with same timestamp → sort by order_index
 3. Items without timestamps → sort by order_index
+
+**Implementation**: `lib/utils.ts` provides `sortChronologically()` helper using lodash for reliable sorting.
 
 ### Sync Queue Processing
 
@@ -533,7 +541,7 @@ allow write: if request.auth != null
 
 ### Database Migrations
 
-Dexie handles schema migrations automatically. Current version: **v4**
+Dexie handles schema migrations automatically. Current version: **v5**
 
 **Migration v2 → v3**:
 - Added `user_access`, `updated_by` fields
@@ -542,6 +550,10 @@ Dexie handles schema migrations automatically. Current version: **v4**
 **Migration v3 → v4**:
 - Added `syncQueue` table
 - No data transformation required
+
+**Migration v4 → v5**:
+- Removed deprecated `places` table
+- No data transformation required (table was unused)
 
 ### Future Migrations
 

@@ -6,7 +6,7 @@
 
 ---
 
-## 1. Consolidate Date/Time Utilities
+## 1. Consolidate Date/Time Utilities ✅ COMPLETED
 
 **Current State**: 
 - Custom date formatting functions in `lib/dateTime.ts`
@@ -24,9 +24,15 @@
 
 **Effort**: Low (2-3 hours)
 
+**Completed**: 2025-10-15
+- Installed date-fns package
+- Replaced custom Intl.DateTimeFormat calls with date-fns format/parseISO
+- Reduced from ~80 lines to ~50 lines
+- Committed in: `f8660cf`
+
 ---
 
-## 2. Simplify Sync Provider Logic
+## 2. Simplify Sync Provider Logic ✅ COMPLETED
 
 **Current State**:
 - `SyncProvider.tsx` has complex polling logic with intervals, visibility listeners, and online event handling
@@ -40,15 +46,21 @@
 - Better DevTools integration for debugging
 
 **Impact**:
-- Reduce `SyncProvider.tsx` from ~180 lines to ~60 lines
+- Reduce `SyncProvider.tsx` from ~180 lines to ~110 lines
 - Better error handling and retry strategies
 - Easier to test and maintain
 
 **Effort**: Medium (4-6 hours)
 
+**Completed**: 2025-10-15
+- Installed @tanstack/react-query
+- Replaced manual polling with React Query useQuery/useMutation
+- Automatic background syncing with refetch on focus/reconnect
+- Committed in: `5db57a4`
+
 ---
 
-## 3. Consolidate Database Operations Layer
+## 3. Consolidate Database Operations Layer ✅ COMPLETED
 
 **Current State**:
 - Multiple files in `lib/db/operations/` (trips.ts, flights.ts, hotels.ts, activities.ts, restaurants.ts, places.ts)
@@ -61,15 +73,21 @@
 - Entity-specific logic only where needed
 
 **Impact**:
-- Reduce operation files from 6 files (~800 lines) to 2-3 files (~400 lines)
+- Reduce operation files from 6 files (~800 lines) to consolidated base + entity files (~400 lines)
 - Consistent error handling across all operations
 - Easier to add new entity types
 
 **Effort**: Medium-High (6-8 hours)
 
+**Completed**: 2025-10-15
+- Created base.ts with generic CRUD operations
+- Refactored hotels, activities, restaurants, flights to use base operations
+- Reduced code duplication significantly
+- Committed in: `c8932be`
+
 ---
 
-## 4. Merge Firebase Schema Transformations
+## 4. Merge Firebase Schema Transformations ✅ COMPLETED
 
 **Current State**:
 - Separate transformation functions in `lib/firebase/sync.ts` (Firestore → IndexedDB)
@@ -79,14 +97,19 @@
 **Opportunity**:
 - Create bidirectional converters in `lib/firebase/converter.ts`
 - Single source of truth for field mappings
-- Use Zod or similar for schema validation and transformation
 
 **Impact**:
-- Remove ~200 lines of duplicate transformation code
-- Better type safety with schema validation
-- Easier to maintain when schema changes
+- Remove ~300 lines of duplicate transformation code
+- Better maintainability when schema changes
+- Consistent field mappings in both directions
 
 **Effort**: Medium (4-5 hours)
+
+**Completed**: 2025-10-15
+- Created bidirectional converters (tripToFirestore/tripFromFirestore, etc.)
+- Single source of truth in lib/firebase/converter.ts
+- Removed duplicate transformation functions
+- Committed in: `dc8a443`
 
 ---
 
@@ -111,7 +134,7 @@
 
 ---
 
-## 6. Replace Custom Sorting Logic with Lodash
+## 6. Replace Custom Sorting Logic with Lodash ✅ COMPLETED
 
 **Current State**:
 - Custom `sortChronologically` function in `lib/utils.ts`
@@ -128,6 +151,12 @@
 - Better readability
 
 **Effort**: Low (1-2 hours)
+
+**Completed**: 2025-10-15
+- Installed lodash and @types/lodash
+- Replaced sortChronologically with lodash orderBy
+- Simplified sorting logic with helper functions
+- Committed in: `f87d63a`
 
 ---
 
@@ -189,7 +218,7 @@
 
 ---
 
-## 10. Remove Deprecated Places API
+## 10. Remove Deprecated Places API ✅ COMPLETED
 
 **Current State**:
 - `lib/db/operations/places.ts` exists but marked as "DEPRECATED - maintained for backward compatibility"
@@ -207,6 +236,13 @@
 - Less cognitive load for developers
 
 **Effort**: Low-Medium (3-4 hours including migration)
+
+**Completed**: 2025-10-15
+- Removed places operations file
+- Removed places table from Dexie schema (v4 → v5 migration)
+- Cleaned up Place-related types from models
+- Removed all places references
+- Committed in: `52d3813`
 
 ---
 

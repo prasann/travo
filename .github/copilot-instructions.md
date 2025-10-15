@@ -1,25 +1,26 @@
 # travo Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2025-10-10
+Last updated: 2025-10-15
 
 ## Active Technologies
-- TypeScript 5.x (strict mode) + Next.js 15.5.4 (App Router), React 19.1.0, DaisyUI 5.2.0, Tailwind CSS 4.1.14
-- JSON file (trips.json) - static data with no persistence
-<<<<<<< HEAD
-- TypeScript 5.x (strict mode enabled) (005-let-s-introduce)
-- IndexedDB (browser-native, persistent local storage) (005-let-s-introduce)
-=======
-- TypeScript 5.x (strict mode), JavaScript ES2020+ + Next.js 15.5.4, React 19.1.0, DaisyUI 5.2.0, Tailwind CSS 4.1.14 (005-need-to-better)
-- JSON files (one per trip) in `/frontend/data/trips/` directory, migrating from single `trips.json` (005-need-to-better)
->>>>>>> main
-- TypeScript 5.x (strict mode), JavaScript ES2020+ + Next.js 15.5.4 (App Router), React 19.1.0, DaisyUI 5.2.0, Tailwind CSS 4.1.14, Dexie.js (IndexedDB wrapper) (006-edit-mode-for)
-- IndexedDB (via Dexie.js) for offline-first local persistence (006-edit-mode-for)
+- **Frontend Framework**: Next.js 15.5.4 (App Router), React 19.1.0
+- **Language**: TypeScript 5.x (strict mode enabled)
+- **UI/Styling**: DaisyUI 5.2.0, Tailwind CSS 4.1.14
+- **Local Database**: IndexedDB via Dexie.js 4.2.1 (offline-first persistence)
+- **Cloud Services**: Firebase 12.4.0 (Auth + Firestore)
+- **Additional**: @dnd-kit (drag-drop), Lucide React (icons), react-hook-form
 
 ## Project Structure
 ```
-backend/
 frontend/
-tests/
+  ├── app/              # Next.js App Router (pages, layouts, API routes)
+  ├── components/       # React components (UI + edit mode)
+  ├── lib/              # Core logic (db, firebase, sync, services, utils)
+  ├── contexts/         # React contexts (Auth)
+  ├── types/            # TypeScript type definitions
+  ├── hooks/            # Custom React hooks
+  ├── config/           # Configuration (theme)
+  └── public/           # Static assets
 ```
 
 ## Commands
@@ -30,13 +31,21 @@ tests/
 ## Code Style
 - TypeScript strict mode enabled
 - Use DaisyUI utility classes for styling
-- Server Components by default, Client Components when needed
+- Server Components by default, Client Components when needed (`'use client'`)
 - Follow Next.js App Router conventions
+- All database operations return `Result<T>` type for explicit error handling
 
-## Recent Changes
-- 006-edit-mode-for: Added TypeScript 5.x (strict mode), JavaScript ES2020+ + Next.js 15.5.4 (App Router), React 19.1.0, DaisyUI 5.2.0, Tailwind CSS 4.1.14, Dexie.js (IndexedDB wrapper)
-- 005-let-s-introduce: Added TypeScript 5.x (strict mode enabled)
-- 005-need-to-better: Added TypeScript 5.x (strict mode), JavaScript ES2020+ + Next.js 15.5.4, React 19.1.0, DaisyUI 5.2.0, Tailwind CSS 4.1.14
+## Key Architecture Patterns
+- **Offline-first**: IndexedDB as primary storage, Firestore for cloud sync
+- **Data flow**: User actions → IndexedDB → Sync Queue → Firestore (background)
+- **Provider hierarchy**: AuthProvider → DatabaseProvider → SyncProvider → App
+- **Edit mode**: Category-based editing with Google Maps integration for place lookup
+
+## Documentation
+When making significant changes to features, data models, or architecture:
+- Update `/travo-prd.md` if user-facing features change
+- Update `/technical-specifications.md` if implementation details change
+- Keep both documents in sync with the actual codebase
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

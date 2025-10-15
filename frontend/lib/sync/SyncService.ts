@@ -25,7 +25,12 @@ import {
   flightConverter, 
   hotelConverter, 
   activityConverter, 
-  restaurantConverter 
+  restaurantConverter,
+  tripToFirestore,
+  flightToFirestore,
+  hotelToFirestore,
+  activityToFirestore,
+  restaurantToFirestore
 } from '../firebase/converter';
 import { 
   getQueuedEntries, 
@@ -47,107 +52,6 @@ import type {
   FirestoreDailyActivity,
   FirestoreRestaurant
 } from '../firebase/schema';
-
-/**
- * Transform IndexedDB Trip to Firestore Trip format
- */
-function transformTripToFirestore(trip: Trip): FirestoreTrip {
-  return {
-    id: trip.id,
-    name: trip.name,
-    destination: trip.description || trip.name, // Map description to destination
-    start_date: trip.start_date,
-    end_date: trip.end_date,
-    user_access: trip.user_access,
-    updated_by: trip.updated_by,
-    updated_at: trip.updated_at,
-    created_at: trip.updated_at, // Use updated_at as fallback
-  };
-}
-
-/**
- * Transform IndexedDB Flight to Firestore Flight format
- * Firestore uses simplified schema with just direction
- */
-function transformFlightToFirestore(flight: Flight): FirestoreFlight {
-  // Determine direction based on notes or default to outbound
-  const direction: 'outbound' | 'return' = 
-    flight.notes?.toLowerCase().includes('return') ? 'return' : 'outbound';
-  
-  return {
-    id: flight.id,
-    trip_id: flight.trip_id,
-    direction,
-    updated_by: flight.updated_by,
-    updated_at: flight.updated_at,
-  };
-}
-
-/**
- * Transform IndexedDB Hotel to Firestore Hotel format
- */
-function transformHotelToFirestore(hotel: Hotel): FirestoreHotel {
-  return {
-    id: hotel.id,
-    trip_id: hotel.trip_id,
-    name: hotel.name || 'Hotel',
-    address: hotel.address || '',
-    plus_code: hotel.plus_code || undefined,
-    city: hotel.city || undefined,
-    check_in_date: hotel.check_in_time?.split('T')[0] || '',
-    check_out_date: hotel.check_out_time?.split('T')[0] || '',
-    updated_by: hotel.updated_by,
-    updated_at: hotel.updated_at,
-  };
-}
-
-/**
- * Transform IndexedDB Activity to Firestore Activity format
- */
-function transformActivityToFirestore(activity: DailyActivity): FirestoreDailyActivity {
-  // Determine time of day from start_time if available
-  let time_of_day: 'morning' | 'afternoon' | 'evening' | 'night' = 'morning';
-  
-  if (activity.start_time) {
-    const hour = new Date(activity.start_time).getHours();
-    if (hour >= 12 && hour < 17) time_of_day = 'afternoon';
-    else if (hour >= 17 && hour < 21) time_of_day = 'evening';
-    else if (hour >= 21 || hour < 6) time_of_day = 'night';
-  }
-  
-  return {
-    id: activity.id,
-    trip_id: activity.trip_id,
-    name: activity.name || '',
-    date: activity.date || '',
-    time_of_day,
-    city: activity.city || undefined,
-    plus_code: activity.plus_code || undefined,
-    address: activity.address || undefined,
-    notes: activity.notes || undefined,
-    order_index: activity.order_index ?? 0,
-    updated_by: activity.updated_by,
-    updated_at: activity.updated_at,
-  };
-}
-
-/**
- * Transform IndexedDB Restaurant to Firestore Restaurant format
- */
-function transformRestaurantToFirestore(restaurant: RestaurantRecommendation): FirestoreRestaurant {
-  return {
-    id: restaurant.id,
-    trip_id: restaurant.trip_id,
-    name: restaurant.name || '',
-    address: restaurant.address || undefined,
-    plus_code: restaurant.plus_code || undefined,
-    city: restaurant.city || undefined,
-    cuisine_type: restaurant.cuisine_type || undefined,
-    notes: restaurant.notes || undefined,
-    updated_by: restaurant.updated_by,
-    updated_at: restaurant.updated_at,
-  };
-}
 
 // Remove undefined fields from an object (Firestore rejects explicit undefined)
 function sanitize<T extends Record<string, any>>(obj: T): T {
@@ -177,7 +81,7 @@ export async function pushTripToFirestore(trip: Trip, userEmail: string): Promis
     const tripRef = doc(firestore, 'trips', trip.id).withConverter(tripConverter);
     
     // Transform to Firestore format
-    const firestoreTrip = transformTripToFirestore(trip);
+    const firestoreTrip = tripToFirestore(trip);
     
     // Update metadata
     firestoreTrip.updated_by = userEmail;
@@ -216,7 +120,7 @@ export async function pushFlightToFirestore(
       .withConverter(flightConverter);
     
     // Transform to Firestore format
-    const firestoreFlight = transformFlightToFirestore(flight);
+    const firestoreFlight = flightToFirestore(flight);
     
     // Update metadata
     firestoreFlight.updated_by = userEmail;
@@ -250,7 +154,7 @@ export async function pushHotelToFirestore(
       .withConverter(hotelConverter);
     
     // Transform to Firestore format
-    const firestoreHotel = transformHotelToFirestore(hotel);
+    const firestoreHotel = hotelToFirestore(hotel);
     
     // Update metadata
     firestoreHotel.updated_by = userEmail;
@@ -284,7 +188,7 @@ export async function pushActivityToFirestore(
       .withConverter(activityConverter);
     
     // Transform to Firestore format
-    const firestoreActivity = transformActivityToFirestore(activity);
+    const firestoreActivity = activityToFirestore(activity);
     
     // Update metadata
     firestoreActivity.updated_by = userEmail;
@@ -318,7 +222,7 @@ export async function pushRestaurantToFirestore(
       .withConverter(restaurantConverter);
     
     // Transform to Firestore format
-    const firestoreRestaurant = transformRestaurantToFirestore(restaurant);
+    const firestoreRestaurant = restaurantToFirestore(restaurant);
     
     // Update metadata
     firestoreRestaurant.updated_by = userEmail;

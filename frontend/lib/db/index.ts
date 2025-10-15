@@ -11,7 +11,6 @@
 // Re-export types
 export type {
   Trip,
-  Place,
   Flight,
   FlightLeg,
   Hotel,
@@ -19,9 +18,6 @@ export type {
   RestaurantRecommendation,
   TripInput,
   TripUpdate,
-  PlaceInput,
-  PlaceUpdate,
-  TripWithPlaces,
   TripWithRelations,
   DbError,
   ValidationError,
@@ -40,6 +36,12 @@ export {
   isNotFoundError
 } from './models';
 
+// Re-export neverthrow utilities for Result handling
+export { ok, err } from './errors';
+
+// Helper functions for backward compatibility during migration
+export { isOk, isErr, unwrap, unwrapErr } from './resultHelpers';
+
 // Initialization
 export { initializeDatabase, isInitialized } from './init';
 
@@ -47,7 +49,6 @@ export { initializeDatabase, isInitialized } from './init';
 export { 
   getAllTrips, 
   getTripById, 
-  getTripWithPlaces,
   getTripWithRelations,
   updateTrip,
   deleteTrip
@@ -97,6 +98,3 @@ export {
   getPendingCount,
   clearQueue
 } from '../sync/SyncQueue';
-
-// Place operations (DEPRECATED - maintained for backward compatibility)
-export { getPlacesByTripId, getPlaceById } from './operations/places';

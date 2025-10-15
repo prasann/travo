@@ -9,6 +9,7 @@
 import { db } from './schema';
 import type { Result } from './models';
 import { wrapDatabaseOperation } from './errors';
+import { isOk, unwrap, unwrapErr } from './resultHelpers';
 import { loadSeedData } from './seed';
 import { syncTripsFromFirestore } from '@/lib/firebase/sync';
 
@@ -58,7 +59,6 @@ export async function initializeDatabase(userEmail?: string): Promise<Result<voi
     await db.hotels.count();
     await db.activities.count();
     await db.restaurants.count();
-    await db.places.count(); // Backward compatibility
     
     // If user is authenticated, sync from Firestore
     if (userEmail) {
@@ -75,12 +75,12 @@ export async function initializeDatabase(userEmail?: string): Promise<Result<voi
       console.log('[DB Init] Pulling trips from Firestore...');
       const syncResult = await syncTripsFromFirestore(userEmail);
       
-      if (!syncResult.success) {
-        console.error('[DB Init] Failed to sync from Firestore:', syncResult.error.message);
+      if (!isOk(syncResult)) {
+        console.error('[DB Init] Failed to sync from Firestore:', unwrapErr(syncResult).message);
         // Don't throw - allow app to continue even if sync fails
         // User can retry or add trips manually
       } else {
-        console.log(`[DB Init] Successfully synced ${syncResult.data} trips from Firestore`);
+        console.log(`[DB Init] Successfully synced ${unwrap(syncResult)} trips from Firestore`);
       }
     } else {
       console.log('[DB Init] No user authenticated, skipping Firestore sync');
@@ -91,8 +91,8 @@ export async function initializeDatabase(userEmail?: string): Promise<Result<voi
         if (!hasData) {
           console.log('[DB Init] Loading seed data for development...');
           const seedResult = await loadSeedData();
-          if (!seedResult.success) {
-            console.warn('[DB Init] Failed to load seed data:', seedResult.error.message);
+          if (!isOk(seedResult)) {
+            console.warn('[DB Init] Failed to load seed data:', unwrapErr(seedResult).message);
           }
         }
       }

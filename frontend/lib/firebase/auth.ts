@@ -2,12 +2,11 @@ import {
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
-  GoogleAuthProvider,
   signOut as firebaseSignOut,
   User,
   UserCredential,
 } from 'firebase/auth';
-import { auth } from './config';
+import Firebase from './Firebase';
 
 /**
  * Custom user type for application use
@@ -20,22 +19,16 @@ export interface AppUser {
 }
 
 /**
- * Google Auth Provider instance
- */
-const googleProvider = new GoogleAuthProvider();
-
-// Configure provider for maximum token validity
-googleProvider.setCustomParameters({
-  prompt: 'select_account', // Allow user to select account
-});
-
-/**
  * Sign in with Google using popup (preferred method)
  * Falls back to redirect if popup is blocked
  * @returns Promise with user credential
  * @throws Error if sign-in fails
  */
 export async function signInWithGoogle(): Promise<UserCredential> {
+  const firebase = Firebase.getInstance();
+  const auth = firebase.auth;
+  const googleProvider = firebase.googleProvider;
+
   try {
     console.log('🔐 Attempting Google sign in with popup...');
     const result = await signInWithPopup(auth, googleProvider);
@@ -61,6 +54,8 @@ export async function signInWithGoogle(): Promise<UserCredential> {
  * Call this on app initialization
  */
 export async function checkRedirectResult(): Promise<UserCredential | null> {
+  const auth = Firebase.getInstance().auth;
+  
   try {
     const result = await getRedirectResult(auth);
     if (result) {
@@ -78,6 +73,8 @@ export async function checkRedirectResult(): Promise<UserCredential | null> {
  * @throws Error if sign-out fails
  */
 export async function signOut(): Promise<void> {
+  const auth = Firebase.getInstance().auth;
+  
   try {
     await firebaseSignOut(auth);
   } catch (error) {
@@ -91,6 +88,7 @@ export async function signOut(): Promise<void> {
  * @returns User object or null if not authenticated
  */
 export function getCurrentUser(): User | null {
+  const auth = Firebase.getInstance().auth;
   return auth.currentUser;
 }
 
@@ -113,5 +111,6 @@ export function toAppUser(user: User): AppUser {
  * @returns true if user is signed in, false otherwise
  */
 export function isAuthenticated(): boolean {
+  const auth = Firebase.getInstance().auth;
   return auth.currentUser !== null;
 }

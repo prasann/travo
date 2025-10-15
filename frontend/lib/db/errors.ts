@@ -3,8 +3,10 @@
  * 
  * Feature: 005-let-s-introduce
  * Date: 2025-10-12
+ * Refactored: 2025-10-15 (neverthrow integration)
  */
 
+import { ok, err } from 'neverthrow';
 import type { 
   DbError, 
   ValidationError, 
@@ -13,6 +15,12 @@ import type {
   NotFoundError,
   Result 
 } from './models';
+
+// ============================================================================
+// Neverthrow Export (for cleaner imports)
+// ============================================================================
+
+export { ok, err } from 'neverthrow';
 
 /**
  * Create a validation error
@@ -60,32 +68,36 @@ export function createNotFoundError(entityType: string, id: string): NotFoundErr
 
 /**
  * Wrap a database operation with error handling
- * Converts exceptions into Result type
+ * Converts exceptions into Result type using neverthrow
+ * 
+ * @example
+ * const result = await wrapDatabaseOperation(async () => {
+ *   return await db.trips.get(id);
+ * });
+ * 
+ * result.match(
+ *   trip => console.log('Success:', trip),
+ *   error => console.error('Error:', error.message)
+ * );
  */
 export async function wrapDatabaseOperation<T>(
   operation: () => Promise<T>
 ): Promise<Result<T>> {
   try {
     const data = await operation();
-    return { success: true, data };
+    return ok(data);
   } catch (error) {
     // Handle quota exceeded errors
     if (error instanceof Error && 
         (error.name === 'QuotaExceededError' || 
          error.message.includes('quota') ||
          error.message.includes('storage'))) {
-      return {
-        success: false,
-        error: createQuotaExceededError()
-      };
+      return err(createQuotaExceededError());
     }
     
     // Handle other database errors
-    return {
-      success: false,
-      error: createDatabaseError(
-        error instanceof Error ? error.message : 'Unknown database error'
-      )
-    };
+    return err(createDatabaseError(
+      error instanceof Error ? error.message : 'Unknown database error'
+    ));
   }
 }

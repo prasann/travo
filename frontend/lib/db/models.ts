@@ -23,6 +23,7 @@ import type {
   TripIndex as TripIndexType,
   TripIndexFile as TripIndexFileType,
 } from '@/types';
+import { Result as NeverThrowResult } from 'neverthrow';
 
 // Re-export base types with database extensions for convenience
 export type TripIndex = TripIndexType;
@@ -272,11 +273,40 @@ export interface NotFoundError extends DbError {
 
 /**
  * Result type for operations that may fail
- * Uses discriminated union for type-safe error handling
+ * Uses neverthrow's Result type for Railway Oriented Programming
+ * 
+ * Benefits of neverthrow:
+ * - Composable error handling with .map(), .mapErr(), .andThen()
+ * - Type-safe pattern matching with .match()
+ * - Better error propagation with async/await
+ * - Functional programming patterns
+ * 
+ * @example Basic usage with match()
+ * const result = await getUser(id);
+ * const message = result.match(
+ *   user => `Welcome ${user.name}`,
+ *   error => `Error: ${error.message}`
+ * );
+ * 
+ * @example Chaining operations
+ * const result = await getUser(id)
+ *   .andThen(user => validateUser(user))
+ *   .andThen(user => saveUser(user));
+ * 
+ * @example Transforming data
+ * const userName = await getUser(id)
+ *   .map(user => user.name);
+ * 
+ * @example Legacy compatibility (isOk() instead of .success)
+ * if (result.isOk()) {
+ *   console.log(result.value); // or result._unsafeUnwrap()
+ * } else {
+ *   console.error(result.error); // or result._unsafeUnwrapErr()
+ * }
+ * 
+ * For migration guide, see: https://github.com/supermacro/neverthrow
  */
-export type Result<T> =
-  | { success: true; data: T }
-  | { success: false; error: DbError };
+export type Result<T> = NeverThrowResult<T, DbError>;
 
 // ============================================================================
 // Type Guards

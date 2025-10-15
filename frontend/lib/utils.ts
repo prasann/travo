@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { orderBy } from "lodash"
 import type { Flight, Hotel, DailyActivity, TimelineItem } from '@/types'
 
 /**
@@ -48,7 +49,28 @@ export function getItemDate(item: TimelineItem): string | null {
 }
 
 /**
- * Sort timeline items chronologically
+ * Get sort key for timeline item (timestamp milliseconds or Infinity for items without timestamps)
+ * 
+ * @param item Timeline item
+ * @returns Milliseconds since epoch or Infinity
+ */
+function getSortKey(item: TimelineItem): number {
+  const timestamp = getTimestamp(item);
+  return timestamp ? timestamp.getTime() : Infinity;
+}
+
+/**
+ * Get secondary sort key (order_index) for timeline items
+ * 
+ * @param item Timeline item
+ * @returns order_index if available, otherwise 0
+ */
+function getOrderIndex(item: TimelineItem): number {
+  return 'order_index' in item ? item.order_index : 0;
+}
+
+/**
+ * Sort timeline items chronologically using lodash orderBy
  * 
  * Priority:
  * 1. Items with timestamps (sorted by time)
@@ -58,27 +80,5 @@ export function getItemDate(item: TimelineItem): string | null {
  * @returns Sorted array in chronological order
  */
 export function sortChronologically(items: TimelineItem[]): TimelineItem[] {
-  return [...items].sort((a, b) => {
-    const timeA = getTimestamp(a);
-    const timeB = getTimestamp(b);
-    
-    // Both have timestamps: sort by time
-    if (timeA && timeB) {
-      const diff = timeA.getTime() - timeB.getTime();
-      
-      // Same timestamp: use order_index for activities
-      if (diff === 0 && 'order_index' in a && 'order_index' in b) {
-        return a.order_index - b.order_index;
-      }
-      
-      return diff;
-    }
-    
-    // Items without timestamps go last, sorted by order_index if available
-    if (!timeA && !timeB && 'order_index' in a && 'order_index' in b) {
-      return a.order_index - b.order_index;
-    }
-    
-    return timeA ? -1 : 1;
-  });
+  return orderBy(items, [getSortKey, getOrderIndex], ['asc', 'asc']);
 }

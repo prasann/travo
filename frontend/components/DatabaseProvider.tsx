@@ -12,7 +12,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { initializeDatabase } from '@/lib/db';
+import { initializeDatabase, isOk, unwrapErr } from '@/lib/db';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
@@ -35,12 +35,13 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       const userEmail = user?.email || undefined;
       const result = await initializeDatabase(userEmail);
       
-      if (result.success) {
+      if (isOk(result)) {
         console.log('[DatabaseProvider] ✓ Database initialized successfully');
         setIsInitialized(true);
       } else {
-        console.error('[DatabaseProvider] ✗ Database initialization failed:', result.error);
-        setError(result.error.message);
+        const error = unwrapErr(result);
+        console.error('[DatabaseProvider] ✗ Database initialization failed:', error);
+        setError(error.message);
       }
     }
 

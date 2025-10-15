@@ -39,6 +39,9 @@ export {
 // Re-export neverthrow utilities for Result handling
 export { ok, err } from './errors';
 
+// Helper functions for backward compatibility during migration
+export { isOk, isErr, unwrap, unwrapErr } from './resultHelpers';
+
 // Initialization
 export { initializeDatabase, isInitialized } from './init';
 

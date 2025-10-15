@@ -1,7 +1,7 @@
 'use client';
 
 import { TripList } from '@/components/TripList';
-import { getAllTrips } from '@/lib/db';
+import { getAllTrips, isOk, unwrap, unwrapErr } from '@/lib/db';
 import { useEffect, useState } from 'react';
 import type { Trip } from '@/lib/db';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,10 +23,10 @@ export default function HomePage() {
 
       const result = await getAllTrips();
       
-      if (result.success) {
-        setTrips(result.data);
+      if (isOk(result)) {
+        setTrips(unwrap(result));
       } else {
-        setError(result.error.message);
+        setError(unwrapErr(result).message);
       }
       
       setIsLoading(false);

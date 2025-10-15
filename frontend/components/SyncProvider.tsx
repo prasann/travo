@@ -4,9 +4,11 @@
  * SyncProvider
  * Wraps application to provide realtime status of push sync queue and trigger automatic processing.
  * Phase 4 Integration: Automatic push sync UI + background processing.
+ * Refactored: Using React Query for automatic background syncing.
  */
 
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect } from 'react';
+import { QueryClient, QueryClientProvider, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   getPendingCount, 
@@ -27,138 +29,115 @@ interface SyncContextValue {
 
 const SyncContext = createContext<SyncContextValue | undefined>(undefined);
 
-const POLL_INTERVAL_MS = 30_000; // periodic attempt
-const INITIAL_DEBOUNCE_MS = 1_000; // short delay after mount
+const POLL_INTERVAL_MS = 30_000; // 30 seconds
 
-export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Create a QueryClient instance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      staleTime: 10_000, // Consider data stale after 10 seconds
+    },
+  },
+});
+
+/**
+ * Internal sync provider that uses React Query
+ */
+const SyncProviderInternal: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const userEmail = user?.email || null;
-  const [pending, setPending] = useState(0);
-  const [failed, setFailed] = useState(0);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [lastRun, setLastRun] = useState<string | null>(null);
-  const [lastResult, setLastResult] = useState<{ success: number; failed: number; total: number } | null>(null);
-  const intervalRef = useRef<number | null>(null);
-  const visibilityListenerSet = useRef(false);
-  const onlineListenerSet = useRef(false);
-  const lastPendingRef = useRef(0);
+  const queryClient = useQueryClient();
 
-  const refreshQueueSnapshot = useCallback(async () => {
-    try {
-      const [pCount, failedEntries] = await Promise.all([
+  // Query for queue snapshot (pending and failed counts)
+  const { data: queueSnapshot } = useQuery({
+    queryKey: ['syncQueue', userEmail],
+    queryFn: async () => {
+      const [pending, failedEntries] = await Promise.all([
         getPendingCount(),
         getFailedEntries(),
       ]);
-      setPending(pCount);
-      setFailed(failedEntries.length);
-      lastPendingRef.current = pCount;
-    } catch (err) {
-      console.warn('[SyncProvider] Failed to refresh queue snapshot', err);
-    }
-  }, []);
+      return { pending, failed: failedEntries.length };
+    },
+    enabled: !!userEmail,
+    refetchInterval: POLL_INTERVAL_MS,
+  });
 
-  const runSync = useCallback(async () => {
-    if (!userEmail) return; // only sync when authenticated
-    if (isSyncing) return; // avoid overlapping runs
+  // Query for last sync result
+  const { data: syncResult } = useQuery({
+    queryKey: ['syncResult', userEmail],
+    queryFn: () => null as { success: number; failed: number; total: number; timestamp: string } | null,
+    enabled: false, // Only updated via mutation
+  });
 
-    setIsSyncing(true);
-    try {
+  // Mutation for triggering sync
+  const syncMutation = useMutation({
+    mutationFn: async () => {
+      if (!userEmail) throw new Error('User not authenticated');
       const result = await triggerSync(userEmail);
+      return result;
+    },
+    onSuccess: (result) => {
       if (result) {
-        setLastResult(result);
-        setLastRun(new Date().toISOString());
+        // Update sync result in cache
+        queryClient.setQueryData(['syncResult', userEmail], {
+          ...result,
+          timestamp: new Date().toISOString(),
+        });
+        // Refresh queue snapshot
+        queryClient.invalidateQueries({ queryKey: ['syncQueue', userEmail] });
       }
-    } catch (err) {
-      console.error('[SyncProvider] Sync error', err);
-    } finally {
-      setIsSyncing(false);
-      // Always refresh queue after attempt
-      refreshQueueSnapshot();
+    },
+    onError: (error) => {
+      console.error('[SyncProvider] Sync error', error);
+    },
+  });
+
+  // Auto-trigger sync when new items are added to queue
+  useEffect(() => {
+    if (!userEmail || !queueSnapshot) return;
+    
+    // If there are pending items and we're not currently syncing, trigger sync
+    if (queueSnapshot.pending > 0 && !syncMutation.isPending) {
+      syncMutation.mutate();
     }
-  }, [userEmail, isSyncing, refreshQueueSnapshot]);
+  }, [queueSnapshot?.pending, userEmail]);
+
+  const refreshQueueSnapshot = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ['syncQueue', userEmail] });
+  }, [queryClient, userEmail]);
 
   const syncNow = useCallback(async () => {
-    await runSync();
-  }, [runSync]);
-
-  // Observe queue growth to trigger immediate sync (polling fallback otherwise)
-  const checkAndMaybeSync = useCallback(async () => {
-    if (!userEmail) return;
-    const entries = await getQueuedEntries();
-    const count = entries.length;
-    if (count > 0 && lastPendingRef.current === 0) {
-      // newly added first pending item(s)
-      await runSync();
-    } else {
-      // Just update state counters
-      setPending(count);
-      const failedEntries = entries.filter(e => e.retries >= 3);
-      setFailed(failedEntries.length);
-      lastPendingRef.current = count;
-    }
-  }, [userEmail, runSync]);
-
-  // Initial load + periodic polling
-  useEffect(() => {
-    if (!userEmail) {
-      // reset state on logout
-      setPending(0);
-      setFailed(0);
-      setLastResult(null);
-      setLastRun(null);
-      if (intervalRef.current) {
-        window.clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
-    }
-
-    // Initial snapshot (debounced) then schedule interval
-    const timeout = window.setTimeout(() => {
-      refreshQueueSnapshot();
-      checkAndMaybeSync();
-    }, INITIAL_DEBOUNCE_MS);
-
-    if (!intervalRef.current) {
-      intervalRef.current = window.setInterval(() => {
-        checkAndMaybeSync();
-      }, POLL_INTERVAL_MS) as unknown as number;
-    }
-
-    return () => {
-      window.clearTimeout(timeout);
-    };
-  }, [userEmail, refreshQueueSnapshot, checkAndMaybeSync]);
-
-  // Visibility & online event listeners
-  useEffect(() => {
-    if (!visibilityListenerSet.current) {
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          checkAndMaybeSync();
-        }
-      });
-      visibilityListenerSet.current = true;
-    }
-    if (!onlineListenerSet.current) {
-      window.addEventListener('online', () => {
-        checkAndMaybeSync();
-      });
-      onlineListenerSet.current = true;
-    }
-  }, [checkAndMaybeSync]);
+    syncMutation.mutate();
+  }, [syncMutation]);
 
   const value: SyncContextValue = {
-    pending,
-    failed,
-    isSyncing,
-    lastRun,
-    lastResult,
+    pending: queueSnapshot?.pending || 0,
+    failed: queueSnapshot?.failed || 0,
+    isSyncing: syncMutation.isPending,
+    lastRun: syncResult?.timestamp || null,
+    lastResult: syncResult ? {
+      success: syncResult.success,
+      failed: syncResult.failed,
+      total: syncResult.total,
+    } : null,
     syncNow,
     refreshQueueSnapshot,
   };
 
   return <SyncContext.Provider value={value}>{children}</SyncContext.Provider>;
+};
+
+/**
+ * SyncProvider - Wraps children with QueryClientProvider and sync logic
+ */
+export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <SyncProviderInternal>{children}</SyncProviderInternal>
+    </QueryClientProvider>
+  );
 };
 
 export function useSyncStatus(): SyncContextValue {

@@ -34,6 +34,7 @@ frontend/
 - Server Components by default, Client Components when needed (`'use client'`)
 - Follow Next.js App Router conventions
 - All database operations return `Result<T>` type for explicit error handling
+- **Do not add unused methods or "future-use" code** - add functionality only when explicitly needed
 
 ## Key Architecture Patterns
 - **Offline-first**: IndexedDB as primary storage, Firestore for cloud sync

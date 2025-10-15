@@ -15,6 +15,7 @@ import {
   type FirestoreTripWithRelations 
 } from '@/lib/firebase/firestore';
 import type { Result } from '@/lib/db/models';
+import { ok, err, isOk, unwrap, unwrapErr } from '@/lib/db/resultHelpers';
 import { 
   tripFromFirestore,
   flightFromFirestore,
@@ -60,16 +61,13 @@ async function saveTripToIndexedDB(tripData: FirestoreTripWithRelations): Promis
     
     console.log(`[Sync] Successfully saved trip: ${trip.name} (${flights.length} flights, ${hotels.length} hotels, ${activities.length} activities, ${restaurants.length} restaurants)`);
     
-    return { success: true, data: undefined };
+    return ok(undefined);
   } catch (error) {
     console.error('[Sync] Error saving trip to IndexedDB:', error);
-    return {
-      success: false,
-      error: {
-        type: 'database',
-        message: `Failed to save trip: ${error instanceof Error ? error.message : 'Unknown error'}`
-      }
-    };
+    return err({
+      type: 'database',
+      message: `Failed to save trip: ${error instanceof Error ? error.message : 'Unknown error'}`
+    });
   }
 }
 
@@ -85,11 +83,11 @@ export async function syncTripsFromFirestore(userEmail: string): Promise<Result<
     
     // Pull trip list from Firestore
     const tripsResult = await pullTripsForUser(userEmail);
-    if (!tripsResult.success) {
+    if (!isOk(tripsResult)) {
       return tripsResult as Result<number>;
     }
     
-    const trips = tripsResult.data;
+    const trips = unwrap(tripsResult);
     console.log(`[Sync] Found ${trips.length} trips to sync`);
     
     // Pull and save each trip with relations
@@ -98,16 +96,16 @@ export async function syncTripsFromFirestore(userEmail: string): Promise<Result<
     
     for (const trip of trips) {
       const tripResult = await pullTripWithRelations(trip.id);
-      if (!tripResult.success) {
-        console.error(`[Sync] Failed to pull trip ${trip.id}:`, tripResult.error.message);
-        errors.push(`${trip.name}: ${tripResult.error.message}`);
+      if (!isOk(tripResult)) {
+        console.error(`[Sync] Failed to pull trip ${trip.id}:`, unwrapErr(tripResult).message);
+        errors.push(`${trip.name}: ${unwrapErr(tripResult).message}`);
         continue;
       }
       
-      const saveResult = await saveTripToIndexedDB(tripResult.data);
-      if (!saveResult.success) {
-        console.error(`[Sync] Failed to save trip ${trip.id}:`, saveResult.error.message);
-        errors.push(`${trip.name}: ${saveResult.error.message}`);
+      const saveResult = await saveTripToIndexedDB(unwrap(tripResult));
+      if (!isOk(saveResult)) {
+        console.error(`[Sync] Failed to save trip ${trip.id}:`, unwrapErr(saveResult).message);
+        errors.push(`${trip.name}: ${unwrapErr(saveResult).message}`);
         continue;
       }
       
@@ -120,19 +118,13 @@ export async function syncTripsFromFirestore(userEmail: string): Promise<Result<
     
     console.log(`[Sync] Successfully synced ${successCount}/${trips.length} trips`);
     
-    return {
-      success: true,
-      data: successCount
-    };
+    return ok(successCount);
   } catch (error) {
     console.error('[Sync] Error during sync:', error);
-    return {
-      success: false,
-      error: {
-        type: 'database',
-        message: `Sync failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-      }
-    };
+    return err({
+      type: 'database',
+      message: `Sync failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    });
   }
 }
 
@@ -154,15 +146,12 @@ export async function clearLocalData(): Promise<Result<void>> {
     
     console.log('[Sync] Local data cleared successfully');
     
-    return { success: true, data: undefined };
+    return ok(undefined);
   } catch (error) {
     console.error('[Sync] Error clearing local data:', error);
-    return {
-      success: false,
-      error: {
-        type: 'database',
-        message: `Failed to clear data: ${error instanceof Error ? error.message : 'Unknown error'}`
-      }
-    };
+    return err({
+      type: 'database',
+      message: `Failed to clear data: ${error instanceof Error ? error.message : 'Unknown error'}`
+    });
   }
 }

@@ -3,7 +3,7 @@
 import { notFound } from 'next/navigation'
 import { TripTimeline } from '@/components/TripTimeline'
 import { RestaurantList } from '@/components/RestaurantList'
-import { getTripWithRelations } from '@/lib/db'
+import { getTripWithRelations, isOk, unwrap, unwrapErr } from '@/lib/db'
 import { formatDate } from '@/lib/dateTime'
 import { useEffect, useState } from 'react'
 import type { TripWithRelations } from '@/lib/db'
@@ -30,10 +30,10 @@ export default function TripPage({ params }: TripPageProps) {
     async function loadTrip() {
       const result = await getTripWithRelations(tripId!);
       
-      if (result.success) {
-        setTrip(result.data);
+      if (isOk(result)) {
+        setTrip(unwrap(result));
       } else {
-        setError(result.error.message);
+        setError(unwrapErr(result).message);
       }
       
       setIsLoading(false);

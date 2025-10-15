@@ -36,6 +36,7 @@ import type {
   FirestoreRestaurant 
 } from './schema';
 import type { Result } from '@/lib/db/models';
+import { ok, err, isOk, unwrap } from '@/lib/db/resultHelpers';
 
 /**
  * Trip data with all related entities loaded from Firestore
@@ -77,19 +78,13 @@ export async function pullTripsForUser(userEmail: string): Promise<Result<Firest
     
     console.log(`[Firestore] Found ${trips.length} trips for user`);
     
-    return {
-      success: true,
-      data: trips
-    };
+    return ok(trips);
   } catch (error) {
     console.error('[Firestore] Error pulling trips for user:', error);
-    return {
-      success: false,
-      error: {
-        type: 'database',
-        message: `Failed to pull trips: ${error instanceof Error ? error.message : 'Unknown error'}`
-      }
-    };
+    return err({
+      type: 'database',
+      message: `Failed to pull trips: ${error instanceof Error ? error.message : 'Unknown error'}`
+    });
   }
 }
 
@@ -108,24 +103,18 @@ export async function pullTripWithRelations(tripId: string): Promise<Result<Fire
     const tripDoc = await getDoc(tripRef);
     
     if (!tripDoc.exists()) {
-      return {
-        success: false,
-        error: {
-          type: 'not_found',
-          message: `Trip not found: ${tripId}`
-        }
-      };
+      return err({
+        type: 'not_found',
+        message: `Trip not found: ${tripId}`
+      });
     }
     
     const trip = tripDoc.data();
     if (!trip) {
-      return {
-        success: false,
-        error: {
-          type: 'validation',
-          message: `Trip data is invalid: ${tripId}`
-        }
-      };
+      return err({
+        type: 'validation',
+        message: `Trip data is invalid: ${tripId}`
+      });
     }
     
     // Pull all subcollections in parallel
@@ -137,32 +126,31 @@ export async function pullTripWithRelations(tripId: string): Promise<Result<Fire
     ]);
     
     // Check for errors
-    if (!flightsResult.success) return flightsResult as Result<FirestoreTripWithRelations>;
-    if (!hotelsResult.success) return hotelsResult as Result<FirestoreTripWithRelations>;
-    if (!activitiesResult.success) return activitiesResult as Result<FirestoreTripWithRelations>;
-    if (!restaurantsResult.success) return restaurantsResult as Result<FirestoreTripWithRelations>;
+    if (!isOk(flightsResult)) return flightsResult as Result<FirestoreTripWithRelations>;
+    if (!isOk(hotelsResult)) return hotelsResult as Result<FirestoreTripWithRelations>;
+    if (!isOk(activitiesResult)) return activitiesResult as Result<FirestoreTripWithRelations>;
+    if (!isOk(restaurantsResult)) return restaurantsResult as Result<FirestoreTripWithRelations>;
     
-    console.log(`[Firestore] Successfully pulled trip with ${flightsResult.data.length} flights, ${hotelsResult.data.length} hotels, ${activitiesResult.data.length} activities, ${restaurantsResult.data.length} restaurants`);
+    const flights = unwrap(flightsResult);
+    const hotels = unwrap(hotelsResult);
+    const activities = unwrap(activitiesResult);
+    const restaurants = unwrap(restaurantsResult);
     
-    return {
-      success: true,
-      data: {
-        trip,
-        flights: flightsResult.data,
-        hotels: hotelsResult.data,
-        activities: activitiesResult.data,
-        restaurants: restaurantsResult.data
-      }
-    };
+    console.log(`[Firestore] Successfully pulled trip with ${flights.length} flights, ${hotels.length} hotels, ${activities.length} activities, ${restaurants.length} restaurants`);
+    
+    return ok({
+      trip,
+      flights,
+      hotels,
+      activities,
+      restaurants
+    });
   } catch (error) {
     console.error('[Firestore] Error pulling trip with relations:', error);
-    return {
-      success: false,
-      error: {
-        type: 'database',
-        message: `Failed to pull trip: ${error instanceof Error ? error.message : 'Unknown error'}`
-      }
-    };
+    return err({
+      type: 'database',
+      message: `Failed to pull trip: ${error instanceof Error ? error.message : 'Unknown error'}`
+    });
   }
 }
 
@@ -185,19 +173,13 @@ async function pullFlightsForTrip(tripId: string): Promise<Result<FirestoreFligh
       }
     });
     
-    return {
-      success: true,
-      data: flights
-    };
+    return ok(flights);
   } catch (error) {
     console.error('[Firestore] Error pulling flights:', error);
-    return {
-      success: false,
-      error: {
-        type: 'database',
-        message: `Failed to pull flights: ${error instanceof Error ? error.message : 'Unknown error'}`
-      }
-    };
+    return err({
+      type: 'database',
+      message: `Failed to pull flights: ${error instanceof Error ? error.message : 'Unknown error'}`
+    });
   }
 }
 
@@ -220,19 +202,13 @@ async function pullHotelsForTrip(tripId: string): Promise<Result<FirestoreHotel[
       }
     });
     
-    return {
-      success: true,
-      data: hotels
-    };
+    return ok(hotels);
   } catch (error) {
     console.error('[Firestore] Error pulling hotels:', error);
-    return {
-      success: false,
-      error: {
-        type: 'database',
-        message: `Failed to pull hotels: ${error instanceof Error ? error.message : 'Unknown error'}`
-      }
-    };
+    return err({
+      type: 'database',
+      message: `Failed to pull hotels: ${error instanceof Error ? error.message : 'Unknown error'}`
+    });
   }
 }
 
@@ -255,19 +231,13 @@ async function pullActivitiesForTrip(tripId: string): Promise<Result<FirestoreDa
       }
     });
     
-    return {
-      success: true,
-      data: activities
-    };
+    return ok(activities);
   } catch (error) {
     console.error('[Firestore] Error pulling activities:', error);
-    return {
-      success: false,
-      error: {
-        type: 'database',
-        message: `Failed to pull activities: ${error instanceof Error ? error.message : 'Unknown error'}`
-      }
-    };
+    return err({
+      type: 'database',
+      message: `Failed to pull activities: ${error instanceof Error ? error.message : 'Unknown error'}`
+    });
   }
 }
 
@@ -290,18 +260,12 @@ async function pullRestaurantsForTrip(tripId: string): Promise<Result<FirestoreR
       }
     });
     
-    return {
-      success: true,
-      data: restaurants
-    };
+    return ok(restaurants);
   } catch (error) {
     console.error('[Firestore] Error pulling restaurants:', error);
-    return {
-      success: false,
-      error: {
-        type: 'database',
-        message: `Failed to pull restaurants: ${error instanceof Error ? error.message : 'Unknown error'}`
-      }
-    };
+    return err({
+      type: 'database',
+      message: `Failed to pull restaurants: ${error instanceof Error ? error.message : 'Unknown error'}`
+    });
   }
 }

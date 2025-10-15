@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import type { TripEditFormData, EditCategory } from '@/types/editMode';
 import type { TripWithRelations } from '@/lib/db/models';
 import { getTripWithRelations } from '@/lib/db/operations/trips';
+import { isOk, unwrap, unwrapErr } from '@/lib/db/resultHelpers';
 import CategoryNav from './CategoryNav';
 import NotesSection from './NotesSection';
 import HotelSection from './HotelSection';
@@ -46,18 +47,19 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
       setIsLoading(true);
       const result = await getTripWithRelations(tripId);
       
-      if (result.success) {
-        setTrip(result.data);
+      if (isOk(result)) {
+        const tripData = unwrap(result);
+        setTrip(tripData);
         
         // Initialize form with trip data
         reset({
-          name: result.data.name,
-          description: result.data.description || '',
-          start_date: result.data.start_date,
-          end_date: result.data.end_date,
-          home_location: result.data.home_location || '',
+          name: tripData.name,
+          description: tripData.description || '',
+          start_date: tripData.start_date,
+          end_date: tripData.end_date,
+          home_location: tripData.home_location || '',
           notes: '', // Trip-level notes not in current schema
-          hotels: result.data.hotels.map(h => ({
+          hotels: tripData.hotels.map(h => ({
             id: h.id,
             name: h.name,
             address: h.address,
@@ -69,7 +71,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             phone: h.phone,
             notes: h.notes,
           })),
-          activities: result.data.activities.map(a => ({
+          activities: tripData.activities.map(a => ({
             id: a.id,
             name: a.name,
             address: a.address,
@@ -81,7 +83,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             order_index: a.order_index,
             notes: a.notes,
           })),
-          flights: result.data.flights.map(f => ({
+          flights: tripData.flights.map(f => ({
             id: f.id,
             airline: f.airline,
             flight_number: f.flight_number,
@@ -94,7 +96,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           })),
         });
       } else {
-        setError(result.error.message);
+        setError(unwrapErr(result).message);
       }
       
       setIsLoading(false);
@@ -126,8 +128,8 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         home_location: data.home_location,
       });
       
-      if (!tripResult.success) {
-        throw new Error(tripResult.error.message);
+      if (!isOk(tripResult)) {
+        throw new Error(unwrapErr(tripResult).message);
       }
       
       // Handle hotel changes
@@ -219,18 +221,19 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
       
       // Reload trip data to get updated IDs
       const reloadResult = await getTripWithRelations(tripId);
-      if (reloadResult.success) {
-        setTrip(reloadResult.data);
+      if (isOk(reloadResult)) {
+        const reloadedTrip = unwrap(reloadResult);
+        setTrip(reloadedTrip);
         
         // Reset form with fresh data
         reset({
-          name: reloadResult.data.name,
-          description: reloadResult.data.description || '',
-          start_date: reloadResult.data.start_date,
-          end_date: reloadResult.data.end_date,
-          home_location: reloadResult.data.home_location || '',
+          name: reloadedTrip.name,
+          description: reloadedTrip.description || '',
+          start_date: reloadedTrip.start_date,
+          end_date: reloadedTrip.end_date,
+          home_location: reloadedTrip.home_location || '',
           notes: '',
-          hotels: reloadResult.data.hotels.map(h => ({
+          hotels: reloadedTrip.hotels.map(h => ({
             id: h.id,
             name: h.name,
             address: h.address,
@@ -242,7 +245,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             phone: h.phone,
             notes: h.notes,
           })),
-          activities: reloadResult.data.activities.map(a => ({
+          activities: reloadedTrip.activities.map(a => ({
             id: a.id,
             name: a.name,
             address: a.address,
@@ -254,7 +257,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             order_index: a.order_index,
             notes: a.notes,
           })),
-          flights: reloadResult.data.flights.map(f => ({
+          flights: reloadedTrip.flights.map(f => ({
             id: f.id,
             airline: f.airline,
             flight_number: f.flight_number,

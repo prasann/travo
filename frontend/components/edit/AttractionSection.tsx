@@ -53,13 +53,21 @@ export default function AttractionSection({
     address: string;
     plusCode?: string;
     city?: string;
+    placeId?: string;
+    location?: {
+      lat: number;
+      lng: number;
+    };
   }) => {
     setNewActivity(prev => ({
       ...prev,
       name: result.name,
       address: result.address,
       plus_code: result.plusCode,
-      city: result.city
+      city: result.city,
+      google_maps_url: mapsUrl, // Store the original URL
+      latitude: result.location?.lat,
+      longitude: result.location?.lng,
     }));
   };
   
@@ -89,6 +97,9 @@ export default function AttractionSection({
       duration_minutes: newActivity.duration_minutes,
       order_index: nextOrderIndex,
       notes: newActivity.notes,
+      google_maps_url: newActivity.google_maps_url,
+      latitude: newActivity.latitude,
+      longitude: newActivity.longitude,
     };
     
     setValue('activities', [...activities, activity]);

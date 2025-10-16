@@ -71,6 +71,15 @@ export interface HotelEditFormData {
   /** Hotel notes */
   notes?: string;
   
+  /** Google Maps URL for direct linking */
+  google_maps_url?: string;
+  
+  /** Latitude coordinate */
+  latitude?: number;
+  
+  /** Longitude coordinate */
+  longitude?: number;
+  
   /** Flag for deletion (internal use) */
   _deleted?: boolean;
 }
@@ -108,6 +117,15 @@ export interface ActivityEditFormData {
   
   /** Activity notes */
   notes?: string;
+  
+  /** Google Maps URL for direct linking */
+  google_maps_url?: string;
+  
+  /** Latitude coordinate */
+  latitude?: number;
+  
+  /** Longitude coordinate */
+  longitude?: number;
   
   /** Flag for deletion (internal use) */
   _deleted?: boolean;

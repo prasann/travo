@@ -76,6 +76,11 @@ export interface FirestoreHotel {
   check_in_date: string;  // ISO 8601 date
   check_out_date: string; // ISO 8601 date
   
+  // Location fields for map view
+  google_maps_url?: string;
+  latitude?: number;
+  longitude?: number;
+  
   // Audit fields
   updated_by: string;
   updated_at: string;
@@ -97,6 +102,11 @@ export interface FirestoreDailyActivity {
   notes?: string;
   order_index: number;
   
+  // Location fields for map view
+  google_maps_url?: string;
+  latitude?: number;
+  longitude?: number;
+  
   // Audit fields
   updated_by: string;
   updated_at: string;
@@ -116,6 +126,11 @@ export interface FirestoreRestaurant {
   cuisine_type?: string;
   notes?: string;
   recommended_dishes?: string[];
+  
+  // Location fields for map view
+  google_maps_url?: string;
+  latitude?: number;
+  longitude?: number;
   
   // Audit fields
   updated_by: string;

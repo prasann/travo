@@ -21,7 +21,7 @@ import type {
  * TravoDatabase - IndexedDB database wrapper using Dexie
  * 
  * Database: TravoLocalDB
- * Version: 4 (Added sync queue for push sync)
+ * Version: 6 (Added location fields for map view)
  */
 export class TravoDatabase extends Dexie {
   // Declare table types
@@ -166,6 +166,24 @@ export class TravoDatabase extends Dexie {
       console.log('[Migration] Removing deprecated places table from v4 to v5...');
       // No data migration needed - places table was already deprecated and unused
       console.log('[Migration] Deprecated places table removed successfully');
+    });
+    
+    // Define schema version 6 (Add location fields for map view)
+    // New optional fields: google_maps_url, latitude, longitude
+    // No new indexes needed - these fields are for display/rendering only
+    this.version(6).stores({
+      trips: 'id, deleted, updated_at, start_date, end_date, *user_access',
+      flights: 'id, trip_id, departure_time, updated_at',
+      flightLegs: 'id, flight_id, [flight_id+leg_number]',
+      hotels: 'id, trip_id, check_in_time, city, updated_at',
+      activities: 'id, trip_id, date, [trip_id+date+order_index], city, updated_at',
+      restaurants: 'id, trip_id, city, updated_at',
+      syncQueue: 'id, entity_type, entity_id, created_at, retries'
+    }).upgrade(async (trans) => {
+      console.log('[Migration] Upgrading to v6: Adding location fields (google_maps_url, latitude, longitude)');
+      // No data migration needed - new fields are optional
+      // Existing data will continue to work, new entries will include location data
+      console.log('[Migration] Schema v6 upgrade complete - location fields available');
     });
   }
 }

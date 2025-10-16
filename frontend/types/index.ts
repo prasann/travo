@@ -196,6 +196,15 @@ export interface Hotel {
   /** Google Maps Plus Code for location */
   plus_code?: string;
   
+  /** Google Maps URL for direct linking */
+  google_maps_url?: string;
+  
+  /** Latitude coordinate (decimal degrees) */
+  latitude?: number;
+  
+  /** Longitude coordinate (decimal degrees) */
+  longitude?: number;
+  
   /** Check-in timestamp with timezone (ISO 8601 with timezone) */
   check_in_time?: string;
   
@@ -253,6 +262,15 @@ export interface DailyActivity {
   /** Google Maps Plus Code (8-character format) */
   plus_code?: string;
   
+  /** Google Maps URL for direct linking */
+  google_maps_url?: string;
+  
+  /** Latitude coordinate (decimal degrees) */
+  latitude?: number;
+  
+  /** Longitude coordinate (decimal degrees) */
+  longitude?: number;
+  
   /** Full address */
   address?: string;
   
@@ -297,6 +315,15 @@ export interface RestaurantRecommendation {
   
   /** Google Maps Plus Code */
   plus_code?: string;
+  
+  /** Google Maps URL for direct linking */
+  google_maps_url?: string;
+  
+  /** Latitude coordinate (decimal degrees) */
+  latitude?: number;
+  
+  /** Longitude coordinate (decimal degrees) */
+  longitude?: number;
   
   /** Contact phone number */
   phone?: string;

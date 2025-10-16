@@ -25,12 +25,25 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
   const [plusCode, setPlusCode] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   
-  const handlePlusCodeSuccess = (result: { name: string; address: string }) => {
+  const handlePlusCodeSuccess = (result: { 
+    name: string; 
+    address: string;
+    plusCode?: string;
+    city?: string;
+    placeId?: string;
+    location?: {
+      lat: number;
+      lng: number;
+    };
+  }) => {
     setNewHotel(prev => ({
       ...prev,
       name: result.name,
       address: result.address,
-      plus_code: plusCode
+      plus_code: result.plusCode || plusCode,
+      google_maps_url: plusCode, // Store the original URL
+      latitude: result.location?.lat,
+      longitude: result.location?.lng,
     }));
   };
   
@@ -54,6 +67,9 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
       confirmation_number: newHotel.confirmation_number,
       phone: newHotel.phone,
       notes: newHotel.notes,
+      google_maps_url: newHotel.google_maps_url,
+      latitude: newHotel.latitude,
+      longitude: newHotel.longitude,
     };
     
     setValue('hotels', [...hotels, hotel]);

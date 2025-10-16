@@ -3,10 +3,13 @@
 import { notFound } from 'next/navigation'
 import { TripTimeline } from '@/components/TripTimeline'
 import { RestaurantList } from '@/components/RestaurantList'
+import TripMapView from '@/components/TripMapView'
 import { getTripWithRelations, isOk, unwrap, unwrapErr } from '@/lib/db'
 import { formatDate } from '@/lib/dateTime'
 import { useEffect, useState } from 'react'
 import type { TripWithRelations } from '@/lib/db'
+
+type ViewMode = 'timeline' | 'map';
 
 interface TripPageProps {
   params: Promise<{
@@ -19,6 +22,7 @@ export default function TripPage({ params }: TripPageProps) {
   const [trip, setTrip] = useState<TripWithRelations | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('timeline');
 
   useEffect(() => {
     params.then(p => setTripId(p.tripId));
@@ -78,11 +82,37 @@ export default function TripPage({ params }: TripPageProps) {
           )}
         </div>
 
-        {/* Timeline */}
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Timeline</h2>
-          <TripTimeline trip={trip} />
+        {/* View Toggle */}
+        <div className="mb-6">
+          <div className="tabs tabs-boxed bg-base-100 shadow-sm">
+            <button
+              className={`tab ${viewMode === 'timeline' ? 'tab-active' : ''}`}
+              onClick={() => setViewMode('timeline')}
+            >
+              📅 Timeline
+            </button>
+            <button
+              className={`tab ${viewMode === 'map' ? 'tab-active' : ''}`}
+              onClick={() => setViewMode('map')}
+            >
+              🗺️ Map
+            </button>
+          </div>
         </div>
+
+        {/* Timeline View */}
+        {viewMode === 'timeline' && (
+          <div>
+            <TripTimeline trip={trip} />
+          </div>
+        )}
+        
+        {/* Map View */}
+        {viewMode === 'map' && (
+          <div>
+            <TripMapView trip={trip} />
+          </div>
+        )}
 
         {/* Restaurant Recommendations */}
         {trip.restaurants && trip.restaurants.length > 0 && (

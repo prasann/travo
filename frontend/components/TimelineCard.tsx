@@ -10,8 +10,8 @@ interface TimelineCardProps {
   icon: ReactNode;
   /** Tailwind color class for icon background (e.g., 'primary', 'secondary', 'accent', 'warning') */
   iconColor: string;
-  /** Card title */
-  title: string;
+  /** Card title (can be string or clickable link) */
+  title: ReactNode;
   /** Main content area (key information) */
   content: ReactNode;
   /** Optional additional details section (shown below separator) */

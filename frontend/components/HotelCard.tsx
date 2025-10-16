@@ -3,9 +3,10 @@
  * Feature: Enhanced Trip Data Model & Itinerary Management
  */
 
-import { Hotel as HotelIcon, MapPin } from 'lucide-react';
+import { Hotel as HotelIcon, MapPin, ExternalLink } from 'lucide-react';
 import type { Hotel } from '@/types';
 import { formatTime } from '@/lib/dateTime';
+import { getGoogleMapsUrl } from '@/lib/mapsUtils';
 import { TimelineCard } from './TimelineCard';
 
 interface HotelCardProps {
@@ -13,7 +14,22 @@ interface HotelCardProps {
 }
 
 export function HotelCard({ hotel }: HotelCardProps) {
-  const title = hotel.name || 'Hotel';
+  const mapsUrl = getGoogleMapsUrl(hotel);
+  
+  // Make title clickable if we have a maps URL
+  const title = mapsUrl ? (
+    <a
+      href={mapsUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="hover:text-secondary transition-colors inline-flex items-center gap-1.5 group"
+    >
+      {hotel.name || 'Hotel'}
+      <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+    </a>
+  ) : (
+    hotel.name || 'Hotel'
+  );
   
   const content = (
     <>

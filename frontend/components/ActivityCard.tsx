@@ -5,9 +5,10 @@
 
 'use client'
 
-import { MapPin } from 'lucide-react';
+import { MapPin, ExternalLink } from 'lucide-react';
 import type { DailyActivity } from '@/types';
 import { formatTime } from '@/lib/dateTime';
+import { getGoogleMapsUrl } from '@/lib/mapsUtils';
 import { TimelineCard } from './TimelineCard';
 
 interface ActivityCardProps {
@@ -15,7 +16,22 @@ interface ActivityCardProps {
 }
 
 export function ActivityCard({ activity }: ActivityCardProps) {
-  const title = activity.name;
+  const mapsUrl = getGoogleMapsUrl(activity);
+  
+  // Make title clickable if we have a maps URL
+  const title = mapsUrl ? (
+    <a
+      href={mapsUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="hover:text-accent transition-colors inline-flex items-center gap-1.5 group"
+    >
+      {activity.name}
+      <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+    </a>
+  ) : (
+    activity.name
+  );
   
   // Icon or image with fallback
   const icon = activity.image_url ? (

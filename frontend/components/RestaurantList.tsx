@@ -3,8 +3,9 @@
  * Feature: Enhanced Trip Data Model & Itinerary Management
  */
 
-import { Utensils, Phone, Globe } from 'lucide-react';
+import { Utensils, Phone, Globe, ExternalLink } from 'lucide-react';
 import type { RestaurantRecommendation } from '@/types';
+import { getGoogleMapsUrl } from '@/lib/mapsUtils';
 
 interface RestaurantListProps {
   restaurants: RestaurantRecommendation[];
@@ -36,7 +37,10 @@ export function RestaurantList({ restaurants }: RestaurantListProps) {
           <h3 className="text-lg font-semibold mb-3 text-base-content/80">{city}</h3>
           
           <div className="space-y-2">
-            {restaurantsByCity[city].map((restaurant) => (
+            {restaurantsByCity[city].map((restaurant) => {
+              const mapsUrl = getGoogleMapsUrl(restaurant);
+              
+              return (
               <div key={restaurant.id} className="card bg-base-100 shadow-sm border border-base-200">
                 <div className="card-body p-2 sm:p-3">
                   <div className="flex gap-2 items-start">
@@ -47,7 +51,20 @@ export function RestaurantList({ restaurants }: RestaurantListProps) {
                     
                     {/* Restaurant info */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-sm sm:text-base leading-tight">{restaurant.name}</h4>
+                      {/* Make restaurant name clickable */}
+                      {mapsUrl ? (
+                        <a
+                          href={mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-bold text-sm sm:text-base leading-tight hover:text-warning transition-colors inline-flex items-center gap-1 group"
+                        >
+                          {restaurant.name}
+                          <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </a>
+                      ) : (
+                        <h4 className="font-bold text-sm sm:text-base leading-tight">{restaurant.name}</h4>
+                      )}
                       
                       {restaurant.cuisine_type && (
                         <p className="text-xs text-base-content/70">
@@ -92,7 +109,8 @@ export function RestaurantList({ restaurants }: RestaurantListProps) {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       ))}

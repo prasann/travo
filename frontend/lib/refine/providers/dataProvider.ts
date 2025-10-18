@@ -1,14 +1,23 @@
 import type { DataProvider } from "@refinedev/core";
 import { resultToPromise } from "../utils/resultConverter";
 import { getAllTrips, getTripWithRelations, updateTrip, deleteTrip } from "@/lib/db/operations/trips";
+import { createActivity, updateActivity, deleteActivity } from "@/lib/db/operations/activities";
+import { createHotel, updateHotel, deleteHotel } from "@/lib/db/operations/hotels";
+import { updateFlight, deleteFlight } from "@/lib/db/operations/flights";
+import { createRestaurant, updateRestaurant, deleteRestaurant } from "@/lib/db/operations/restaurants";
+import { db } from "@/lib/db/schema";
 import type { Trip } from "@/lib/db/models";
 
 /**
  * Resource operation registry for routing Refine requests to database operations
+ * 
+ * For nested resources (activities, hotels, flights, restaurants), we handle them
+ * differently based on meta.tripId to support filtering by parent trip.
  */
 interface ResourceOperations {
-  getList?: () => Promise<any>;
+  getList?: (meta?: any) => Promise<any>;
   getOne?: (id: string) => Promise<any>;
+  create?: (data: any) => Promise<any>;
   update?: (data: any) => Promise<any>;
   delete?: (id: string) => Promise<any>;
 }
@@ -20,11 +29,88 @@ const resourceRegistry: Record<string, ResourceOperations> = {
     update: updateTrip,
     delete: deleteTrip,
   },
-  // Other resources will be added in Phase 6
-  // activities: { ... },
-  // hotels: { ... },
-  // flights: { ... },
-  // restaurants: { ... },
+  // Nested resources (Phase 6)
+  activities: {
+    getList: async (meta?: any) => {
+      if (meta?.tripId) {
+        // Filter by trip ID
+        const activities = await db.activities.where('trip_id').equals(meta.tripId).toArray();
+        return { ok: true, value: activities };
+      }
+      // Get all activities (fallback)
+      const activities = await db.activities.toArray();
+      return { ok: true, value: activities };
+    },
+    getOne: async (id: string) => {
+      const activity = await db.activities.get(id);
+      if (!activity) {
+        return { ok: false, error: { message: `Activity ${id} not found`, code: 'NOT_FOUND' } };
+      }
+      return { ok: true, value: activity };
+    },
+    create: createActivity,
+    update: async (data: any) => await updateActivity(data.id, data),
+    delete: deleteActivity,
+  },
+  hotels: {
+    getList: async (meta?: any) => {
+      if (meta?.tripId) {
+        const hotels = await db.hotels.where('trip_id').equals(meta.tripId).toArray();
+        return { ok: true, value: hotels };
+      }
+      const hotels = await db.hotels.toArray();
+      return { ok: true, value: hotels };
+    },
+    getOne: async (id: string) => {
+      const hotel = await db.hotels.get(id);
+      if (!hotel) {
+        return { ok: false, error: { message: `Hotel ${id} not found`, code: 'NOT_FOUND' } };
+      }
+      return { ok: true, value: hotel };
+    },
+    create: createHotel,
+    update: async (data: any) => await updateHotel(data.id, data),
+    delete: deleteHotel,
+  },
+  flights: {
+    getList: async (meta?: any) => {
+      if (meta?.tripId) {
+        const flights = await db.flights.where('trip_id').equals(meta.tripId).toArray();
+        return { ok: true, value: flights };
+      }
+      const flights = await db.flights.toArray();
+      return { ok: true, value: flights };
+    },
+    getOne: async (id: string) => {
+      const flight = await db.flights.get(id);
+      if (!flight) {
+        return { ok: false, error: { message: `Flight ${id} not found`, code: 'NOT_FOUND' } };
+      }
+      return { ok: true, value: flight };
+    },
+    update: async (data: any) => await updateFlight(data.id, data),
+    delete: deleteFlight,
+  },
+  restaurants: {
+    getList: async (meta?: any) => {
+      if (meta?.tripId) {
+        const restaurants = await db.restaurants.where('trip_id').equals(meta.tripId).toArray();
+        return { ok: true, value: restaurants };
+      }
+      const restaurants = await db.restaurants.toArray();
+      return { ok: true, value: restaurants };
+    },
+    getOne: async (id: string) => {
+      const restaurant = await db.restaurants.get(id);
+      if (!restaurant) {
+        return { ok: false, error: { message: `Restaurant ${id} not found`, code: 'NOT_FOUND' } };
+      }
+      return { ok: true, value: restaurant };
+    },
+    create: createRestaurant,
+    update: async (data: any) => await updateRestaurant(data.id, data),
+    delete: deleteRestaurant,
+  },
 };
 
 /**
@@ -47,8 +133,8 @@ export const dataProvider: DataProvider = {
       throw new Error(`getList not implemented for resource: ${resource}`);
     }
     
-    // Fetch all items from IndexedDB
-    const result = await operations.getList();
+    // Fetch items from IndexedDB (pass meta for filtering)
+    const result = await operations.getList(meta);
     const items = await resultToPromise(result);
     
     // Apply sorting if specified
@@ -102,7 +188,18 @@ export const dataProvider: DataProvider = {
    * Create a new resource
    */
   create: async ({ resource, variables, meta }) => {
-    throw new Error(`create not implemented for resource: ${resource}`);
+    const operations = resourceRegistry[resource];
+    
+    if (!operations?.create) {
+      throw new Error(`create not implemented for resource: ${resource}`);
+    }
+    
+    const result = await operations.create(variables as any);
+    const item = await resultToPromise(result);
+    
+    return {
+      data: item as any,
+    };
   },
 
   /**

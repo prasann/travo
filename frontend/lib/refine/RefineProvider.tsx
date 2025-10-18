@@ -1,9 +1,10 @@
 "use client";
 
 import { Refine } from "@refinedev/core";
+import routerProvider from "@refinedev/react-router-v6";
 import { dataProvider } from "./providers/dataProvider";
-import { stubAuthProvider } from "./providers/stubAuthProvider";
-import { stubNotificationProvider } from "./providers/stubNotificationProvider";
+import { authProvider } from "./providers/authProvider";
+import { notificationProvider } from "./providers/notificationProvider";
 
 interface RefineProviderProps {
   children: React.ReactNode;
@@ -14,15 +15,15 @@ interface RefineProviderProps {
  * 
  * Phase 1: ✅ Uses stub providers for initial setup
  * Phase 2: ✅ Real data provider integrated
- * Phase 7: 🔲 Will integrate Firebase auth provider
- * Phase 8: 🔲 Will integrate DaisyUI notification provider
+ * Phase 7: ✅ Firebase auth provider integrated
+ * Phase 8: ✅ DaisyUI notification provider integrated
  */
 export function RefineProvider({ children }: RefineProviderProps) {
   return (
     <Refine
       dataProvider={dataProvider}
-      authProvider={stubAuthProvider}
-      notificationProvider={stubNotificationProvider}
+      authProvider={authProvider}
+      notificationProvider={notificationProvider}
       resources={[
         {
           name: "trips",

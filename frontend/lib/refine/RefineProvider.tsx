@@ -1,7 +1,6 @@
 "use client";
 
 import { Refine } from "@refinedev/core";
-import routerProvider from "@refinedev/react-router-v6";
 import { dataProvider } from "./providers/dataProvider";
 import { authProvider } from "./providers/authProvider";
 import { notificationProvider } from "./providers/notificationProvider";

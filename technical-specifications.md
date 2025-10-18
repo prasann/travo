@@ -36,7 +36,7 @@
 - **TypeScript 5.x** - Type safety with strict mode enabled
 - **Refine.dev 5.0.4** - Framework for data-intensive applications
   - @refinedev/react-hook-form 5.0.1 - Form integration
-  - @refinedev/react-router-v6 4.6.2 - Routing integration
+  - @tanstack/react-query 5.90.3 - Query management (peer dependency)
 
 ### UI & Styling
 - **DaisyUI 5.2.0** - Component library

@@ -55,6 +55,23 @@ export function getCurrentISOTimestamp(): string {
   return new Date().toISOString();
 }
 
+/**
+ * Build Firestore document by filtering out undefined values from optional fields
+ * 
+ * @param required - Required fields (always included)
+ * @param optional - Optional fields (undefined values filtered out)
+ * @returns DocumentData with required fields and defined optional fields
+ */
+function buildFirestoreDoc<T extends DocumentData>(
+  required: Record<string, any>,
+  optional: Record<string, any> = {}
+): T {
+  const filtered = Object.fromEntries(
+    Object.entries(optional).filter(([_, value]) => value !== undefined)
+  );
+  return { ...required, ...filtered } as T;
+}
+
 // ============================================================================
 // Trip Converter
 // ============================================================================
@@ -139,26 +156,28 @@ export const flightConverter: FirestoreDataConverter<FirestoreFlight> = {
 
 export const hotelConverter: FirestoreDataConverter<FirestoreHotel> = {
   toFirestore(hotel: FirestoreHotel): DocumentData {
-    const data: DocumentData = {
-      id: hotel.id,
-      trip_id: hotel.trip_id,
-      name: hotel.name,
-      address: hotel.address,
-      check_in_date: hotel.check_in_date,
-      check_out_date: hotel.check_out_date,
-      updated_by: hotel.updated_by,
-      updated_at: hotel.updated_at,
-    };
-
-    // Only include optional fields if they have values
-    if (hotel.plus_code !== undefined) data.plus_code = hotel.plus_code;
-    if (hotel.city !== undefined) data.city = hotel.city;
-    if (hotel.maps_link !== undefined) data.maps_link = hotel.maps_link;
-    if (hotel.google_maps_url !== undefined) data.google_maps_url = hotel.google_maps_url;
-    if (hotel.latitude !== undefined) data.latitude = hotel.latitude;
-    if (hotel.longitude !== undefined) data.longitude = hotel.longitude;
-
-    return data;
+    return buildFirestoreDoc(
+      // Required fields
+      {
+        id: hotel.id,
+        trip_id: hotel.trip_id,
+        name: hotel.name,
+        address: hotel.address,
+        check_in_date: hotel.check_in_date,
+        check_out_date: hotel.check_out_date,
+        updated_by: hotel.updated_by,
+        updated_at: hotel.updated_at,
+      },
+      // Optional fields (undefined values filtered automatically)
+      {
+        plus_code: hotel.plus_code,
+        city: hotel.city,
+        maps_link: hotel.maps_link,
+        google_maps_url: hotel.google_maps_url,
+        latitude: hotel.latitude,
+        longitude: hotel.longitude,
+      }
+    );
   },
 
   fromFirestore(
@@ -194,28 +213,30 @@ export const hotelConverter: FirestoreDataConverter<FirestoreHotel> = {
 
 export const activityConverter: FirestoreDataConverter<FirestoreDailyActivity> = {
   toFirestore(activity: FirestoreDailyActivity): DocumentData {
-    const data: DocumentData = {
-      id: activity.id,
-      trip_id: activity.trip_id,
-      date: activity.date,
-      name: activity.name,
-      order_index: activity.order_index,
-      updated_by: activity.updated_by,
-      updated_at: activity.updated_at,
-    };
-
-    // Only include optional fields if they have values
-    if (activity.time_of_day !== undefined) data.time_of_day = activity.time_of_day;
-    if (activity.plus_code !== undefined) data.plus_code = activity.plus_code;
-    if (activity.address !== undefined) data.address = activity.address;
-    if (activity.city !== undefined) data.city = activity.city;
-    if (activity.maps_link !== undefined) data.maps_link = activity.maps_link;
-    if (activity.google_maps_url !== undefined) data.google_maps_url = activity.google_maps_url;
-    if (activity.latitude !== undefined) data.latitude = activity.latitude;
-    if (activity.longitude !== undefined) data.longitude = activity.longitude;
-    if (activity.notes !== undefined) data.notes = activity.notes;
-
-    return data;
+    return buildFirestoreDoc(
+      // Required fields
+      {
+        id: activity.id,
+        trip_id: activity.trip_id,
+        date: activity.date,
+        name: activity.name,
+        order_index: activity.order_index,
+        updated_by: activity.updated_by,
+        updated_at: activity.updated_at,
+      },
+      // Optional fields (undefined values filtered automatically)
+      {
+        time_of_day: activity.time_of_day,
+        plus_code: activity.plus_code,
+        address: activity.address,
+        city: activity.city,
+        maps_link: activity.maps_link,
+        google_maps_url: activity.google_maps_url,
+        latitude: activity.latitude,
+        longitude: activity.longitude,
+        notes: activity.notes,
+      }
+    );
   },
 
   fromFirestore(
@@ -253,27 +274,29 @@ export const activityConverter: FirestoreDataConverter<FirestoreDailyActivity> =
 
 export const restaurantConverter: FirestoreDataConverter<FirestoreRestaurant> = {
   toFirestore(restaurant: FirestoreRestaurant): DocumentData {
-    const data: DocumentData = {
-      id: restaurant.id,
-      trip_id: restaurant.trip_id,
-      name: restaurant.name,
-      updated_by: restaurant.updated_by,
-      updated_at: restaurant.updated_at,
-      recommended_dishes: restaurant.recommended_dishes || [],
-    };
-
-    // Only include optional fields if they have values
-    if (restaurant.address !== undefined) data.address = restaurant.address;
-    if (restaurant.plus_code !== undefined) data.plus_code = restaurant.plus_code;
-    if (restaurant.city !== undefined) data.city = restaurant.city;
-    if (restaurant.maps_link !== undefined) data.maps_link = restaurant.maps_link;
-    if (restaurant.google_maps_url !== undefined) data.google_maps_url = restaurant.google_maps_url;
-    if (restaurant.latitude !== undefined) data.latitude = restaurant.latitude;
-    if (restaurant.longitude !== undefined) data.longitude = restaurant.longitude;
-    if (restaurant.cuisine_type !== undefined) data.cuisine_type = restaurant.cuisine_type;
-    if (restaurant.notes !== undefined) data.notes = restaurant.notes;
-
-    return data;
+    return buildFirestoreDoc(
+      // Required fields
+      {
+        id: restaurant.id,
+        trip_id: restaurant.trip_id,
+        name: restaurant.name,
+        updated_by: restaurant.updated_by,
+        updated_at: restaurant.updated_at,
+        recommended_dishes: restaurant.recommended_dishes || [],
+      },
+      // Optional fields (undefined values filtered automatically)
+      {
+        address: restaurant.address,
+        plus_code: restaurant.plus_code,
+        city: restaurant.city,
+        maps_link: restaurant.maps_link,
+        google_maps_url: restaurant.google_maps_url,
+        latitude: restaurant.latitude,
+        longitude: restaurant.longitude,
+        cuisine_type: restaurant.cuisine_type,
+        notes: restaurant.notes,
+      }
+    );
   },
 
   fromFirestore(

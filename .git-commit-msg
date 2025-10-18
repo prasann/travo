@@ -1,8 +1,0 @@
-feat: Phase 4 - Migrate trip detail page to useShow hook
-
-Changes:
-- Replaced manual state management with Refine useShow hook
-- Removed 3 useState declarations and 1 useEffect
-- Leverages automatic caching from list page navigation
-- Bundle size reduced from 283 kB to 214 kB (24% reduction)
-- Task tracker updated: 24/45 tasks complete (53%)

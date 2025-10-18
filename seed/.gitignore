@@ -6,3 +6,7 @@ service-account.json
 
 # Generated files
 firestore-upload/
+
+# Activity conversion files (may contain personal data)
+activities-input.json
+activities-output.json

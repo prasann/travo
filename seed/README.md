@@ -6,13 +6,15 @@ This folder contains test data and scripts for seeding Firestore with sample tri
 
 ```
 seed/
-├── package.json              # Dependencies (firebase-admin)
-├── upload-test-data.js       # Script to upload test data to Firestore
-├── test-data/                # Test trip JSON files
-│   ├── 123e4567-*.json      # Tokyo Spring Adventure
-│   ├── 456def78-*.json      # Paris Summer Trip
-│   └── 987f6543-*.json      # NYC Fall Getaway
-└── README.md                 # This file
+├── package.json                      # Dependencies (firebase-admin)
+├── upload.js                         # Script to upload test data to Firestore
+├── bulk-import-activities.js         # Script to bulk import activities from Maps URLs
+├── activities-input.example.json     # Example input format for bulk import
+├── test-data/                        # Test trip JSON files
+│   ├── 123e4567-*.json              # Tokyo Spring Adventure
+│   ├── 456def78-*.json              # Paris Summer Trip
+│   └── 987f6543-*.json              # NYC Fall Getaway
+└── README.md                         # This file
 ```
 
 ## 🚀 Quick Start
@@ -68,6 +70,27 @@ After uploading:
 3. **Refresh the page** to trigger sync
 4. Check console logs - you should see sync messages
 5. The Tokyo trip should appear in your trip list!
+
+## � Convert Activities from URLs
+
+Convert Google Maps URLs to JSON format for bulk import.
+
+### Quick Start
+
+1. Create `activities-input.json`:
+   ```json
+   {
+     "2025-10-20": ["https://maps.app.goo.gl/xxx", "https://maps.app.goo.gl/yyy"],
+     "2025-10-21": ["https://maps.app.goo.gl/zzz"]
+   }
+   ```
+
+2. Convert to JSON:
+   ```bash
+   GOOGLE_MAPS_API_KEY=your_key npm run convert-activities
+   ```
+
+3. Output: `activities-output.json` (ready to merge into trip JSON and upload with `upload.js`)
 
 ## 📝 Test Data
 

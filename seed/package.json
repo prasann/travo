@@ -4,7 +4,8 @@
   "private": true,
   "description": "Seed data and scripts for uploading test data to Firestore",
   "scripts": {
-    "upload": "node upload.js"
+    "upload": "node upload.js",
+    "convert-activities": "node convert-activities.js"
   },
   "devDependencies": {
     "firebase-admin": "^13.5.0"

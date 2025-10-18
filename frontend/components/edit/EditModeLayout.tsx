@@ -1,11 +1,11 @@
 /**
  * Edit Mode Layout Component
  * 
- * Feature: 006-edit-mode-for
- * Feature: Refine Integration Phase 5 - Edit Forms
- * Purpose: Main container for trip editing interface
- * 
- * Step 4: Migrate flights to Refine mutations
+ * Manages trip editing with Refine.dev integration for automatic:
+ * - Data loading and caching
+ * - Form state management
+ * - CRUD operations with notifications
+ * - Cache invalidation
  */
 
 'use client';
@@ -31,7 +31,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<EditCategory>('info');
   
-  // Refine's useForm - handles loading, data fetching, and trip-level saving
+  // Refine form hook - automatic data loading and trip-level mutations
   const formReturn = useForm<TripEditFormData, any, TripEditFormData>({
     refineCoreProps: {
       resource: "trips",
@@ -50,22 +50,22 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
     formState: { errors, isSubmitting },
   } = formReturn;
   
-  // Access Refine core methods
+  // Access Refine core for query and mutations
   const refineCore = (formReturn as any).refineCore;
   const queryResult = refineCore?.query;
   const onFinish = refineCore?.onFinish;
   
-  // Refine mutation hooks for hotels (Step 2)
-  const { mutateAsync: createHotel } = useCreate();
-  const { mutateAsync: updateHotel } = useUpdate();
-  const { mutateAsync: deleteHotel } = useDelete();
+  // Refine mutation hooks for nested entities
+  const { mutateAsync: createEntity } = useCreate();
+  const { mutateAsync: updateEntity } = useUpdate();
+  const { mutateAsync: deleteEntity } = useDelete();
   
-  // Extract trip data and loading state from Refine
+  // Extract trip data and loading state
   const trip = queryResult?.data?.data as TripWithRelations | undefined;
   const isLoading = !queryResult || queryResult.isLoading;
   const queryError = queryResult?.error;
 
-  // Watch form fields
+  // Watch form fields for conditional rendering
   const watchedNotes = watch('notes');
   const watchedStartDate = watch('start_date');
   const watchedEndDate = watch('end_date');
@@ -120,10 +120,10 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
     }
   }, [trip, reset]);
   
-  // Save handler - Step 1: Uses Refine for trip-level, manual for nested entities
+  // Save handler - processes trip and all nested entities
   const onSubmit = async (data: TripEditFormData) => {
     try {
-      // Save trip basic info through Refine (automatic notification & cache invalidation)
+      // Save trip basic info (automatic notification & cache invalidation)
       await onFinish({
         name: data.name,
         description: data.description,
@@ -132,20 +132,18 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         home_location: data.home_location,
       });
       
-      // Import DB operations for nested entities
+      // Import bulk update for activity reordering
       const { bulkUpdateActivities } = await import('@/lib/db/operations/activities');
       
-      // Handle hotel changes with Refine mutations (Step 2)
+      // Process hotel changes
       for (const hotel of data.hotels) {
         if (hotel._deleted && hotel.id) {
-          // Delete existing hotel
-          await deleteHotel({
+          await deleteEntity({
             resource: 'hotels',
             id: hotel.id,
           });
         } else if (!hotel.id) {
-          // Create new hotel
-          await createHotel({
+          await createEntity({
             resource: 'hotels',
             values: {
               trip_id: tripId,
@@ -161,8 +159,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             },
           });
         } else if (hotel.id) {
-          // Update existing hotel notes
-          await updateHotel({
+          await updateEntity({
             resource: 'hotels',
             id: hotel.id,
             values: {
@@ -172,19 +169,17 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         }
       }
       
-      // Handle activity changes with Refine mutations (Step 3)
+      // Process activity changes
       const reorderedActivities: Array<{ id: string; order_index: number }> = [];
       
       for (const activity of data.activities) {
         if (activity._deleted && activity.id) {
-          // Delete existing activity
-          await deleteHotel({
+          await deleteEntity({
             resource: 'activities',
             id: activity.id,
           });
         } else if (!activity.id) {
-          // Create new activity
-          await createHotel({
+          await createEntity({
             resource: 'activities',
             values: {
               trip_id: tripId,
@@ -201,14 +196,12 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             },
           });
         } else if (activity.id) {
-          // Track activities with updated order_index for bulk update
           reorderedActivities.push({
             id: activity.id,
             order_index: activity.order_index
           });
           
-          // Update activity notes
-          await updateHotel({
+          await updateEntity({
             resource: 'activities',
             id: activity.id,
             values: {
@@ -218,15 +211,15 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         }
       }
       
-      // Bulk update order_index for reordered activities (custom operation)
+      // Bulk update activity order for drag-drop reordering
       if (reorderedActivities.length > 0) {
         await bulkUpdateActivities(reorderedActivities);
       }
       
-      // Update flight notes with Refine mutations (Step 4)
+      // Process flight notes
       for (const flight of data.flights) {
         if (flight.id) {
-          await updateHotel({
+          await updateEntity({
             resource: 'flights',
             id: flight.id,
             values: {
@@ -237,17 +230,13 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
       }
       
       setSuccessMessage('Trip saved successfully!');
-      
-      // Refetch trip data (Refine handles this automatically, but we manually trigger for nested entities)
       await queryResult?.refetch();
       
-      // Clear success message after 3 seconds
       setTimeout(() => {
         setSuccessMessage(null);
       }, 3000);
     } catch (err) {
       console.error('Save error:', err);
-      // Refine handles error notifications automatically
     }
   };
   

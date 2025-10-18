@@ -23,8 +23,8 @@ export function getTimestamp(item: TimelineItem): Date | null {
   if ('check_in_time' in item && item.check_in_time) {
     return new Date(item.check_in_time);
   }
-  if ('start_time' in item && item.start_time) {
-    return new Date(item.start_time);
+  if ('date' in item && item.date) {
+    return new Date(item.date);
   }
   return null;
 }

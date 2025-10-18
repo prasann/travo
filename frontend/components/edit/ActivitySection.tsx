@@ -1,8 +1,8 @@
 /**
- * Attraction Section Component
+ * Activity Section Component
  * 
  * Feature: 006-edit-mode-for
- * Purpose: Manage attractions in edit mode with Plus Code lookup
+ * Purpose: Manage activities in edit mode with Plus Code lookup
  */
 
 'use client';
@@ -11,9 +11,9 @@ import { useState } from 'react';
 import { UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import type { TripEditFormData, ActivityEditFormData } from '@/types/editMode';
 import MapsLinkInput from './MapsLinkInput';
-import AttractionItem from './SortableAttractionItem';
+import ActivityItem from './SortableActivityItem';
 
-interface AttractionSectionProps {
+interface ActivitySectionProps {
   register: UseFormRegister<TripEditFormData>;
   setValue: UseFormSetValue<TripEditFormData>;
   watch: UseFormWatch<TripEditFormData>;
@@ -21,13 +21,13 @@ interface AttractionSectionProps {
   tripEndDate: string;
 }
 
-export default function AttractionSection({ 
+export default function ActivitySection({ 
   register, 
   setValue, 
   watch,
   tripStartDate,
   tripEndDate 
-}: AttractionSectionProps) {
+}: ActivitySectionProps) {
   const activities = watch('activities') || [];
   const [newActivity, setNewActivity] = useState<Partial<ActivityEditFormData>>({});
   const [mapsUrl, setMapsUrl] = useState('');
@@ -93,8 +93,6 @@ export default function AttractionSection({
       plus_code: newActivity.plus_code,
       city: newActivity.city,
       date: newActivity.date,
-      start_time: newActivity.start_time,
-      duration_minutes: newActivity.duration_minutes,
       order_index: nextOrderIndex,
       notes: newActivity.notes,
       google_maps_url: newActivity.google_maps_url,
@@ -176,7 +174,7 @@ export default function AttractionSection({
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
-        <h2 className="card-title">Attractions</h2>
+        <h2 className="card-title">Activities</h2>
         
         {/* Existing Activities */}
         {Object.keys(activitiesByDate).length > 0 && (
@@ -189,7 +187,7 @@ export default function AttractionSection({
                     <h3 className="font-semibold text-lg mb-3">{date}</h3>
                     <div className="space-y-3">
                       {items.map(({ activity, actualIndex }, positionInDate) => (
-                        <AttractionItem
+                        <ActivityItem
                           key={activity.id || actualIndex}
                           activity={activity}
                           index={actualIndex}
@@ -217,14 +215,14 @@ export default function AttractionSection({
             onClick={() => setShowAddForm(true)}
             className="btn btn-outline btn-primary"
           >
-            + Add Attraction
+            + Add Activity
           </button>
         )}
         
         {showAddForm && (
           <div className="card bg-base-200 mt-4">
             <div className="card-body">
-              <h3 className="font-semibold mb-4">Add New Attraction</h3>
+              <h3 className="font-semibold mb-4">Add New Activity</h3>
               
               {/* Google Maps Link Lookup */}
               <MapsLinkInput
@@ -269,32 +267,6 @@ export default function AttractionSection({
                         placeholder="Tokyo"
                       />
                     </div>
-                    
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text">Start Time</span>
-                      </label>
-                      <input
-                        type="time"
-                        value={newActivity.start_time || ''}
-                        onChange={(e) => setNewActivity(prev => ({ ...prev, start_time: e.target.value }))}
-                        className="input input-bordered"
-                      />
-                    </div>
-                    
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text">Duration (minutes)</span>
-                      </label>
-                      <input
-                        type="number"
-                        value={newActivity.duration_minutes || ''}
-                        onChange={(e) => setNewActivity(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) || undefined }))}
-                        className="input input-bordered"
-                        placeholder="120"
-                        min="0"
-                      />
-                    </div>
                   </div>
                   
                   <div className="form-control mt-4">
@@ -317,7 +289,7 @@ export default function AttractionSection({
                       className="btn btn-primary"
                       disabled={!newActivity.date}
                     >
-                      Add Attraction
+                      Add Activity
                     </button>
                     <button
                       type="button"

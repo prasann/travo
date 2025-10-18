@@ -17,7 +17,7 @@ import { isOk, unwrap, unwrapErr } from '@/lib/db/resultHelpers';
 import CategoryNav from './CategoryNav';
 import NotesSection from './NotesSection';
 import HotelSection from './HotelSection';
-import AttractionSection from './AttractionSection';
+import ActivitySection from './ActivitySection';
 import FlightSection from './FlightSection';
 
 interface EditModeLayoutProps {
@@ -78,10 +78,11 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             plus_code: a.plus_code,
             city: a.city,
             date: a.date,
-            start_time: a.start_time,
-            duration_minutes: a.duration_minutes,
             order_index: a.order_index,
             notes: a.notes,
+            google_maps_url: a.google_maps_url,
+            latitude: a.latitude,
+            longitude: a.longitude,
           })),
           flights: tripData.flights.map(f => ({
             id: f.id,
@@ -176,10 +177,11 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             plus_code: activity.plus_code,
             city: activity.city,
             date: activity.date,
-            start_time: activity.start_time,
-            duration_minutes: activity.duration_minutes,
             order_index: activity.order_index,
             notes: activity.notes,
+            google_maps_url: activity.google_maps_url,
+            latitude: activity.latitude,
+            longitude: activity.longitude,
           });
         } else if (activity.id) {
           // Track activities with updated order_index for bulk update
@@ -252,10 +254,11 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             plus_code: a.plus_code,
             city: a.city,
             date: a.date,
-            start_time: a.start_time,
-            duration_minutes: a.duration_minutes,
             order_index: a.order_index,
             notes: a.notes,
+            google_maps_url: a.google_maps_url,
+            latitude: a.latitude,
+            longitude: a.longitude,
           })),
           flights: reloadedTrip.flights.map(f => ({
             id: f.id,
@@ -461,9 +464,9 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             />
           )}
           
-          {/* Attractions Section */}
-          {activeCategory === 'attractions' && (
-            <AttractionSection
+          {/* Activities Section */}
+          {activeCategory === 'activities' && (
+            <ActivitySection
               register={register}
               setValue={setValue}
               watch={watch}

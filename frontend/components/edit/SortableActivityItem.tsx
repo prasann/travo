@@ -1,8 +1,8 @@
 /**
- * Sortable Attraction Item Component
+ * Sortable Activity Item Component
  * 
  * Feature: 006-edit-mode-for (Phase 5 - US3)
- * Purpose: Individual sortable attraction item for drag-and-drop
+ * Purpose: Individual sortable activity item for drag-and-drop
  */
 
 'use client';
@@ -12,7 +12,7 @@ import { UseFormRegister, UseFormWatch } from 'react-hook-form';
 import type { TripEditFormData, ActivityEditFormData } from '@/types/editMode';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
-interface AttractionItemProps {
+interface ActivityItemProps {
   activity: ActivityEditFormData;
   index: number;
   register: UseFormRegister<TripEditFormData>;
@@ -25,7 +25,7 @@ interface AttractionItemProps {
   availableDates: string[];
 }
 
-export default function AttractionItem({
+export default function ActivityItem({
   activity,
   index,
   register,
@@ -36,7 +36,7 @@ export default function AttractionItem({
   isFirst,
   isLast,
   availableDates
-}: AttractionItemProps) {
+}: ActivityItemProps) {
   const [notesOpen, setNotesOpen] = useState(false);
   const notes = watch(`activities.${index}.notes`) || '';
   

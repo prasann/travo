@@ -425,14 +425,7 @@ export function hotelFromFirestore(firestoreHotel: FirestoreHotel): Hotel {
  * Transform IndexedDB Activity to Firestore Activity format
  */
 export function activityToFirestore(activity: DailyActivity): FirestoreDailyActivity {
-  let time_of_day: 'morning' | 'afternoon' | 'evening' | 'night' = 'morning';
-  
-  if (activity.start_time) {
-    const hour = new Date(activity.start_time).getHours();
-    if (hour >= 12 && hour < 17) time_of_day = 'afternoon';
-    else if (hour >= 17 && hour < 21) time_of_day = 'evening';
-    else if (hour >= 21 || hour < 6) time_of_day = 'night';
-  }
+  const time_of_day: 'morning' | 'afternoon' | 'evening' | 'night' = 'morning';
   
   return {
     id: activity.id,
@@ -462,8 +455,6 @@ export function activityFromFirestore(firestoreActivity: FirestoreDailyActivity)
     trip_id: firestoreActivity.trip_id,
     name: firestoreActivity.name,
     date: firestoreActivity.date,
-    start_time: undefined,
-    duration_minutes: undefined,
     order_index: firestoreActivity.order_index,
     city: firestoreActivity.city,
     plus_code: firestoreActivity.plus_code,

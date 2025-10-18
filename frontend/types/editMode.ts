@@ -85,7 +85,7 @@ export interface HotelEditFormData {
 }
 
 /**
- * Form data for editing/creating an activity (attraction)
+ * Form data for editing/creating an activity
  */
 export interface ActivityEditFormData {
   /** Activity ID (undefined for new activities) */
@@ -105,12 +105,6 @@ export interface ActivityEditFormData {
   
   /** Activity date (ISO 8601: YYYY-MM-DD) */
   date: string;
-  
-  /** Optional start time with timezone */
-  start_time?: string;
-  
-  /** Activity duration in minutes */
-  duration_minutes?: number;
   
   /** Display order (for same-day activities) */
   order_index: number;
@@ -169,7 +163,7 @@ export interface FlightEditFormData {
 /**
  * Category names for tab navigation
  */
-export type EditCategory = 'info' | 'flights' | 'hotels' | 'attractions' | 'notes';
+export type EditCategory = 'info' | 'flights' | 'hotels' | 'activities' | 'notes';
 
 /**
  * UI state for Maps Link input component

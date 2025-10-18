@@ -5,7 +5,7 @@
  * Feature: Refine Integration Phase 5 - Edit Forms
  * Purpose: Main container for trip editing interface
  * 
- * Step 3: Migrate activities to Refine mutations
+ * Step 4: Migrate flights to Refine mutations
  */
 
 'use client';
@@ -132,9 +132,8 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         home_location: data.home_location,
       });
       
-      // Import DB operations for nested entities (TODO: Replace in Step 4)
+      // Import DB operations for nested entities
       const { bulkUpdateActivities } = await import('@/lib/db/operations/activities');
-      const { updateFlight } = await import('@/lib/db/operations/flights');
       
       // Handle hotel changes with Refine mutations (Step 2)
       for (const hotel of data.hotels) {
@@ -224,11 +223,15 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         await bulkUpdateActivities(reorderedActivities);
       }
       
-      // Update flight notes (Phase 6)
+      // Update flight notes with Refine mutations (Step 4)
       for (const flight of data.flights) {
         if (flight.id) {
-          await updateFlight(flight.id, {
-            notes: flight.notes ?? undefined,
+          await updateHotel({
+            resource: 'flights',
+            id: flight.id,
+            values: {
+              notes: flight.notes ?? undefined,
+            },
           });
         }
       }

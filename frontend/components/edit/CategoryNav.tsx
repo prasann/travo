@@ -18,7 +18,7 @@ const categories: { id: EditCategory; label: string }[] = [
   { id: 'info', label: 'Trip Info' },
   { id: 'flights', label: 'Flights' },
   { id: 'hotels', label: 'Hotels' },
-  { id: 'attractions', label: 'Attractions' },
+  { id: 'activities', label: 'Activities' },
   { id: 'notes', label: 'Notes' },
 ];
 

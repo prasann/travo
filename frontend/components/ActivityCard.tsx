@@ -56,13 +56,6 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   
   const content = (
     <>
-      {activity.start_time && (
-        <p className="text-xs sm:text-sm font-medium text-base-content/80">
-          {formatTime(activity.start_time)}
-          {activity.duration_minutes && ` • ${activity.duration_minutes} min`}
-        </p>
-      )}
-      
       {activity.address && (
         <p className="text-xs sm:text-sm text-base-content/60 mt-1">{activity.address}</p>
       )}

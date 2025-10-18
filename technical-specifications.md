@@ -34,6 +34,9 @@
 - **Next.js 15.5.4** - React framework with App Router
 - **React 19.1.0** - UI library
 - **TypeScript 5.x** - Type safety with strict mode enabled
+- **Refine.dev 5.0.4** - Framework for data-intensive applications
+  - @refinedev/react-hook-form 5.0.1 - Form integration
+  - @tanstack/react-query 5.90.3 - Query management (peer dependency)
 
 ### UI & Styling
 - **DaisyUI 5.2.0** - Component library
@@ -95,6 +98,15 @@ frontend/
 │       └── NotesSection.tsx      # Notes editing
 │
 ├── lib/                          # Core logic
+│   ├── refine/                   # Refine.dev integration
+│   │   ├── RefineProvider.tsx    # Main Refine wrapper
+│   │   ├── providers/            # Refine providers
+│   │   │   ├── dataProvider.ts   # IndexedDB data provider
+│   │   │   ├── authProvider.ts   # Firebase auth provider
+│   │   │   └── notificationProvider.ts # DaisyUI notifications
+│   │   └── utils/
+│   │       └── resultConverter.ts # Result<T> converters
+│   │
 │   ├── db/                       # Database layer
 │   │   ├── index.ts              # Public API exports
 │   │   ├── schema.ts             # Dexie schema definition
@@ -362,14 +374,50 @@ onAuthStateChanged() → User | null
 
 ### Local State
 - Component-level: `useState` for UI state
-- Forms: `react-hook-form` for form state (partially implemented)
+- Forms: Refine's `useForm` with react-hook-form integration
+  - Automatic data loading from IndexedDB
+  - Built-in validation and error handling
+  - Optimistic updates and cache management
 - Timeline: `useMemo` for derived data (day grouping, sorting)
 
 ### Global State
 - Auth: `AuthContext` (user, loading, error)
+- Data operations: Refine's data provider
+  - Automatic caching with TanStack Query
+  - Built-in mutations (create, update, delete)
+  - Automatic notifications on success/error
+  - Cache invalidation on mutations
 - Sync: React Query manages sync queue state with automatic background refetch
   - `useSyncStatus()` hook provides pending count, failed count, sync trigger
   - Automatic cache invalidation and refetch on focus/reconnect
+
+### Refine Integration
+
+**Data Provider** (`lib/refine/providers/dataProvider.ts`):
+- Bridges Refine operations to IndexedDB via Dexie
+- Resource registry: trips, hotels, activities, flights, restaurants
+- Supports nested resource filtering via `meta.tripId`
+- Returns `Result<T>` pattern from DB operations
+- Automatic error handling and transformation
+
+**Auth Provider** (`lib/refine/providers/authProvider.ts`):
+- Integrates Firebase Auth with Refine
+- Google OAuth sign-in flow
+- Session persistence and auto-refresh
+- User identity management
+
+**Notification Provider** (`lib/refine/providers/notificationProvider.ts`):
+- DaisyUI toast-based notifications
+- Auto-dismiss after 4 seconds
+- Success/error/warning/info types
+- Triggered automatically by mutations
+
+**Form Management**:
+- Edit Mode uses `useForm` from @refinedev/react-hook-form
+- Automatic data loading for trip details
+- Trip-level fields saved via Refine's `onFinish`
+- Nested entities (hotels, activities, flights) use mutation hooks
+- Custom `bulkUpdateActivities` for drag-drop reordering
 
 ---
 

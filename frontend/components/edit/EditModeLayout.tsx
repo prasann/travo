@@ -1,23 +1,25 @@
 /**
  * Edit Mode Layout Component
  * 
- * Feature: 006-edit-mode-for
- * Purpose: Main container for trip editing interface
+ * Manages trip editing with Refine.dev integration for automatic:
+ * - Data loading and caching
+ * - Form state management
+ * - CRUD operations with notifications
+ * - Cache invalidation
  */
 
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm } from '@refinedev/react-hook-form';
+import { useCreate, useUpdate, useDelete } from '@refinedev/core';
 import { useRouter } from 'next/navigation';
 import type { TripEditFormData, EditCategory } from '@/types/editMode';
 import type { TripWithRelations } from '@/lib/db/models';
-import { getTripWithRelations } from '@/lib/db/operations/trips';
-import { isOk, unwrap, unwrapErr } from '@/lib/db/resultHelpers';
 import CategoryNav from './CategoryNav';
 import NotesSection from './NotesSection';
 import HotelSection from './HotelSection';
-import AttractionSection from './AttractionSection';
+import ActivitySection from './ActivitySection';
 import FlightSection from './FlightSection';
 
 interface EditModeLayoutProps {
@@ -26,101 +28,103 @@ interface EditModeLayoutProps {
 
 export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
   const router = useRouter();
-  const [trip, setTrip] = useState<TripWithRelations | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<EditCategory>('info');
   
-  // Initialize React Hook Form
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<TripEditFormData>();
+  // Refine form hook - automatic data loading and trip-level mutations
+  const formReturn = useForm<TripEditFormData, any, TripEditFormData>({
+    refineCoreProps: {
+      resource: "trips",
+      action: "edit",
+      id: tripId,
+      redirect: false,
+    },
+  });
   
-  // Watch form fields
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = formReturn;
+  
+  // Access Refine core for query and mutations
+  const refineCore = (formReturn as any).refineCore;
+  const queryResult = refineCore?.query;
+  const onFinish = refineCore?.onFinish;
+  
+  // Refine mutation hooks for nested entities
+  const { mutateAsync: createEntity } = useCreate();
+  const { mutateAsync: updateEntity } = useUpdate();
+  const { mutateAsync: deleteEntity } = useDelete();
+  
+  // Extract trip data and loading state
+  const trip = queryResult?.data?.data as TripWithRelations | undefined;
+  const isLoading = !queryResult || queryResult.isLoading;
+  const queryError = queryResult?.error;
+
+  // Watch form fields for conditional rendering
   const watchedNotes = watch('notes');
   const watchedStartDate = watch('start_date');
   const watchedEndDate = watch('end_date');
   
-  // Load trip data
+  // Initialize form with trip data (including nested entities)
   useEffect(() => {
-    async function loadTrip() {
-      setIsLoading(true);
-      const result = await getTripWithRelations(tripId);
-      
-      if (isOk(result)) {
-        const tripData = unwrap(result);
-        setTrip(tripData);
-        
-        // Initialize form with trip data
-        reset({
-          name: tripData.name,
-          description: tripData.description || '',
-          start_date: tripData.start_date,
-          end_date: tripData.end_date,
-          home_location: tripData.home_location || '',
-          notes: '', // Trip-level notes not in current schema
-          hotels: tripData.hotels.map(h => ({
-            id: h.id,
-            name: h.name,
-            address: h.address,
-            plus_code: h.plus_code,
-            city: h.city,
-            check_in_time: h.check_in_time,
-            check_out_time: h.check_out_time,
-            confirmation_number: h.confirmation_number,
-            phone: h.phone,
-            notes: h.notes,
-          })),
-          activities: tripData.activities.map(a => ({
-            id: a.id,
-            name: a.name,
-            address: a.address,
-            plus_code: a.plus_code,
-            city: a.city,
-            date: a.date,
-            start_time: a.start_time,
-            duration_minutes: a.duration_minutes,
-            order_index: a.order_index,
-            notes: a.notes,
-          })),
-          flights: tripData.flights.map(f => ({
-            id: f.id,
-            airline: f.airline,
-            flight_number: f.flight_number,
-            departure_time: f.departure_time,
-            arrival_time: f.arrival_time,
-            departure_location: f.departure_location,
-            arrival_location: f.arrival_location,
-            confirmation_number: f.confirmation_number,
-            notes: f.notes,
-          })),
-        });
-      } else {
-        setError(unwrapErr(result).message);
-      }
-      
-      setIsLoading(false);
+    if (trip) {
+      reset({
+        name: trip.name,
+        description: trip.description || '',
+        start_date: trip.start_date,
+        end_date: trip.end_date,
+        home_location: trip.home_location || '',
+        notes: '',
+        hotels: trip.hotels.map(h => ({
+          id: h.id,
+          name: h.name,
+          address: h.address,
+          plus_code: h.plus_code,
+          city: h.city,
+          check_in_time: h.check_in_time,
+          check_out_time: h.check_out_time,
+          confirmation_number: h.confirmation_number,
+          phone: h.phone,
+          notes: h.notes,
+        })),
+        activities: trip.activities.map(a => ({
+          id: a.id,
+          name: a.name,
+          address: a.address,
+          plus_code: a.plus_code,
+          city: a.city,
+          date: a.date,
+          order_index: a.order_index,
+          notes: a.notes,
+          google_maps_url: a.google_maps_url,
+          latitude: a.latitude,
+          longitude: a.longitude,
+        })),
+        flights: trip.flights.map(f => ({
+          id: f.id,
+          airline: f.airline,
+          flight_number: f.flight_number,
+          departure_time: f.departure_time,
+          arrival_time: f.arrival_time,
+          departure_location: f.departure_location,
+          arrival_location: f.arrival_location,
+          confirmation_number: f.confirmation_number,
+          notes: f.notes,
+        })),
+      });
     }
-    
-    loadTrip();
-  }, [tripId, reset]);
+  }, [trip, reset]);
   
-  // Save handler
+  // Save handler - processes trip and all nested entities
   const onSubmit = async (data: TripEditFormData) => {
-    setIsSaving(true);
-    setError(null);
-    setSuccessMessage(null);
-    
     try {
-      // Import DB operations dynamically to avoid server-side issues
-      const { updateTrip } = await import('@/lib/db/operations/trips');
-      const { createHotel, updateHotel, deleteHotel } = await import('@/lib/db/operations/hotels');
-      const { createActivity, updateActivity, deleteActivity, bulkUpdateActivities } = await import('@/lib/db/operations/activities');
-      const { updateFlight } = await import('@/lib/db/operations/flights');
-      
-      // Update trip basic info
-      const tripResult = await updateTrip({
-        id: tripId,
+      // Save trip basic info (automatic notification & cache invalidation)
+      await onFinish({
         name: data.name,
         description: data.description,
         start_date: data.start_date,
@@ -128,165 +132,111 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         home_location: data.home_location,
       });
       
-      if (!isOk(tripResult)) {
-        throw new Error(unwrapErr(tripResult).message);
-      }
+      // Import bulk update for activity reordering
+      const { bulkUpdateActivities } = await import('@/lib/db/operations/activities');
       
-      // Handle hotel changes
+      // Process hotel changes
       for (const hotel of data.hotels) {
         if (hotel._deleted && hotel.id) {
-          // Delete existing hotel
-          await deleteHotel(hotel.id);
+          await deleteEntity({
+            resource: 'hotels',
+            id: hotel.id,
+          });
         } else if (!hotel.id) {
-          // Create new hotel
-          await createHotel({
-            trip_id: tripId,
-            name: hotel.name,
-            address: hotel.address,
-            plus_code: hotel.plus_code,
-            city: hotel.city,
-            check_in_time: hotel.check_in_time,
-            check_out_time: hotel.check_out_time,
-            confirmation_number: hotel.confirmation_number,
-            phone: hotel.phone,
-            notes: hotel.notes,
+          await createEntity({
+            resource: 'hotels',
+            values: {
+              trip_id: tripId,
+              name: hotel.name,
+              address: hotel.address,
+              plus_code: hotel.plus_code,
+              city: hotel.city,
+              check_in_time: hotel.check_in_time,
+              check_out_time: hotel.check_out_time,
+              confirmation_number: hotel.confirmation_number,
+              phone: hotel.phone,
+              notes: hotel.notes,
+            },
           });
         } else if (hotel.id) {
-          // Update existing hotel (Phase 6 - notes support)
-          await updateHotel(hotel.id, {
-            notes: hotel.notes,
+          await updateEntity({
+            resource: 'hotels',
+            id: hotel.id,
+            values: {
+              notes: hotel.notes,
+            },
           });
         }
       }
       
-      // Handle activity changes
+      // Process activity changes
       const reorderedActivities: Array<{ id: string; order_index: number }> = [];
-      const updatedActivities: Array<{ id: string; notes: string | null }> = [];
       
       for (const activity of data.activities) {
         if (activity._deleted && activity.id) {
-          // Delete existing activity
-          await deleteActivity(activity.id);
+          await deleteEntity({
+            resource: 'activities',
+            id: activity.id,
+          });
         } else if (!activity.id) {
-          // Create new activity
-          await createActivity({
-            trip_id: tripId,
-            name: activity.name,
-            address: activity.address,
-            plus_code: activity.plus_code,
-            city: activity.city,
-            date: activity.date,
-            start_time: activity.start_time,
-            duration_minutes: activity.duration_minutes,
-            order_index: activity.order_index,
-            notes: activity.notes,
+          await createEntity({
+            resource: 'activities',
+            values: {
+              trip_id: tripId,
+              name: activity.name,
+              address: activity.address,
+              plus_code: activity.plus_code,
+              city: activity.city,
+              date: activity.date,
+              order_index: activity.order_index,
+              notes: activity.notes,
+              google_maps_url: activity.google_maps_url,
+              latitude: activity.latitude,
+              longitude: activity.longitude,
+            },
           });
         } else if (activity.id) {
-          // Track activities with updated order_index for bulk update
           reorderedActivities.push({
             id: activity.id,
             order_index: activity.order_index
           });
           
-          // Track notes updates (Phase 6)
-          updatedActivities.push({
+          await updateEntity({
+            resource: 'activities',
             id: activity.id,
-            notes: activity.notes ?? null
+            values: {
+              notes: activity.notes ?? null,
+            },
           });
         }
       }
       
-      // Bulk update order_index for reordered activities
+      // Bulk update activity order for drag-drop reordering
       if (reorderedActivities.length > 0) {
         await bulkUpdateActivities(reorderedActivities);
       }
       
-      // Update activity notes (Phase 6)
-      for (const activity of updatedActivities) {
-        await updateActivity(activity.id, {
-          notes: activity.notes ?? undefined,
-        });
-      }
-      
-      // Update flight notes (Phase 6)
+      // Process flight notes
       for (const flight of data.flights) {
         if (flight.id) {
-          await updateFlight(flight.id, {
-            notes: flight.notes ?? undefined,
+          await updateEntity({
+            resource: 'flights',
+            id: flight.id,
+            values: {
+              notes: flight.notes ?? undefined,
+            },
           });
         }
       }
       
       setSuccessMessage('Trip saved successfully!');
+      await queryResult?.refetch();
       
-      // Reload trip data to get updated IDs
-      const reloadResult = await getTripWithRelations(tripId);
-      if (isOk(reloadResult)) {
-        const reloadedTrip = unwrap(reloadResult);
-        setTrip(reloadedTrip);
-        
-        // Reset form with fresh data
-        reset({
-          name: reloadedTrip.name,
-          description: reloadedTrip.description || '',
-          start_date: reloadedTrip.start_date,
-          end_date: reloadedTrip.end_date,
-          home_location: reloadedTrip.home_location || '',
-          notes: '',
-          hotels: reloadedTrip.hotels.map(h => ({
-            id: h.id,
-            name: h.name,
-            address: h.address,
-            plus_code: h.plus_code,
-            city: h.city,
-            check_in_time: h.check_in_time,
-            check_out_time: h.check_out_time,
-            confirmation_number: h.confirmation_number,
-            phone: h.phone,
-            notes: h.notes,
-          })),
-          activities: reloadedTrip.activities.map(a => ({
-            id: a.id,
-            name: a.name,
-            address: a.address,
-            plus_code: a.plus_code,
-            city: a.city,
-            date: a.date,
-            start_time: a.start_time,
-            duration_minutes: a.duration_minutes,
-            order_index: a.order_index,
-            notes: a.notes,
-          })),
-          flights: reloadedTrip.flights.map(f => ({
-            id: f.id,
-            airline: f.airline,
-            flight_number: f.flight_number,
-            departure_time: f.departure_time,
-            arrival_time: f.arrival_time,
-            departure_location: f.departure_location,
-            arrival_location: f.arrival_location,
-            confirmation_number: f.confirmation_number,
-            notes: f.notes,
-          })),
-        });
-      }
-      
-      // Clear success message after 3 seconds
       setTimeout(() => {
         setSuccessMessage(null);
       }, 3000);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred while saving.';
-      
-      if (errorMessage.includes('quota')) {
-        setError('Storage quota exceeded. Please free up space and try again.');
-      } else {
-        setError(errorMessage);
-      }
-      
       console.error('Save error:', err);
-    } finally {
-      setIsSaving(false);
     }
   };
   
@@ -299,13 +249,13 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
     );
   }
   
-  // Error state
-  if (error && !trip) {
+  // Error state  
+  if (queryError || !trip) {
     return (
       <main className="min-h-screen bg-base-200 p-4 sm:p-8">
         <div className="container mx-auto max-w-4xl">
           <div className="alert alert-error">
-            <span>{error}</span>
+            <span>{queryError?.message || 'Failed to load trip'}</span>
           </div>
           <button
             onClick={() => router.push('/')}
@@ -340,9 +290,9 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         )}
         
         {/* Error Message */}
-        {error && (
+        {queryError && (
           <div className="alert alert-error mb-4">
-            <span>{error}</span>
+            <span>{queryError.message}</span>
           </div>
         )}
         
@@ -449,6 +399,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             <FlightSection
               register={register}
               watch={watch}
+              setValue={setValue}
             />
           )}
           
@@ -461,9 +412,9 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             />
           )}
           
-          {/* Attractions Section */}
-          {activeCategory === 'attractions' && (
-            <AttractionSection
+          {/* Activities Section */}
+          {activeCategory === 'activities' && (
+            <ActivitySection
               register={register}
               setValue={setValue}
               watch={watch}
@@ -482,9 +433,9 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={isSaving}
+              disabled={isSubmitting}
             >
-              {isSaving ? (
+              {isSubmitting ? (
                 <>
                   <span className="loading loading-spinner"></span>
                   Saving...

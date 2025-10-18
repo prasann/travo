@@ -55,6 +55,23 @@ export function getCurrentISOTimestamp(): string {
   return new Date().toISOString();
 }
 
+/**
+ * Build Firestore document by filtering out undefined values from optional fields
+ * 
+ * @param required - Required fields (always included)
+ * @param optional - Optional fields (undefined values filtered out)
+ * @returns DocumentData with required fields and defined optional fields
+ */
+function buildFirestoreDoc<T extends DocumentData>(
+  required: Record<string, any>,
+  optional: Record<string, any> = {}
+): T {
+  const filtered = Object.fromEntries(
+    Object.entries(optional).filter(([_, value]) => value !== undefined)
+  );
+  return { ...required, ...filtered } as T;
+}
+
 // ============================================================================
 // Trip Converter
 // ============================================================================
@@ -139,22 +156,28 @@ export const flightConverter: FirestoreDataConverter<FirestoreFlight> = {
 
 export const hotelConverter: FirestoreDataConverter<FirestoreHotel> = {
   toFirestore(hotel: FirestoreHotel): DocumentData {
-    return {
-      id: hotel.id,
-      trip_id: hotel.trip_id,
-      name: hotel.name,
-      address: hotel.address,
-      plus_code: hotel.plus_code,
-      city: hotel.city,
-      maps_link: hotel.maps_link,
-      google_maps_url: hotel.google_maps_url,
-      latitude: hotel.latitude,
-      longitude: hotel.longitude,
-      check_in_date: hotel.check_in_date,
-      check_out_date: hotel.check_out_date,
-      updated_by: hotel.updated_by,
-      updated_at: hotel.updated_at,
-    };
+    return buildFirestoreDoc(
+      // Required fields
+      {
+        id: hotel.id,
+        trip_id: hotel.trip_id,
+        name: hotel.name,
+        address: hotel.address,
+        check_in_date: hotel.check_in_date,
+        check_out_date: hotel.check_out_date,
+        updated_by: hotel.updated_by,
+        updated_at: hotel.updated_at,
+      },
+      // Optional fields (undefined values filtered automatically)
+      {
+        plus_code: hotel.plus_code,
+        city: hotel.city,
+        maps_link: hotel.maps_link,
+        google_maps_url: hotel.google_maps_url,
+        latitude: hotel.latitude,
+        longitude: hotel.longitude,
+      }
+    );
   },
 
   fromFirestore(
@@ -190,24 +213,30 @@ export const hotelConverter: FirestoreDataConverter<FirestoreHotel> = {
 
 export const activityConverter: FirestoreDataConverter<FirestoreDailyActivity> = {
   toFirestore(activity: FirestoreDailyActivity): DocumentData {
-    return {
-      id: activity.id,
-      trip_id: activity.trip_id,
-      date: activity.date,
-      time_of_day: activity.time_of_day,
-      name: activity.name,
-      plus_code: activity.plus_code,
-      address: activity.address,
-      city: activity.city,
-      maps_link: activity.maps_link,
-      google_maps_url: activity.google_maps_url,
-      latitude: activity.latitude,
-      longitude: activity.longitude,
-      notes: activity.notes,
-      order_index: activity.order_index,
-      updated_by: activity.updated_by,
-      updated_at: activity.updated_at,
-    };
+    return buildFirestoreDoc(
+      // Required fields
+      {
+        id: activity.id,
+        trip_id: activity.trip_id,
+        date: activity.date,
+        name: activity.name,
+        order_index: activity.order_index,
+        updated_by: activity.updated_by,
+        updated_at: activity.updated_at,
+      },
+      // Optional fields (undefined values filtered automatically)
+      {
+        time_of_day: activity.time_of_day,
+        plus_code: activity.plus_code,
+        address: activity.address,
+        city: activity.city,
+        maps_link: activity.maps_link,
+        google_maps_url: activity.google_maps_url,
+        latitude: activity.latitude,
+        longitude: activity.longitude,
+        notes: activity.notes,
+      }
+    );
   },
 
   fromFirestore(
@@ -245,23 +274,29 @@ export const activityConverter: FirestoreDataConverter<FirestoreDailyActivity> =
 
 export const restaurantConverter: FirestoreDataConverter<FirestoreRestaurant> = {
   toFirestore(restaurant: FirestoreRestaurant): DocumentData {
-    return {
-      id: restaurant.id,
-      trip_id: restaurant.trip_id,
-      name: restaurant.name,
-      address: restaurant.address,
-      plus_code: restaurant.plus_code,
-      city: restaurant.city,
-      maps_link: restaurant.maps_link,
-      google_maps_url: restaurant.google_maps_url,
-      latitude: restaurant.latitude,
-      longitude: restaurant.longitude,
-      cuisine_type: restaurant.cuisine_type,
-      notes: restaurant.notes,
-      recommended_dishes: restaurant.recommended_dishes || [],
-      updated_by: restaurant.updated_by,
-      updated_at: restaurant.updated_at,
-    };
+    return buildFirestoreDoc(
+      // Required fields
+      {
+        id: restaurant.id,
+        trip_id: restaurant.trip_id,
+        name: restaurant.name,
+        updated_by: restaurant.updated_by,
+        updated_at: restaurant.updated_at,
+        recommended_dishes: restaurant.recommended_dishes || [],
+      },
+      // Optional fields (undefined values filtered automatically)
+      {
+        address: restaurant.address,
+        plus_code: restaurant.plus_code,
+        city: restaurant.city,
+        maps_link: restaurant.maps_link,
+        google_maps_url: restaurant.google_maps_url,
+        latitude: restaurant.latitude,
+        longitude: restaurant.longitude,
+        cuisine_type: restaurant.cuisine_type,
+        notes: restaurant.notes,
+      }
+    );
   },
 
   fromFirestore(
@@ -425,14 +460,7 @@ export function hotelFromFirestore(firestoreHotel: FirestoreHotel): Hotel {
  * Transform IndexedDB Activity to Firestore Activity format
  */
 export function activityToFirestore(activity: DailyActivity): FirestoreDailyActivity {
-  let time_of_day: 'morning' | 'afternoon' | 'evening' | 'night' = 'morning';
-  
-  if (activity.start_time) {
-    const hour = new Date(activity.start_time).getHours();
-    if (hour >= 12 && hour < 17) time_of_day = 'afternoon';
-    else if (hour >= 17 && hour < 21) time_of_day = 'evening';
-    else if (hour >= 21 || hour < 6) time_of_day = 'night';
-  }
+  const time_of_day: 'morning' | 'afternoon' | 'evening' | 'night' = 'morning';
   
   return {
     id: activity.id,
@@ -462,8 +490,6 @@ export function activityFromFirestore(firestoreActivity: FirestoreDailyActivity)
     trip_id: firestoreActivity.trip_id,
     name: firestoreActivity.name,
     date: firestoreActivity.date,
-    start_time: undefined,
-    duration_minutes: undefined,
     order_index: firestoreActivity.order_index,
     city: firestoreActivity.city,
     plus_code: firestoreActivity.plus_code,

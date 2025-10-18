@@ -4,6 +4,7 @@ import { ACTIVE_THEME } from "@/config/theme";
 import { DatabaseProvider } from "@/components/DatabaseProvider";
 import { SyncProvider } from "@/components/SyncProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { RefineProvider } from "@/lib/refine/RefineProvider";
 
 export const metadata: Metadata = {
   title: "Travo - Trip Planner",
@@ -20,9 +21,11 @@ export default function RootLayout({
       <body className="antialiased" suppressHydrationWarning>
         <AuthProvider>
           <DatabaseProvider>
-            <SyncProvider>
-              {children}
-            </SyncProvider>
+            <RefineProvider>
+              <SyncProvider>
+                {children}
+              </SyncProvider>
+            </RefineProvider>
           </DatabaseProvider>
         </AuthProvider>
       </body>

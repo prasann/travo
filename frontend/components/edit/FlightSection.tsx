@@ -72,7 +72,8 @@ export default function FlightSection({ register, watch, setValue }: FlightSecti
                 <div className="card-body">
                   {/* Flight Header - Read-only */}
                   <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-2">
+                    {/* Title with airline and flight number */}
+                    <div className="flex items-center gap-2 mb-1">
                       {flight.airline && (
                         <span className="font-semibold text-lg">{flight.airline}</span>
                       )}
@@ -84,23 +85,25 @@ export default function FlightSection({ register, watch, setValue }: FlightSecti
                       )}
                     </div>
                     
-                    {/* Route - Read-only */}
-                    <div className="flex items-center gap-2 text-base-content/60 text-sm mb-3">
-                      {flight.departure_location && (
-                        <>
-                          <span className="font-medium">{flight.departure_location}</span>
-                          <span>→</span>
-                        </>
-                      )}
-                      {flight.arrival_location && (
-                        <span className="font-medium">{flight.arrival_location}</span>
-                      )}
-                    </div>
+                    {/* Route - Prominent display */}
+                    {(flight.departure_location || flight.arrival_location) && (
+                      <div className="text-base font-medium mb-3">
+                        {flight.departure_location && (
+                          <span className="text-info">{flight.departure_location}</span>
+                        )}
+                        {flight.departure_location && flight.arrival_location && (
+                          <span className="mx-2 text-base-content/40">→</span>
+                        )}
+                        {flight.arrival_location && (
+                          <span className="text-success">{flight.arrival_location}</span>
+                        )}
+                      </div>
+                    )}
                     
                     {flight.confirmation_number && (
-                      <div className="text-sm">
+                      <div className="text-sm mb-2">
                         <span className="text-base-content/60">Confirmation: </span>
-                        <span className="font-mono">{flight.confirmation_number}</span>
+                        <span className="font-mono font-semibold">{flight.confirmation_number}</span>
                       </div>
                     )}
                   </div>

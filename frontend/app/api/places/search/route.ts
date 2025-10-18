@@ -11,6 +11,10 @@ import { NextRequest, NextResponse } from 'next/server';
  * User copies URL from Google Maps browser address bar.
  * Example: https://www.google.com/maps/place/Tokyo+Skytree/@35.71,139.77/...
  */
+
+// Mark route as dynamic (required for Next.js 15 App Router API routes with query params)
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const url = searchParams.get('url');

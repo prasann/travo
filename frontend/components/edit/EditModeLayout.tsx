@@ -399,6 +399,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             <FlightSection
               register={register}
               watch={watch}
+              setValue={setValue}
             />
           )}
           

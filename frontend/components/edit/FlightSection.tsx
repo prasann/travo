@@ -7,17 +7,37 @@
 
 'use client';
 
-import { UseFormRegister, UseFormWatch } from 'react-hook-form';
+import { UseFormRegister, UseFormWatch, UseFormSetValue } from 'react-hook-form';
 import type { TripEditFormData } from '@/types/editMode';
 
 interface FlightSectionProps {
   register: UseFormRegister<TripEditFormData>;
   watch: UseFormWatch<TripEditFormData>;
+  setValue: UseFormSetValue<TripEditFormData>;
 }
 
 const MAX_NOTES_LENGTH = 2000;
 
-export default function FlightSection({ register, watch }: FlightSectionProps) {
+/**
+ * Convert ISO datetime string to datetime-local input format (YYYY-MM-DDTHH:mm)
+ */
+function toDateTimeLocalValue(isoString?: string): string {
+  if (!isoString) return '';
+  try {
+    const date = new Date(isoString);
+    // Format: YYYY-MM-DDTHH:mm
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  } catch {
+    return '';
+  }
+}
+
+export default function FlightSection({ register, watch, setValue }: FlightSectionProps) {
   const flights = watch('flights') || [];
   
   // Filter out deleted flights
@@ -50,50 +70,76 @@ export default function FlightSection({ register, watch }: FlightSectionProps) {
             return (
               <div key={flight.id || index} className="card bg-base-200">
                 <div className="card-body">
-                  {/* Flight Info (Read-only) */}
+                  {/* Flight Header - Read-only */}
                   <div className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
                       {flight.airline && (
-                        <span className="font-semibold">{flight.airline}</span>
+                        <span className="font-semibold text-lg">{flight.airline}</span>
                       )}
                       {flight.flight_number && (
                         <span className="badge badge-primary">{flight.flight_number}</span>
                       )}
+                      {!flight.airline && !flight.flight_number && (
+                        <span className="font-semibold text-lg">Flight {index + 1}</span>
+                      )}
                     </div>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    {/* Route - Read-only */}
+                    <div className="flex items-center gap-2 text-base-content/60 text-sm mb-3">
                       {flight.departure_location && (
-                        <div>
-                          <span className="text-base-content/60">From: </span>
+                        <>
                           <span className="font-medium">{flight.departure_location}</span>
-                        </div>
+                          <span>→</span>
+                        </>
                       )}
                       {flight.arrival_location && (
-                        <div>
-                          <span className="text-base-content/60">To: </span>
-                          <span className="font-medium">{flight.arrival_location}</span>
-                        </div>
-                      )}
-                      {flight.departure_time && (
-                        <div>
-                          <span className="text-base-content/60">Departs: </span>
-                          <span>{new Date(flight.departure_time).toLocaleString()}</span>
-                        </div>
-                      )}
-                      {flight.arrival_time && (
-                        <div>
-                          <span className="text-base-content/60">Arrives: </span>
-                          <span>{new Date(flight.arrival_time).toLocaleString()}</span>
-                        </div>
+                        <span className="font-medium">{flight.arrival_location}</span>
                       )}
                     </div>
                     
                     {flight.confirmation_number && (
-                      <div className="mt-2 text-sm">
+                      <div className="text-sm">
                         <span className="text-base-content/60">Confirmation: </span>
                         <span className="font-mono">{flight.confirmation_number}</span>
                       </div>
                     )}
+                  </div>
+                  
+                  {/* Editable Flight Times */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Departure Time</span>
+                      </label>
+                      <input
+                        type="datetime-local"
+                        {...register(`flights.${index}.departure_time`)}
+                        defaultValue={toDateTimeLocalValue(flight.departure_time)}
+                        className="input input-bordered"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            setValue(`flights.${index}.departure_time`, new Date(e.target.value).toISOString());
+                          }
+                        }}
+                      />
+                    </div>
+                    
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Arrival Time</span>
+                      </label>
+                      <input
+                        type="datetime-local"
+                        {...register(`flights.${index}.arrival_time`)}
+                        defaultValue={toDateTimeLocalValue(flight.arrival_time)}
+                        className="input input-bordered"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            setValue(`flights.${index}.arrival_time`, new Date(e.target.value).toISOString());
+                          }
+                        }}
+                      />
+                    </div>
                   </div>
                   
                   {/* Notes Field (Editable) */}

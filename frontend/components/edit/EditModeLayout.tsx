@@ -2,18 +2,19 @@
  * Edit Mode Layout Component
  * 
  * Feature: 006-edit-mode-for
+ * Feature: Refine Integration Phase 5 - Edit Forms
  * Purpose: Main container for trip editing interface
+ * 
+ * Step 1: Basic useForm migration (trip-level fields only)
  */
 
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm } from '@refinedev/react-hook-form';
 import { useRouter } from 'next/navigation';
 import type { TripEditFormData, EditCategory } from '@/types/editMode';
 import type { TripWithRelations } from '@/lib/db/models';
-import { getTripWithRelations } from '@/lib/db/operations/trips';
-import { isOk, unwrap, unwrapErr } from '@/lib/db/resultHelpers';
 import CategoryNav from './CategoryNav';
 import NotesSection from './NotesSection';
 import HotelSection from './HotelSection';
@@ -26,102 +27,98 @@ interface EditModeLayoutProps {
 
 export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
   const router = useRouter();
-  const [trip, setTrip] = useState<TripWithRelations | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<EditCategory>('info');
   
-  // Initialize React Hook Form
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<TripEditFormData>();
+  // Refine's useForm - handles loading, data fetching, and trip-level saving
+  const formReturn = useForm<TripEditFormData, any, TripEditFormData>({
+    refineCoreProps: {
+      resource: "trips",
+      action: "edit",
+      id: tripId,
+      redirect: false,
+    },
+  });
   
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = formReturn;
+  
+  // Access Refine core methods
+  const refineCore = (formReturn as any).refineCore;
+  const queryResult = refineCore?.query;
+  const onFinish = refineCore?.onFinish;
+  
+  // Extract trip data and loading state from Refine
+  const trip = queryResult?.data?.data as TripWithRelations | undefined;
+  const isLoading = !queryResult || queryResult.isLoading;
+  const queryError = queryResult?.error;
+
   // Watch form fields
   const watchedNotes = watch('notes');
   const watchedStartDate = watch('start_date');
   const watchedEndDate = watch('end_date');
   
-  // Load trip data
+  // Initialize form with trip data (including nested entities)
   useEffect(() => {
-    async function loadTrip() {
-      setIsLoading(true);
-      const result = await getTripWithRelations(tripId);
-      
-      if (isOk(result)) {
-        const tripData = unwrap(result);
-        setTrip(tripData);
-        
-        // Initialize form with trip data
-        reset({
-          name: tripData.name,
-          description: tripData.description || '',
-          start_date: tripData.start_date,
-          end_date: tripData.end_date,
-          home_location: tripData.home_location || '',
-          notes: '', // Trip-level notes not in current schema
-          hotels: tripData.hotels.map(h => ({
-            id: h.id,
-            name: h.name,
-            address: h.address,
-            plus_code: h.plus_code,
-            city: h.city,
-            check_in_time: h.check_in_time,
-            check_out_time: h.check_out_time,
-            confirmation_number: h.confirmation_number,
-            phone: h.phone,
-            notes: h.notes,
-          })),
-          activities: tripData.activities.map(a => ({
-            id: a.id,
-            name: a.name,
-            address: a.address,
-            plus_code: a.plus_code,
-            city: a.city,
-            date: a.date,
-            order_index: a.order_index,
-            notes: a.notes,
-            google_maps_url: a.google_maps_url,
-            latitude: a.latitude,
-            longitude: a.longitude,
-          })),
-          flights: tripData.flights.map(f => ({
-            id: f.id,
-            airline: f.airline,
-            flight_number: f.flight_number,
-            departure_time: f.departure_time,
-            arrival_time: f.arrival_time,
-            departure_location: f.departure_location,
-            arrival_location: f.arrival_location,
-            confirmation_number: f.confirmation_number,
-            notes: f.notes,
-          })),
-        });
-      } else {
-        setError(unwrapErr(result).message);
-      }
-      
-      setIsLoading(false);
+    if (trip) {
+      reset({
+        name: trip.name,
+        description: trip.description || '',
+        start_date: trip.start_date,
+        end_date: trip.end_date,
+        home_location: trip.home_location || '',
+        notes: '',
+        hotels: trip.hotels.map(h => ({
+          id: h.id,
+          name: h.name,
+          address: h.address,
+          plus_code: h.plus_code,
+          city: h.city,
+          check_in_time: h.check_in_time,
+          check_out_time: h.check_out_time,
+          confirmation_number: h.confirmation_number,
+          phone: h.phone,
+          notes: h.notes,
+        })),
+        activities: trip.activities.map(a => ({
+          id: a.id,
+          name: a.name,
+          address: a.address,
+          plus_code: a.plus_code,
+          city: a.city,
+          date: a.date,
+          order_index: a.order_index,
+          notes: a.notes,
+          google_maps_url: a.google_maps_url,
+          latitude: a.latitude,
+          longitude: a.longitude,
+        })),
+        flights: trip.flights.map(f => ({
+          id: f.id,
+          airline: f.airline,
+          flight_number: f.flight_number,
+          departure_time: f.departure_time,
+          arrival_time: f.arrival_time,
+          departure_location: f.departure_location,
+          arrival_location: f.arrival_location,
+          confirmation_number: f.confirmation_number,
+          notes: f.notes,
+        })),
+      });
     }
-    
-    loadTrip();
-  }, [tripId, reset]);
+  }, [trip, reset]);
   
-  // Save handler
+  // Save handler - Step 1: Uses Refine for trip-level, manual for nested entities
   const onSubmit = async (data: TripEditFormData) => {
-    setIsSaving(true);
-    setError(null);
-    setSuccessMessage(null);
-    
     try {
-      // Import DB operations dynamically to avoid server-side issues
-      const { updateTrip } = await import('@/lib/db/operations/trips');
-      const { createHotel, updateHotel, deleteHotel } = await import('@/lib/db/operations/hotels');
-      const { createActivity, updateActivity, deleteActivity, bulkUpdateActivities } = await import('@/lib/db/operations/activities');
-      const { updateFlight } = await import('@/lib/db/operations/flights');
-      
-      // Update trip basic info
-      const tripResult = await updateTrip({
-        id: tripId,
+      // Save trip basic info through Refine (automatic notification & cache invalidation)
+      await onFinish({
         name: data.name,
         description: data.description,
         start_date: data.start_date,
@@ -129,9 +126,10 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         home_location: data.home_location,
       });
       
-      if (!isOk(tripResult)) {
-        throw new Error(unwrapErr(tripResult).message);
-      }
+      // Import DB operations for nested entities (TODO: Replace in Steps 2-4)
+      const { createHotel, updateHotel, deleteHotel } = await import('@/lib/db/operations/hotels');
+      const { createActivity, updateActivity, deleteActivity, bulkUpdateActivities } = await import('@/lib/db/operations/activities');
+      const { updateFlight } = await import('@/lib/db/operations/flights');
       
       // Handle hotel changes
       for (const hotel of data.hotels) {
@@ -221,75 +219,16 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
       
       setSuccessMessage('Trip saved successfully!');
       
-      // Reload trip data to get updated IDs
-      const reloadResult = await getTripWithRelations(tripId);
-      if (isOk(reloadResult)) {
-        const reloadedTrip = unwrap(reloadResult);
-        setTrip(reloadedTrip);
-        
-        // Reset form with fresh data
-        reset({
-          name: reloadedTrip.name,
-          description: reloadedTrip.description || '',
-          start_date: reloadedTrip.start_date,
-          end_date: reloadedTrip.end_date,
-          home_location: reloadedTrip.home_location || '',
-          notes: '',
-          hotels: reloadedTrip.hotels.map(h => ({
-            id: h.id,
-            name: h.name,
-            address: h.address,
-            plus_code: h.plus_code,
-            city: h.city,
-            check_in_time: h.check_in_time,
-            check_out_time: h.check_out_time,
-            confirmation_number: h.confirmation_number,
-            phone: h.phone,
-            notes: h.notes,
-          })),
-          activities: reloadedTrip.activities.map(a => ({
-            id: a.id,
-            name: a.name,
-            address: a.address,
-            plus_code: a.plus_code,
-            city: a.city,
-            date: a.date,
-            order_index: a.order_index,
-            notes: a.notes,
-            google_maps_url: a.google_maps_url,
-            latitude: a.latitude,
-            longitude: a.longitude,
-          })),
-          flights: reloadedTrip.flights.map(f => ({
-            id: f.id,
-            airline: f.airline,
-            flight_number: f.flight_number,
-            departure_time: f.departure_time,
-            arrival_time: f.arrival_time,
-            departure_location: f.departure_location,
-            arrival_location: f.arrival_location,
-            confirmation_number: f.confirmation_number,
-            notes: f.notes,
-          })),
-        });
-      }
+      // Refetch trip data (Refine handles this automatically, but we manually trigger for nested entities)
+      await queryResult?.refetch();
       
       // Clear success message after 3 seconds
       setTimeout(() => {
         setSuccessMessage(null);
       }, 3000);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred while saving.';
-      
-      if (errorMessage.includes('quota')) {
-        setError('Storage quota exceeded. Please free up space and try again.');
-      } else {
-        setError(errorMessage);
-      }
-      
       console.error('Save error:', err);
-    } finally {
-      setIsSaving(false);
+      // Refine handles error notifications automatically
     }
   };
   
@@ -302,13 +241,13 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
     );
   }
   
-  // Error state
-  if (error && !trip) {
+  // Error state  
+  if (queryError || !trip) {
     return (
       <main className="min-h-screen bg-base-200 p-4 sm:p-8">
         <div className="container mx-auto max-w-4xl">
           <div className="alert alert-error">
-            <span>{error}</span>
+            <span>{queryError?.message || 'Failed to load trip'}</span>
           </div>
           <button
             onClick={() => router.push('/')}
@@ -343,9 +282,9 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         )}
         
         {/* Error Message */}
-        {error && (
+        {queryError && (
           <div className="alert alert-error mb-4">
-            <span>{error}</span>
+            <span>{queryError.message}</span>
           </div>
         )}
         
@@ -485,9 +424,9 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={isSaving}
+              disabled={isSubmitting}
             >
-              {isSaving ? (
+              {isSubmitting ? (
                 <>
                   <span className="loading loading-spinner"></span>
                   Saving...

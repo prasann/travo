@@ -5,7 +5,7 @@
  * Feature: Refine Integration Phase 5 - Edit Forms
  * Purpose: Main container for trip editing interface
  * 
- * Step 2: Migrate hotels to Refine mutations
+ * Step 3: Migrate activities to Refine mutations
  */
 
 'use client';
@@ -132,8 +132,8 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         home_location: data.home_location,
       });
       
-      // Import DB operations for nested entities (TODO: Replace in Steps 3-4)
-      const { createActivity, updateActivity, deleteActivity, bulkUpdateActivities } = await import('@/lib/db/operations/activities');
+      // Import DB operations for nested entities (TODO: Replace in Step 4)
+      const { bulkUpdateActivities } = await import('@/lib/db/operations/activities');
       const { updateFlight } = await import('@/lib/db/operations/flights');
       
       // Handle hotel changes with Refine mutations (Step 2)
@@ -173,28 +173,33 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         }
       }
       
-      // Handle activity changes
+      // Handle activity changes with Refine mutations (Step 3)
       const reorderedActivities: Array<{ id: string; order_index: number }> = [];
-      const updatedActivities: Array<{ id: string; notes: string | null }> = [];
       
       for (const activity of data.activities) {
         if (activity._deleted && activity.id) {
           // Delete existing activity
-          await deleteActivity(activity.id);
+          await deleteHotel({
+            resource: 'activities',
+            id: activity.id,
+          });
         } else if (!activity.id) {
           // Create new activity
-          await createActivity({
-            trip_id: tripId,
-            name: activity.name,
-            address: activity.address,
-            plus_code: activity.plus_code,
-            city: activity.city,
-            date: activity.date,
-            order_index: activity.order_index,
-            notes: activity.notes,
-            google_maps_url: activity.google_maps_url,
-            latitude: activity.latitude,
-            longitude: activity.longitude,
+          await createHotel({
+            resource: 'activities',
+            values: {
+              trip_id: tripId,
+              name: activity.name,
+              address: activity.address,
+              plus_code: activity.plus_code,
+              city: activity.city,
+              date: activity.date,
+              order_index: activity.order_index,
+              notes: activity.notes,
+              google_maps_url: activity.google_maps_url,
+              latitude: activity.latitude,
+              longitude: activity.longitude,
+            },
           });
         } else if (activity.id) {
           // Track activities with updated order_index for bulk update
@@ -203,24 +208,20 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             order_index: activity.order_index
           });
           
-          // Track notes updates (Phase 6)
-          updatedActivities.push({
+          // Update activity notes
+          await updateHotel({
+            resource: 'activities',
             id: activity.id,
-            notes: activity.notes ?? null
+            values: {
+              notes: activity.notes ?? null,
+            },
           });
         }
       }
       
-      // Bulk update order_index for reordered activities
+      // Bulk update order_index for reordered activities (custom operation)
       if (reorderedActivities.length > 0) {
         await bulkUpdateActivities(reorderedActivities);
-      }
-      
-      // Update activity notes (Phase 6)
-      for (const activity of updatedActivities) {
-        await updateActivity(activity.id, {
-          notes: activity.notes ?? undefined,
-        });
       }
       
       // Update flight notes (Phase 6)

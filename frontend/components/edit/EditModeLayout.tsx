@@ -5,13 +5,14 @@
  * Feature: Refine Integration Phase 5 - Edit Forms
  * Purpose: Main container for trip editing interface
  * 
- * Step 1: Basic useForm migration (trip-level fields only)
+ * Step 2: Migrate hotels to Refine mutations
  */
 
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useForm } from '@refinedev/react-hook-form';
+import { useCreate, useUpdate, useDelete } from '@refinedev/core';
 import { useRouter } from 'next/navigation';
 import type { TripEditFormData, EditCategory } from '@/types/editMode';
 import type { TripWithRelations } from '@/lib/db/models';
@@ -53,6 +54,11 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
   const refineCore = (formReturn as any).refineCore;
   const queryResult = refineCore?.query;
   const onFinish = refineCore?.onFinish;
+  
+  // Refine mutation hooks for hotels (Step 2)
+  const { mutateAsync: createHotel } = useCreate();
+  const { mutateAsync: updateHotel } = useUpdate();
+  const { mutateAsync: deleteHotel } = useDelete();
   
   // Extract trip data and loading state from Refine
   const trip = queryResult?.data?.data as TripWithRelations | undefined;
@@ -126,34 +132,43 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         home_location: data.home_location,
       });
       
-      // Import DB operations for nested entities (TODO: Replace in Steps 2-4)
-      const { createHotel, updateHotel, deleteHotel } = await import('@/lib/db/operations/hotels');
+      // Import DB operations for nested entities (TODO: Replace in Steps 3-4)
       const { createActivity, updateActivity, deleteActivity, bulkUpdateActivities } = await import('@/lib/db/operations/activities');
       const { updateFlight } = await import('@/lib/db/operations/flights');
       
-      // Handle hotel changes
+      // Handle hotel changes with Refine mutations (Step 2)
       for (const hotel of data.hotels) {
         if (hotel._deleted && hotel.id) {
           // Delete existing hotel
-          await deleteHotel(hotel.id);
+          await deleteHotel({
+            resource: 'hotels',
+            id: hotel.id,
+          });
         } else if (!hotel.id) {
           // Create new hotel
           await createHotel({
-            trip_id: tripId,
-            name: hotel.name,
-            address: hotel.address,
-            plus_code: hotel.plus_code,
-            city: hotel.city,
-            check_in_time: hotel.check_in_time,
-            check_out_time: hotel.check_out_time,
-            confirmation_number: hotel.confirmation_number,
-            phone: hotel.phone,
-            notes: hotel.notes,
+            resource: 'hotels',
+            values: {
+              trip_id: tripId,
+              name: hotel.name,
+              address: hotel.address,
+              plus_code: hotel.plus_code,
+              city: hotel.city,
+              check_in_time: hotel.check_in_time,
+              check_out_time: hotel.check_out_time,
+              confirmation_number: hotel.confirmation_number,
+              phone: hotel.phone,
+              notes: hotel.notes,
+            },
           });
         } else if (hotel.id) {
-          // Update existing hotel (Phase 6 - notes support)
-          await updateHotel(hotel.id, {
-            notes: hotel.notes,
+          // Update existing hotel notes
+          await updateHotel({
+            resource: 'hotels',
+            id: hotel.id,
+            values: {
+              notes: hotel.notes,
+            },
           });
         }
       }

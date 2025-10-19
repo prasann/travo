@@ -47,6 +47,12 @@ export interface PlaceSearchResult {
     lng: number;
   };
   
+  /** Editorial summary/description from Google Places (if available) */
+  description?: string;
+  
+  /** Photo URL from Google Places Photos API (if available) */
+  photoUrl?: string;
+  
   /** Error message (if failed) */
   error?: string;
   
@@ -68,6 +74,8 @@ interface PlaceLookupResponse {
     lat: number;
     lng: number;
   };
+  description?: string;
+  photoUrl?: string;
 }
 
 /**
@@ -208,7 +216,9 @@ export async function searchPlace(input: string): Promise<PlaceSearchResult> {
       plusCode: data.plusCode,
       city: data.city,
       placeId: data.placeId,
-      location: data.location
+      location: data.location,
+      description: data.description,
+      photoUrl: data.photoUrl
     };
     
   } catch (error) {

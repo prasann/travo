@@ -96,6 +96,7 @@ export async function GET(request: NextRequest) {
     
     // Step 5: Extract data from first result
     const place = searchData.results[0];
+    const placeId = place.place_id;
     
     // Extract city from address_components (type: "locality")
     let city: string | undefined;
@@ -111,20 +112,57 @@ export async function GET(request: NextRequest) {
     console.log('Found place:', {
       name: place.name,
       city: city,
-      placeId: place.place_id
+      placeId: placeId
     });
     
-    // Step 6: Return normalized data
+    // Step 6: Fetch Place Details for description and photos
+    // Fields: editorial_summary (description), photos (array of photo references)
+    const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=editorial_summary,photos&key=${apiKey}`;
+    
+    let description: string | undefined;
+    let photoUrl: string | undefined;
+    
+    try {
+      const detailsResponse = await fetch(detailsUrl);
+      const detailsData = await detailsResponse.json();
+      
+      if (detailsData.status === 'OK' && detailsData.result) {
+        // Extract editorial summary (description)
+        const editorialSummary = detailsData.result.editorial_summary?.overview;
+        if (editorialSummary) {
+          description = editorialSummary;
+          const preview = editorialSummary.length > 100 ? editorialSummary.substring(0, 100) + '...' : editorialSummary;
+          console.log('Found description:', preview);
+        }
+        
+        // Extract first photo reference and build photo URL
+        if (detailsData.result.photos && detailsData.result.photos.length > 0) {
+          const photoReference = detailsData.result.photos[0].photo_reference;
+          // Use maxwidth=800 for good quality without huge file sizes
+          photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoReference}&key=${apiKey}`;
+          console.log('Found photo reference');
+        }
+      } else {
+        console.warn('Place Details API returned:', detailsData.status);
+      }
+    } catch (detailsError) {
+      // Log but don't fail the request - description and photo are optional enhancements
+      console.warn('Failed to fetch place details:', detailsError);
+    }
+    
+    // Step 7: Return normalized data with description and photo
     return NextResponse.json({
       name: place.name,
       address: place.formatted_address,
       plusCode: place.plus_code?.global_code,
       city: city,
-      placeId: place.place_id,
+      placeId: placeId,
       location: {
         lat: place.geometry.location.lat,
         lng: place.geometry.location.lng
-      }
+      },
+      description: description,
+      photoUrl: photoUrl
     });
     
   } catch (error) {

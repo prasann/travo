@@ -58,6 +58,8 @@ export default function ActivitySection({
       lat: number;
       lng: number;
     };
+    description?: string;
+    photoUrl?: string;
   }) => {
     setNewActivity(prev => ({
       ...prev,
@@ -68,6 +70,8 @@ export default function ActivitySection({
       google_maps_url: mapsUrl, // Store the original URL
       latitude: result.location?.lat,
       longitude: result.location?.lng,
+      description: result.description,
+      image_url: result.photoUrl,
     }));
   };
   
@@ -98,6 +102,8 @@ export default function ActivitySection({
       google_maps_url: newActivity.google_maps_url,
       latitude: newActivity.latitude,
       longitude: newActivity.longitude,
+      description: newActivity.description,
+      image_url: newActivity.image_url,
     };
     
     setValue('activities', [...activities, activity]);

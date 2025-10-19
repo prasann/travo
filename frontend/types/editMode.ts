@@ -121,6 +121,12 @@ export interface ActivityEditFormData {
   /** Longitude coordinate */
   longitude?: number;
   
+  /** Editorial summary from Google Places API */
+  description?: string;
+  
+  /** Photo URL from Google Places Photos API */
+  image_url?: string;
+  
   /** Flag for deletion (internal use) */
   _deleted?: boolean;
 }

@@ -1,7 +1,8 @@
 'use client';
 
 import { useList } from "@refinedev/core";
-import { TripList } from '@/components/TripList';
+import { TripCard } from '@/components/TripCard';
+import { Navigation } from '@/components/Navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginButton from '@/components/LoginButton';
 import type { Trip } from '@/lib/db';
@@ -90,7 +91,15 @@ export function HomePageRefine() {
   
   return (
     <main className="min-h-screen bg-base-200">
-      <TripList trips={trips} />
+      <Navigation title="Travo" />
+      <div className="page-container">
+        <h1 className="text-4xl font-bold mb-8">My Trips</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {trips.map(trip => (
+            <TripCard key={trip.id} trip={trip} />
+          ))}
+        </div>
+      </div>
     </main>
   );
 }

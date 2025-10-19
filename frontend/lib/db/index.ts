@@ -45,6 +45,9 @@ export { isOk, isErr, unwrap, unwrapErr } from './resultHelpers';
 // Initialization
 export { initializeDatabase, isInitialized } from './init';
 
+// Database management
+export { deleteDatabase, resetDatabase } from './reset';
+
 // Trip operations
 export { 
   getAllTrips, 

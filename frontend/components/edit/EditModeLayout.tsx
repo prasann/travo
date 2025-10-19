@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from '@refinedev/react-hook-form';
 import { useCreate, useUpdate, useDelete } from '@refinedev/core';
 import { useRouter } from 'next/navigation';
+import { Navigation } from '@/components/Navigation';
 import type { TripEditFormData, EditCategory } from '@/types/editMode';
 import type { TripWithRelations } from '@/lib/db/models';
 import { bulkUpdateActivities } from '@/lib/db/operations/activities';
@@ -284,20 +285,16 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
   }
   
   return (
-    <main className="min-h-screen bg-base-200 p-4 sm:p-8">
-      <div className="container mx-auto max-w-4xl">
-        {/* Header */}
+    <main className="min-h-screen bg-base-200">
+      <Navigation title="Travo" showBackButton backHref={`/trip/${tripId}`} />
+      <div className="p-4 sm:p-8">
+        <div className="container mx-auto max-w-4xl">
+          {/* Header */}
           <div className="mb-6">
-          <div className="flex justify-between items-start mb-2">
-            <h1 className="text-2xl sm:text-4xl font-bold">Edit Trip</h1>
-            <button
-              onClick={() => router.push(`/trip/${tripId}`)}
-              className="btn btn-ghost"
-            >
-              Return to View
-            </button>
+            <h1 className="text-2xl sm:text-4xl font-bold">Edit: {trip.name}</h1>
           </div>
-        </div>        {/* Success Message */}
+          
+          {/* Success Message */}
         {successMessage && (
           <div className="alert alert-success mb-4">
             <span>{successMessage}</span>
@@ -461,6 +458,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </main>
   );

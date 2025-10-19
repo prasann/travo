@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Menu } from 'lucide-react'
 import LoginButton from './LoginButton'
 import { SyncStatus } from './SyncStatus'
+import { SettingsMenu } from './SettingsMenu'
 
 export interface NavigationProps {
   title: string
@@ -17,23 +18,37 @@ export function Navigation({
   backHref = '/'
 }: NavigationProps) {
   return (
-    <header className="navbar bg-base-200 shadow-md">
-      <div className="container mx-auto">
-        <div className="flex-none">
-          {showBackButton && (
-            <Link href={backHref} className="btn btn-ghost btn-circle">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          )}
-        </div>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold">{title}</h1>
-        </div>
-        <div className="flex-none flex items-center gap-2">
-          <SyncStatus />
+    <div className="navbar bg-base-200 shadow-md">
+      <div className="navbar-start">
+        {showBackButton && (
+          <Link href={backHref} className="btn btn-ghost btn-circle">
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+        )}
+        <span className="text-xl font-bold ml-2">{title}</span>
+      </div>
+      
+      <div className="navbar-end">
+        <SyncStatus />
+        <SettingsMenu />
+        
+        {/* Desktop: Show full login button */}
+        <div className="hidden sm:flex">
           <LoginButton />
         </div>
+        
+        {/* Mobile: Show dropdown menu */}
+        <div className="dropdown dropdown-end sm:hidden">
+          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+            <Menu className="h-5 w-5" />
+          </div>
+          <ul tabIndex={0} className="menu dropdown-content bg-base-200 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+            <li>
+              <LoginButton />
+            </li>
+          </ul>
+        </div>
       </div>
-    </header>
+    </div>
   )
 }

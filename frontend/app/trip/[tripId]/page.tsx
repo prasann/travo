@@ -2,6 +2,7 @@
 
 import { notFound } from 'next/navigation'
 import { useShow } from '@refinedev/core'
+import { Navigation } from '@/components/Navigation'
 import { TripTimeline } from '@/components/TripTimeline'
 import { RestaurantList } from '@/components/RestaurantList'
 import TripMapView from '@/components/TripMapView'
@@ -65,16 +66,18 @@ export default function TripPage({ params }: TripPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-base-200 p-4 sm:p-8">
-      <div className="container mx-auto max-w-4xl">
-        {/* Trip Header */}
-        <div className="mb-4 sm:mb-6">
-          <div className="flex justify-between items-start mb-1">
-            <h1 className="text-2xl sm:text-4xl font-bold">{trip.name}</h1>
-            <a href={`/trip/${tripId}/edit`} className="btn btn-primary btn-sm">
-              Edit Trip
-            </a>
-          </div>
+    <main className="min-h-screen bg-base-200">
+      <Navigation title="Travo" showBackButton backHref="/" />
+      <div className="p-4 sm:p-8">
+        <div className="container mx-auto max-w-4xl">
+          {/* Trip Header */}
+          <div className="mb-4 sm:mb-6">
+            <div className="flex justify-between items-start mb-1">
+              <h1 className="text-2xl sm:text-4xl font-bold">{trip.name}</h1>
+              <a href={`/trip/${tripId}/edit`} className="btn btn-primary btn-sm">
+                Edit Trip
+              </a>
+            </div>
           <p className="text-base-content/60 text-sm sm:text-base">
             {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
           </p>
@@ -120,10 +123,11 @@ export default function TripPage({ params }: TripPageProps) {
           </div>
         )}
 
-        {/* Restaurant Recommendations */}
-        {trip.restaurants && trip.restaurants.length > 0 && (
-          <RestaurantList restaurants={trip.restaurants} />
-        )}
+          {/* Restaurant Recommendations */}
+          {trip.restaurants && trip.restaurants.length > 0 && (
+            <RestaurantList restaurants={trip.restaurants} />
+          )}
+        </div>
       </div>
     </main>
   )

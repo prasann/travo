@@ -77,6 +77,7 @@ export interface DailyActivity {
   name: string;
   date: string;
   order_index: number;
+  description?: string;
   city?: string;
   plus_code?: string;
   google_maps_url?: string;

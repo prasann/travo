@@ -113,6 +113,7 @@ export interface FirestoreDailyActivity {
   maps_link?: string;
   notes?: string;
   order_index: number;
+  description?: string;   // Editorial summary from Google Places API
   
   // Location fields for map view
   google_maps_url?: string;

@@ -185,6 +185,25 @@ export class TravoDatabase extends Dexie {
       // Existing data will continue to work, new entries will include location data
       console.log('[Migration] Schema v6 upgrade complete - location fields available');
     });
+    
+    // Define schema version 7 (Add description field to activities)
+    // New optional field: description (auto-populated from Google Places API)
+    // No new indexes needed - this field is for display only
+    this.version(7).stores({
+      trips: 'id, deleted, updated_at, start_date, end_date, *user_access',
+      flights: 'id, trip_id, departure_time, updated_at',
+      flightLegs: 'id, flight_id, [flight_id+leg_number]',
+      hotels: 'id, trip_id, check_in_time, city, updated_at',
+      activities: 'id, trip_id, date, [trip_id+date+order_index], city, updated_at',
+      restaurants: 'id, trip_id, city, updated_at',
+      syncQueue: 'id, entity_type, entity_id, created_at, retries'
+    }).upgrade(async (trans) => {
+      console.log('[Migration] Upgrading to v7: Adding description field to activities');
+      // No data migration needed - description field is optional
+      // Existing activities will continue to work without description
+      // New activities will include description from Google Places API
+      console.log('[Migration] Schema v7 upgrade complete - description field available');
+    });
   }
 }
 

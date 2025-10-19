@@ -260,6 +260,7 @@ export const activityConverter: FirestoreDataConverter<FirestoreDailyActivity> =
         google_maps_url: activity.google_maps_url,
         latitude: activity.latitude,
         longitude: activity.longitude,
+        description: activity.description,
         notes: activity.notes,
       }
     );
@@ -284,6 +285,7 @@ export const activityConverter: FirestoreDataConverter<FirestoreDailyActivity> =
       google_maps_url: data.google_maps_url,
       latitude: data.latitude,
       longitude: data.longitude,
+      description: data.description,
       notes: data.notes,
       order_index: data.order_index ?? 0,
       updated_by: data.updated_by || '',
@@ -507,6 +509,7 @@ export function activityToFirestore(activity: DailyActivity): FirestoreDailyActi
     google_maps_url: activity.google_maps_url || undefined,
     latitude: activity.latitude || undefined,
     longitude: activity.longitude || undefined,
+    description: activity.description || undefined,
     notes: activity.notes || undefined,
     order_index: activity.order_index ?? 0,
     updated_by: activity.updated_by,
@@ -530,6 +533,7 @@ export function activityFromFirestore(firestoreActivity: FirestoreDailyActivity)
     google_maps_url: firestoreActivity.google_maps_url,
     latitude: firestoreActivity.latitude,
     longitude: firestoreActivity.longitude,
+    description: firestoreActivity.description,
     image_url: undefined,
     notes: firestoreActivity.notes,
     updated_at: firestoreActivity.updated_at,

@@ -74,7 +74,7 @@ const MAX_RETRIES = 3;
  * @param userEmail User's email (for updated_by field)
  * @returns Promise that resolves when upload is complete
  */
-export async function pushTripToFirestore(trip: Trip, user: User): Promise<void> {
+export async function pushTripToFirestore(trip: Trip, userEmail: string): Promise<void> {
   // console.log(`[Sync] Pushing trip to Firestore: ${trip.id}`);
   
   try {

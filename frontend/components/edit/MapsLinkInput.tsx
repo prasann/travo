@@ -19,6 +19,13 @@ interface MapsLinkInputProps {
     address: string;
     plusCode?: string;
     city?: string;
+    placeId?: string;
+    location?: {
+      lat: number;
+      lng: number;
+    };
+    description?: string;
+    photoUrl?: string;
   }) => void;
   onLookupError: (error: string) => void;
   disabled?: boolean;
@@ -57,7 +64,11 @@ export default function MapsLinkInput({
         name: result.name, 
         address: result.address,
         plusCode: result.plusCode,
-        city: result.city
+        city: result.city,
+        placeId: result.placeId,
+        location: result.location,
+        description: result.description,
+        photoUrl: result.photoUrl
       });
     } else {
       const errorMessage = result.error || 'Unknown error occurred';

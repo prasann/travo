@@ -38,6 +38,12 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
       action: "edit",
       id: tripId,
       redirect: false,
+      successNotification: false, // Disable auto notification - we show custom success message
+      errorNotification: (data) => ({
+        message: 'Failed to save trip',
+        type: 'error',
+        description: data?.message || 'An error occurred while saving',
+      }),
     },
   });
   
@@ -56,9 +62,33 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
   const onFinish = refineCore?.onFinish;
   
   // Refine mutation hooks for nested entities
-  const { mutateAsync: createEntity } = useCreate();
-  const { mutateAsync: updateEntity } = useUpdate();
-  const { mutateAsync: deleteEntity } = useDelete();
+  // Disable automatic notifications - we'll show a single success message
+  const { mutateAsync: createEntity } = useCreate({
+    successNotification: false,
+    errorNotification: (data, values, resource) => ({
+      message: `Failed to create ${resource}`,
+      type: 'error',
+      description: data?.message || 'An error occurred'
+    }),
+  });
+  
+  const { mutateAsync: updateEntity } = useUpdate({
+    successNotification: false,
+    errorNotification: (data, values, resource) => ({
+      message: `Failed to update ${resource}`,
+      type: 'error',
+      description: data?.message || 'An error occurred'
+    }),
+  });
+  
+  const { mutateAsync: deleteEntity } = useDelete({
+    successNotification: false,
+    errorNotification: (data, values, resource) => ({
+      message: `Failed to delete ${resource}`,
+      type: 'error',
+      description: data?.message || 'An error occurred'
+    }),
+  });
   
   // Extract trip data and loading state
   const trip = queryResult?.data?.data as TripWithRelations | undefined;
@@ -91,6 +121,9 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           confirmation_number: h.confirmation_number,
           phone: h.phone,
           notes: h.notes,
+          google_maps_url: h.google_maps_url,
+          latitude: h.latitude,
+          longitude: h.longitude,
         })),
         activities: trip.activities.map(a => ({
           id: a.id,
@@ -104,6 +137,8 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           google_maps_url: a.google_maps_url,
           latitude: a.latitude,
           longitude: a.longitude,
+          description: a.description,
+          image_url: a.image_url,
         })),
         flights: trip.flights.map(f => ({
           id: f.id,
@@ -156,6 +191,9 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
               confirmation_number: hotel.confirmation_number,
               phone: hotel.phone,
               notes: hotel.notes,
+              google_maps_url: hotel.google_maps_url,
+              latitude: hotel.latitude,
+              longitude: hotel.longitude,
             },
           });
         } else if (hotel.id) {
@@ -193,6 +231,8 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
               google_maps_url: activity.google_maps_url,
               latitude: activity.latitude,
               longitude: activity.longitude,
+              description: activity.description,
+              image_url: activity.image_url,
             },
           });
         } else if (activity.id) {

@@ -8,49 +8,86 @@
  * 
  * Setup:
  *   1. Download service account key from Firebase Console:
- *      https://console.firebase.google.com/project/travo-32ec12/settings/serviceaccounts/adminsdk
+ *      https://console.firebase.google.com/project/YOUR_PROJECT/settings/serviceaccounts/adminsdk
  *   2. Click "Generate new private key"
- *   3. Save as service-account.json in this directory (gitignored)
- *   4. Run: npm run upload YOUR_EMAIL@example.com
+ *   3. Save as service-account.dev.json or service-account.prod.json in this directory (gitignored)
+ *   4. Run: npm run upload:dev YOUR_EMAIL@example.com
  * 
  * Usage:
- *   npm run upload YOUR_EMAIL@example.com
+ *   npm run upload:dev YOUR_EMAIL@example.com [TRIP_FILE]
+ *   npm run upload:prod YOUR_EMAIL@example.com [TRIP_FILE]
+ *   
+ *   Or with custom service account:
+ *   node upload.js --env=dev --service-account=path/to/key.json YOUR_EMAIL@example.com
+ *   
+ *   Examples:
+ *     npm run upload:dev user@example.com
+ *     npm run upload:prod user@example.com 456def78-9abc-def0-1234-567890abcdef.json
  */
 
 const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
 
-// Get user email and optional trip file from command line
-const userEmail = process.argv[2];
-const tripFile = process.argv[3]; // Optional: specific trip file to upload
+// Parse command line arguments
+let environment = 'dev'; // default
+let customServiceAccount = null;
+let userEmail = null;
+let tripFile = null;
+
+const args = process.argv.slice(2);
+for (let i = 0; i < args.length; i++) {
+  const arg = args[i];
+  
+  if (arg.startsWith('--env=')) {
+    environment = arg.split('=')[1];
+  } else if (arg.startsWith('--service-account=')) {
+    customServiceAccount = arg.split('=')[1];
+  } else if (!userEmail) {
+    userEmail = arg;
+  } else if (!tripFile) {
+    tripFile = arg;
+  }
+}
 
 if (!userEmail) {
   console.error('❌ Error: Please provide your email address');
-  console.log('\nUsage: npm run upload YOUR_EMAIL@example.com [TRIP_FILE]');
+  console.log('\nUsage:');
+  console.log('  npm run upload:dev YOUR_EMAIL@example.com [TRIP_FILE]');
+  console.log('  npm run upload:prod YOUR_EMAIL@example.com [TRIP_FILE]');
+  console.log('\nOr with custom service account:');
+  console.log('  node upload.js --env=dev --service-account=path/to/key.json YOUR_EMAIL@example.com');
   console.log('\nExamples:');
-  console.log('  npm run upload user@example.com');
-  console.log('  npm run upload user@example.com 456def78-9abc-def0-1234-567890abcdef.json');
-  console.log('  npm run upload user@example.com my-new-trip.json\n');
+  console.log('  npm run upload:dev user@example.com');
+  console.log('  npm run upload:prod user@example.com 456def78-9abc-def0-1234-567890abcdef.json\n');
   process.exit(1);
 }
 
 console.log('🚀 Firebase Test Data Upload Script');
 console.log('=====================================\n');
+console.log(`🌍 Environment: ${environment}`);
 console.log(`📧 User email: ${userEmail}`);
 
-// Check for service account file
-const serviceAccountPath = path.join(__dirname, 'service-account.json');
+// Determine service account file path
+let serviceAccountPath;
+if (customServiceAccount) {
+  serviceAccountPath = path.resolve(customServiceAccount);
+} else {
+  serviceAccountPath = path.join(__dirname, `service-account.${environment}.json`);
+}
+
+console.log(`🔑 Service account: ${path.basename(serviceAccountPath)}\n`);
 
 if (!fs.existsSync(serviceAccountPath)) {
   console.error('\n❌ Service account file not found!');
+  console.log(`\n📝 Looking for: ${serviceAccountPath}`);
   console.log('\n📝 Setup Instructions:');
   console.log('   1. Go to Firebase Console:');
-  console.log('      https://console.firebase.google.com/project/travo-32ec12/settings/serviceaccounts/adminsdk');
+  console.log('      https://console.firebase.google.com/project/YOUR_PROJECT/settings/serviceaccounts/adminsdk');
   console.log('   2. Click "Generate new private key"');
-  console.log('   3. Save the downloaded file as: seed/service-account.json');
+  console.log(`   3. Save the downloaded file as: seed/service-account.${environment}.json`);
   console.log('   4. Run this script again\n');
-  console.log('⚠️  Note: service-account.json is gitignored for security\n');
+  console.log('⚠️  Note: service-account.*.json files are gitignored for security\n');
   process.exit(1);
 }
 
@@ -60,10 +97,13 @@ try {
   
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    projectId: 'travo-32ec12'
+    projectId: serviceAccount.project_id,
+    databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
   });
   
-  console.log('✅ Firebase Admin initialized\n');
+  console.log('✅ Firebase Admin initialized');
+  console.log(`📦 Project: ${serviceAccount.project_id}`);
+  console.log(`🌐 Database: ${serviceAccount.project_id} (default)\n`);
 } catch (error) {
   console.error('❌ Failed to initialize Firebase Admin:', error.message);
   console.log('\n💡 Make sure service-account.json is valid JSON from Firebase Console\n');
@@ -119,7 +159,7 @@ function transformToFirestoreFormat(trip, userEmail) {
       updated_at: now,
       created_at: now
     }),
-    flights: trip.flights.map(flight => cleanObject({
+    flights: (trip.flights || []).map(flight => cleanObject({
       id: flight.id,
       trip_id: trip.id,
       airline: flight.airline,
@@ -133,7 +173,7 @@ function transformToFirestoreFormat(trip, userEmail) {
       updated_by: userEmail,
       updated_at: now
     })),
-    hotels: trip.hotels.map(hotel => cleanObject({
+    hotels: (trip.hotels || []).map(hotel => cleanObject({
       id: hotel.id,
       trip_id: trip.id,
       name: hotel.name,
@@ -151,7 +191,7 @@ function transformToFirestoreFormat(trip, userEmail) {
       updated_by: userEmail,
       updated_at: now
     })),
-    activities: trip.activities.map(activity => {
+    activities: (trip.activities || []).map(activity => {
       let timeOfDay = 'morning';
       if (activity.start_time) {
         const hour = new Date(activity.start_time).getHours();
@@ -178,7 +218,7 @@ function transformToFirestoreFormat(trip, userEmail) {
         updated_at: now
       });
     }),
-    restaurants: trip.restaurants.map(restaurant => cleanObject({
+    restaurants: (trip.restaurants || []).map(restaurant => cleanObject({
       id: restaurant.id,
       trip_id: trip.id,
       name: restaurant.name,
@@ -199,7 +239,29 @@ function transformToFirestoreFormat(trip, userEmail) {
 // Upload to Firestore
 async function uploadData() {
   try {
-    console.log('📤 Transforming data for Firestore...\n');
+    console.log('� Checking Firestore connection...');
+    // Test connection by trying to access a collection
+    const testRef = db.collection('trips').limit(1);
+    try {
+      await testRef.get();
+      console.log('✅ Firestore connection successful\n');
+    } catch (connError) {
+      console.error('❌ Cannot connect to Firestore!');
+      console.log('\n🔧 Possible issues:');
+      console.log('   1. Firestore database not created in Firebase Console');
+      console.log('   2. Database might be in a different location');
+      console.log('   3. Service account lacks permissions\n');
+      console.log('📋 To fix:');
+      console.log('   1. Go to: https://console.firebase.google.com/project/_/firestore');
+      console.log('   2. Create a Firestore database if it doesn\'t exist');
+      console.log('   3. Choose "Start in production mode" or "Start in test mode"');
+      console.log('   4. Select a location (e.g., us-central1)');
+      console.log('   5. Wait for database creation to complete');
+      console.log('   6. Run this script again\n');
+      throw connError;
+    }
+    
+    console.log('�📤 Transforming data for Firestore...\n');
     const transformed = transformToFirestoreFormat(testData, userEmail);
     
     console.log('📝 Data summary:');

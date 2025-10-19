@@ -5,6 +5,8 @@
   "description": "Seed data and scripts for uploading test data to Firestore",
   "scripts": {
     "upload": "node upload.js",
+    "upload:dev": "node upload.js --env=dev",
+    "upload:prod": "node upload.js --env=prod",
     "convert-activities": "node convert-activities.js"
   },
   "devDependencies": {

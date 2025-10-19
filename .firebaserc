@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "travo-32ec12"
+    "default": "travo-dev-64c0e",
+    "dev": "travo-dev-64c0e",
+    "prod": "travo-32ec12"
   }
 }

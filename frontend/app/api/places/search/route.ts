@@ -133,7 +133,11 @@ export async function GET(request: NextRequest) {
         hasEditorialSummary: !!detailsData.result?.editorial_summary,
         hasPhotos: !!detailsData.result?.photos,
         photoCount: detailsData.result?.photos?.length || 0,
-        errorMessage: detailsData.error_message
+        errorMessage: detailsData.error_message,
+        // Log actual structure for debugging
+        editorialSummaryKeys: detailsData.result?.editorial_summary ? Object.keys(detailsData.result.editorial_summary) : [],
+        editorialSummaryOverview: detailsData.result?.editorial_summary?.overview,
+        firstPhotoKeys: detailsData.result?.photos?.[0] ? Object.keys(detailsData.result.photos[0]) : []
       });
       
       if (detailsData.status === 'OK' && detailsData.result) {

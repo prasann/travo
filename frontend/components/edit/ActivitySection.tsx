@@ -106,6 +106,14 @@ export default function ActivitySection({
       image_url: newActivity.image_url,
     };
     
+    console.log('[ActivitySection] Adding activity with data:', {
+      name: activity.name,
+      description: activity.description,
+      image_url: activity.image_url,
+      hasDescription: !!activity.description,
+      hasImageUrl: !!activity.image_url
+    });
+    
     setValue('activities', [...activities, activity]);
     
     // Reset form

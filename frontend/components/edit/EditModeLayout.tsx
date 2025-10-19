@@ -217,6 +217,14 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             id: activity.id,
           });
         } else if (!activity.id) {
+          console.log('[EditModeLayout] Creating new activity:', {
+            name: activity.name,
+            description: activity.description,
+            image_url: activity.image_url,
+            hasDescription: !!activity.description,
+            hasImageUrl: !!activity.image_url
+          });
+          
           await createEntity({
             resource: 'activities',
             values: {

@@ -39,6 +39,8 @@ export default function ActivityItem({
 }: ActivityItemProps) {
   const [notesOpen, setNotesOpen] = useState(false);
   const notes = watch(`activities.${index}.notes`) || '';
+  const description = activity.description;
+  const hasPhoto = !!activity.image_url;
   
   return (
     <div className="card bg-base-200">
@@ -70,6 +72,18 @@ export default function ActivityItem({
           {/* Name */}
           <div className="flex-1 min-w-0">
             <h4 className="font-semibold text-sm truncate">{activity.name}</h4>
+            {/* Show badges for description and photo */}
+            <div className="flex gap-1 mt-0.5">
+              {description && (
+                <span className="badge badge-xs badge-info">description</span>
+              )}
+              {hasPhoto && (
+                <span className="badge badge-xs badge-success">photo</span>
+              )}
+              {activity.city && (
+                <span className="badge badge-xs badge-ghost">{activity.city}</span>
+              )}
+            </div>
           </div>
           
           {/* Delete Icon */}

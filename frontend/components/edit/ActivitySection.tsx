@@ -243,36 +243,47 @@ export default function ActivitySection({
                 <>
                   <div className="alert alert-success mt-4">
                     <span>✓ Found: {newActivity.name}</span>
+                    {newActivity.city && <span className="text-xs opacity-70"> in {newActivity.city}</span>}
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text">Date *</span>
-                      </label>
-                      <input
-                        type="date"
-                        value={newActivity.date || ''}
-                        onChange={(e) => setNewActivity(prev => ({ ...prev, date: e.target.value }))}
-                        className="input input-bordered"
-                        min={tripStartDate}
-                        max={tripEndDate}
-                        required
+                  {/* Show description if available */}
+                  {newActivity.description && (
+                    <div className="alert alert-info mt-2">
+                      <div className="text-xs">
+                        <p className="font-semibold mb-1">Description:</p>
+                        <p className="text-base-content/80">{newActivity.description}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Show photo if available */}
+                  {newActivity.image_url && (
+                    <div className="mt-4">
+                      <img 
+                        src={newActivity.image_url} 
+                        alt={newActivity.name}
+                        className="w-full h-48 object-cover rounded-lg"
+                        onError={(e) => {
+                          // Hide image if it fails to load
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                     </div>
-                    
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text">City</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={newActivity.city || ''}
-                        onChange={(e) => setNewActivity(prev => ({ ...prev, city: e.target.value }))}
-                        className="input input-bordered"
-                        placeholder="Tokyo"
-                      />
-                    </div>
+                  )}
+                  
+                  <div className="form-control mt-4">
+                    <label className="label">
+                      <span className="label-text">Date *</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={newActivity.date || ''}
+                      onChange={(e) => setNewActivity(prev => ({ ...prev, date: e.target.value }))}
+                      className="input input-bordered"
+                      min={tripStartDate}
+                      max={tripEndDate}
+                      required
+                    />
                   </div>
                   
                   <div className="form-control mt-4">

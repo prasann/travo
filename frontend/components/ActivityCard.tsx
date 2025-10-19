@@ -53,10 +53,15 @@ export function ActivityCard({ activity }: ActivityCardProps) {
     <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
   );
   
-  // Collapsed view: Minimal info
+  // Collapsed view: Show description if available, otherwise show city
   const content = (
     <>
-      {activity.city && (
+      {activity.description && (
+        <p className="text-xs sm:text-sm text-base-content/70 line-clamp-2">
+          {activity.description}
+        </p>
+      )}
+      {!activity.description && activity.city && (
         <p className="text-xs text-base-content/60">
           {activity.city}
         </p>
@@ -65,8 +70,15 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   );
   
   // Expanded view: Show all details
-  const details = (activity.address || activity.city || activity.notes || activity.plus_code || activity.latitude || activity.longitude) ? (
+  const details = (activity.description || activity.address || activity.city || activity.notes || activity.plus_code || activity.latitude || activity.longitude) ? (
     <>
+      {/* Description */}
+      {activity.description && (
+        <p className="text-xs sm:text-sm text-base-content/80 mb-3">
+          {activity.description}
+        </p>
+      )}
+      
       {/* City */}
       {activity.city && (
         <p className="text-xs sm:text-sm text-base-content/70">

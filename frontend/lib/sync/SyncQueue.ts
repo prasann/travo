@@ -27,7 +27,7 @@ export async function addToQueue(entry: Omit<SyncQueueEntry, 'id' | 'created_at'
   };
 
   await db.syncQueue.add(queueEntry);
-  console.log('📝 Added to sync queue:', queueEntry.operation, queueEntry.entity_type, queueEntry.entity_id);
+  // console.log('📝 Added to sync queue:', queueEntry.operation, queueEntry.entity_type, queueEntry.entity_id);
 }
 
 /**
@@ -53,7 +53,7 @@ export async function getQueuedEntries(): Promise<SyncQueueEntry[]> {
  */
 export async function removeFromQueue(id: string): Promise<void> {
   await db.syncQueue.delete(id);
-  console.log('✅ Removed from sync queue:', id);
+  // console.log('✅ Removed from sync queue:', id);
 }
 
 /**

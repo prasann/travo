@@ -16,6 +16,7 @@ import { useCreate, useUpdate, useDelete } from '@refinedev/core';
 import { useRouter } from 'next/navigation';
 import type { TripEditFormData, EditCategory } from '@/types/editMode';
 import type { TripWithRelations } from '@/lib/db/models';
+import { bulkUpdateActivities } from '@/lib/db/operations/activities';
 import CategoryNav from './CategoryNav';
 import NotesSection from './NotesSection';
 import HotelSection from './HotelSection';
@@ -167,9 +168,6 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         home_location: data.home_location,
       });
       
-      // Import bulk update for activity reordering
-      const { bulkUpdateActivities } = await import('@/lib/db/operations/activities');
-      
       // Process hotel changes
       for (const hotel of data.hotels) {
         if (hotel._deleted && hotel.id) {
@@ -209,6 +207,18 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
       
       // Process activity changes
       const reorderedActivities: Array<{ id: string; order_index: number }> = [];
+      
+      console.log('[EditModeLayout] Processing activities:', {
+        total: data.activities.length,
+        activities: data.activities.map(a => ({
+          name: a.name,
+          id: a.id,
+          hasId: !!a.id,
+          deleted: a._deleted,
+          description: a.description,
+          image_url: a.image_url
+        }))
+      });
       
       for (const activity of data.activities) {
         if (activity._deleted && activity.id) {

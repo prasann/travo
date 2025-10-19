@@ -61,6 +61,14 @@ export default function ActivitySection({
     description?: string;
     photoUrl?: string;
   }) => {
+    console.log('[ActivitySection] Maps lookup success:', {
+      name: result.name,
+      description: result.description,
+      photoUrl: result.photoUrl,
+      hasDescription: !!result.description,
+      hasPhotoUrl: !!result.photoUrl
+    });
+    
     setNewActivity(prev => ({
       ...prev,
       name: result.name,

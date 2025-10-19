@@ -123,8 +123,18 @@ export async function GET(request: NextRequest) {
     let photoUrl: string | undefined;
     
     try {
+      console.log('Fetching Place Details for:', placeId);
       const detailsResponse = await fetch(detailsUrl);
       const detailsData = await detailsResponse.json();
+      
+      console.log('Place Details API response:', {
+        status: detailsData.status,
+        hasResult: !!detailsData.result,
+        hasEditorialSummary: !!detailsData.result?.editorial_summary,
+        hasPhotos: !!detailsData.result?.photos,
+        photoCount: detailsData.result?.photos?.length || 0,
+        errorMessage: detailsData.error_message
+      });
       
       if (detailsData.status === 'OK' && detailsData.result) {
         // Extract editorial summary (description)
@@ -132,7 +142,9 @@ export async function GET(request: NextRequest) {
         if (editorialSummary) {
           description = editorialSummary;
           const preview = editorialSummary.length > 100 ? editorialSummary.substring(0, 100) + '...' : editorialSummary;
-          console.log('Found description:', preview);
+          console.log('✓ Found description:', preview);
+        } else {
+          console.log('✗ No editorial summary available for this place');
         }
         
         // Extract first photo reference and build photo URL
@@ -140,14 +152,20 @@ export async function GET(request: NextRequest) {
           const photoReference = detailsData.result.photos[0].photo_reference;
           // Use maxwidth=800 for good quality without huge file sizes
           photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoReference}&key=${apiKey}`;
-          console.log('Found photo reference');
+          console.log('✓ Found photo reference:', photoReference.substring(0, 50) + '...');
+        } else {
+          console.log('✗ No photos available for this place');
         }
       } else {
-        console.warn('Place Details API returned:', detailsData.status);
+        console.warn('Place Details API error:', {
+          status: detailsData.status,
+          errorMessage: detailsData.error_message,
+          availableFields: Object.keys(detailsData.result || {})
+        });
       }
     } catch (detailsError) {
       // Log but don't fail the request - description and photo are optional enhancements
-      console.warn('Failed to fetch place details:', detailsError);
+      console.error('Failed to fetch place details:', detailsError);
     }
     
     // Step 7: Return normalized data with description and photo

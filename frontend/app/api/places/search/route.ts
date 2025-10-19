@@ -54,8 +54,6 @@ export async function GET(request: NextRequest) {
       resolvedUrl = redirectResponse.url;
     }
     
-    console.log('Processing URL:', resolvedUrl);
-    
     // Step 3: Extract place name from URL
     // Format: /place/Tokyo+Skytree/@coords or /place/Tokyo+Skytree/data=...
     const placeNameMatch = resolvedUrl.match(/\/place\/([^/@?#]+)/);
@@ -70,8 +68,6 @@ export async function GET(request: NextRequest) {
     // Decode the place name (replace + with spaces, decode URI components)
     const encodedName = placeNameMatch[1];
     const placeName = decodeURIComponent(encodedName.replace(/\+/g, ' '));
-    
-    console.log('Searching for place:', placeName);
     
     // Step 4: Search using Google Places Text Search API
     const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(placeName)}&key=${apiKey}`;
@@ -109,12 +105,6 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    console.log('Found place:', {
-      name: place.name,
-      city: city,
-      placeId: placeId
-    });
-    
     // Step 6: Fetch Place Details for description and photos
     // Fields: editorial_summary (description), photos (array of photo references)
     const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=editorial_summary,photos&key=${apiKey}`;
@@ -123,32 +113,14 @@ export async function GET(request: NextRequest) {
     let photoUrl: string | undefined;
     
     try {
-      console.log('Fetching Place Details for:', placeId);
       const detailsResponse = await fetch(detailsUrl);
       const detailsData = await detailsResponse.json();
-      
-      console.log('Place Details API response:', {
-        status: detailsData.status,
-        hasResult: !!detailsData.result,
-        hasEditorialSummary: !!detailsData.result?.editorial_summary,
-        hasPhotos: !!detailsData.result?.photos,
-        photoCount: detailsData.result?.photos?.length || 0,
-        errorMessage: detailsData.error_message,
-        // Log actual structure for debugging
-        editorialSummaryKeys: detailsData.result?.editorial_summary ? Object.keys(detailsData.result.editorial_summary) : [],
-        editorialSummaryOverview: detailsData.result?.editorial_summary?.overview,
-        firstPhotoKeys: detailsData.result?.photos?.[0] ? Object.keys(detailsData.result.photos[0]) : []
-      });
       
       if (detailsData.status === 'OK' && detailsData.result) {
         // Extract editorial summary (description)
         const editorialSummary = detailsData.result.editorial_summary?.overview;
         if (editorialSummary) {
           description = editorialSummary;
-          const preview = editorialSummary.length > 100 ? editorialSummary.substring(0, 100) + '...' : editorialSummary;
-          console.log('✓ Found description:', preview);
-        } else {
-          console.log('✗ No editorial summary available for this place');
         }
         
         // Extract first photo reference and build photo URL
@@ -156,16 +128,7 @@ export async function GET(request: NextRequest) {
           const photoReference = detailsData.result.photos[0].photo_reference;
           // Use maxwidth=800 for good quality without huge file sizes
           photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoReference}&key=${apiKey}`;
-          console.log('✓ Found photo reference:', photoReference.substring(0, 50) + '...');
-        } else {
-          console.log('✗ No photos available for this place');
         }
-      } else {
-        console.warn('Place Details API error:', {
-          status: detailsData.status,
-          errorMessage: detailsData.error_message,
-          availableFields: Object.keys(detailsData.result || {})
-        });
       }
     } catch (detailsError) {
       // Log but don't fail the request - description and photo are optional enhancements

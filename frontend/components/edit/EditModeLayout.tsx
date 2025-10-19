@@ -208,18 +208,6 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
       // Process activity changes
       const reorderedActivities: Array<{ id: string; order_index: number }> = [];
       
-      console.log('[EditModeLayout] Processing activities:', {
-        total: data.activities.length,
-        activities: data.activities.map(a => ({
-          name: a.name,
-          id: a.id,
-          hasId: !!a.id,
-          deleted: a._deleted,
-          description: a.description,
-          image_url: a.image_url
-        }))
-      });
-      
       for (const activity of data.activities) {
         if (activity._deleted && activity.id) {
           await deleteEntity({
@@ -227,14 +215,6 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             id: activity.id,
           });
         } else if (!activity.id) {
-          console.log('[EditModeLayout] Creating new activity:', {
-            name: activity.name,
-            description: activity.description,
-            image_url: activity.image_url,
-            hasDescription: !!activity.description,
-            hasImageUrl: !!activity.image_url
-          });
-          
           await createEntity({
             resource: 'activities',
             values: {

@@ -61,14 +61,6 @@ export default function ActivitySection({
     description?: string;
     photoUrl?: string;
   }) => {
-    console.log('[ActivitySection] Maps lookup success:', {
-      name: result.name,
-      description: result.description,
-      photoUrl: result.photoUrl,
-      hasDescription: !!result.description,
-      hasPhotoUrl: !!result.photoUrl
-    });
-    
     setNewActivity(prev => ({
       ...prev,
       name: result.name,
@@ -113,14 +105,6 @@ export default function ActivitySection({
       description: newActivity.description,
       image_url: newActivity.image_url,
     };
-    
-    console.log('[ActivitySection] Adding activity with data:', {
-      name: activity.name,
-      description: activity.description,
-      image_url: activity.image_url,
-      hasDescription: !!activity.description,
-      hasImageUrl: !!activity.image_url
-    });
     
     setValue('activities', [...activities, activity]);
     
@@ -264,23 +248,20 @@ export default function ActivitySection({
                   
                   {/* Show description if available */}
                   {newActivity.description && (
-                    <div className="alert alert-info mt-2">
-                      <div className="text-xs">
-                        <p className="font-semibold mb-1">Description:</p>
-                        <p className="text-base-content/80">{newActivity.description}</p>
-                      </div>
+                    <div className="mt-3 p-3 bg-base-200 rounded-lg">
+                      <p className="text-xs font-semibold text-base-content/60 mb-1">Description</p>
+                      <p className="text-sm text-base-content/80">{newActivity.description}</p>
                     </div>
                   )}
                   
                   {/* Show photo if available */}
                   {newActivity.image_url && (
-                    <div className="mt-4">
+                    <div className="mt-3">
                       <img 
                         src={newActivity.image_url} 
                         alt={newActivity.name}
-                        className="w-full h-48 object-cover rounded-lg"
+                        className="w-full max-h-48 object-cover rounded-lg"
                         onError={(e) => {
-                          // Hide image if it fails to load
                           e.currentTarget.style.display = 'none';
                         }}
                       />

@@ -31,14 +31,11 @@ export function HotelCard({ hotel }: HotelCardProps) {
     hotel.name || 'Hotel'
   );
   
+  // Collapsed view: Only show check-in/check-out times
   const content = (
     <>
-      {hotel.address && (
-        <p className="text-xs sm:text-sm text-base-content/60 mb-2">{hotel.address}</p>
-      )}
-      
       {hotel.check_in_time && hotel.check_out_time && (
-        <div className="flex gap-3 sm:gap-4 mt-1">
+        <div className="flex gap-3 sm:gap-4">
           <div>
             <p className="text-xs text-base-content/60">Check-in</p>
             <p className="text-xs sm:text-sm font-medium">{formatTime(hotel.check_in_time)}</p>
@@ -52,22 +49,56 @@ export function HotelCard({ hotel }: HotelCardProps) {
     </>
   );
   
-  const details = (hotel.confirmation_number || hotel.phone || hotel.notes || hotel.plus_code) ? (
+  // Expanded view: Show all details
+  const hasDetails = !!(
+    hotel.address || 
+    hotel.city || 
+    hotel.confirmation_number || 
+    hotel.phone || 
+    hotel.notes || 
+    hotel.plus_code || 
+    hotel.latitude || 
+    hotel.longitude
+  );
+  
+  const details = hasDetails ? (
     <>
-      {hotel.confirmation_number && (
-        <p className="text-xs sm:text-sm text-base-content/60">
-          Confirmation: {hotel.confirmation_number}
+      {/* Address */}
+      {hotel.address && (
+        <p className="text-xs sm:text-sm text-base-content/70">
+          <span className="font-semibold">Address:</span> {hotel.address}
         </p>
       )}
       
+      {/* City */}
+      {hotel.city && (
+        <p className="text-xs sm:text-sm text-base-content/70 mt-1">
+          <span className="font-semibold">City:</span> {hotel.city}
+        </p>
+      )}
+      
+      {/* Confirmation number */}
+      {hotel.confirmation_number && (
+        <p className="text-xs sm:text-sm text-base-content/60 mt-2">
+          <span className="font-semibold">Confirmation:</span> {hotel.confirmation_number}
+        </p>
+      )}
+      
+      {/* Phone */}
       {hotel.phone && (
-        <p className="text-xs sm:text-sm mt-1">📞 {hotel.phone}</p>
+        <p className="text-xs sm:text-sm mt-1">
+          <span className="font-semibold">Phone:</span> {hotel.phone}
+        </p>
       )}
       
-      {hotel.notes && (
-        <p className="text-xs sm:text-sm mt-2 text-base-content/80">{hotel.notes}</p>
+      {/* Coordinates (if available) */}
+      {hotel.latitude && hotel.longitude && (
+        <p className="text-xs text-base-content/60 mt-1">
+          <span className="font-semibold">Coordinates:</span> {hotel.latitude.toFixed(4)}, {hotel.longitude.toFixed(4)}
+        </p>
       )}
       
+      {/* Plus Code */}
       {hotel.plus_code && (
         <div className="flex items-center gap-2 mt-2">
           <MapPin className="w-3 h-3 text-base-content/40" />
@@ -76,12 +107,22 @@ export function HotelCard({ hotel }: HotelCardProps) {
           </p>
         </div>
       )}
+      
+      {/* Notes */}
+      {hotel.notes && (
+        <div className="mt-3 pt-3 border-t border-base-300/50">
+          <p className="text-xs text-base-content/60 mb-1 font-semibold">Notes:</p>
+          <p className="text-xs sm:text-sm text-base-content/80 whitespace-pre-wrap">
+            {hotel.notes}
+          </p>
+        </div>
+      )}
     </>
   ) : undefined;
   
   return (
     <TimelineCard
-      icon={<HotelIcon className="w-8 h-8 sm:w-10 sm:h-10 text-secondary" />}
+      icon={<HotelIcon className="w-6 h-6 sm:w-8 sm:h-8 text-secondary" />}
       iconColor="secondary"
       title={title}
       content={content}

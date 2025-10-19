@@ -7,7 +7,6 @@
 
 import { MapPin, ExternalLink } from 'lucide-react';
 import type { DailyActivity } from '@/types';
-import { formatTime } from '@/lib/dateTime';
 import { getGoogleMapsUrl } from '@/lib/mapsUtils';
 import { TimelineCard } from './TimelineCard';
 
@@ -46,33 +45,65 @@ export function ActivityCard({ activity }: ActivityCardProps) {
         e.currentTarget.style.display = 'none';
         const parent = e.currentTarget.parentElement;
         if (parent) {
-          parent.innerHTML = '<svg class="w-8 h-8 sm:w-10 sm:h-10 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>';
+          parent.innerHTML = '<svg class="w-6 h-6 sm:w-8 sm:h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>';
         }
       }}
     />
   ) : (
-    <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-accent" />
+    <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
   );
   
+  // Collapsed view: Minimal info
   const content = (
     <>
-      {activity.address && (
-        <p className="text-xs sm:text-sm text-base-content/60 mt-1">{activity.address}</p>
+      {activity.city && (
+        <p className="text-xs text-base-content/60">
+          {activity.city}
+        </p>
       )}
     </>
   );
   
-  const details = (activity.notes || activity.plus_code) ? (
+  // Expanded view: Show all details
+  const details = (activity.address || activity.city || activity.notes || activity.plus_code || activity.latitude || activity.longitude) ? (
     <>
-      {activity.notes && (
-        <p className="text-sm opacity-80">{activity.notes}</p>
+      {/* City */}
+      {activity.city && (
+        <p className="text-xs sm:text-sm text-base-content/70">
+          <span className="font-semibold">City:</span> {activity.city}
+        </p>
       )}
       
+      {/* Address */}
+      {activity.address && (
+        <p className="text-xs sm:text-sm text-base-content/70 mt-1">
+          <span className="font-semibold">Address:</span> {activity.address}
+        </p>
+      )}
+      
+      {/* Coordinates (if available) */}
+      {activity.latitude && activity.longitude && (
+        <p className="text-xs text-base-content/60 mt-1">
+          <span className="font-semibold">Coordinates:</span> {activity.latitude.toFixed(4)}, {activity.longitude.toFixed(4)}
+        </p>
+      )}
+      
+      {/* Plus Code */}
       {activity.plus_code && (
         <div className="flex items-center gap-2 mt-2">
           <MapPin className="w-3 h-3 text-base-content/40" />
           <p className="text-xs text-base-content/60 font-mono">
             {activity.plus_code}
+          </p>
+        </div>
+      )}
+      
+      {/* Notes */}
+      {activity.notes && (
+        <div className="mt-3 pt-3 border-t border-base-300/50">
+          <p className="text-xs text-base-content/60 mb-1 font-semibold">Notes:</p>
+          <p className="text-xs sm:text-sm text-base-content/80 whitespace-pre-wrap">
+            {activity.notes}
           </p>
         </div>
       )}

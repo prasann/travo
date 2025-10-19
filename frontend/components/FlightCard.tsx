@@ -13,42 +13,82 @@ interface FlightCardProps {
 }
 
 export function FlightCard({ flight }: FlightCardProps) {
-  const title = `${flight.airline || 'Flight'} ${flight.flight_number || ''}`;
+  const title = `${flight.airline || 'Flight'} ${flight.flight_number || ''}`.trim();
   
+  // Collapsed view: Only show departure → arrival locations
   const content = (
     <>
+      {flight.departure_location && flight.arrival_location && (
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-base-content/80">
+          <span className="font-medium">{flight.departure_location}</span>
+          <span>→</span>
+          <span className="font-medium">{flight.arrival_location}</span>
+        </div>
+      )}
+      {flight.departure_time && (
+        <p className="text-xs text-base-content/60 mt-0.5">
+          {formatTime(flight.departure_time)}
+        </p>
+      )}
+    </>
+  );
+  
+  // Expanded view: Show all details
+  const details = (flight.departure_time || flight.arrival_time || flight.confirmation_number || flight.notes || (flight.legs && flight.legs.length > 0)) ? (
+    <>
+      {/* Detailed times */}
       {flight.departure_time && flight.arrival_time && (
-        <div className="flex gap-3 sm:gap-4 mt-1">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-xs text-base-content/60">Departure</p>
+            <p className="text-xs text-base-content/60 mb-1">Departure</p>
             <p className="font-medium text-xs sm:text-sm">{flight.departure_location}</p>
             <p className="text-xs sm:text-sm">{formatTime(flight.departure_time)}</p>
           </div>
           <div>
-            <p className="text-xs text-base-content/60">Arrival</p>
+            <p className="text-xs text-base-content/60 mb-1">Arrival</p>
             <p className="font-medium text-xs sm:text-sm">{flight.arrival_location}</p>
             <p className="text-xs sm:text-sm">{formatTime(flight.arrival_time)}</p>
           </div>
         </div>
       )}
-    </>
-  );
-  
-  const details = (flight.confirmation_number || flight.notes || (flight.legs && flight.legs.length > 0)) ? (
-    <>
-      {flight.confirmation_number && (
-        <p className="text-xs sm:text-sm text-base-content/60">
-          Confirmation: {flight.confirmation_number}
+      
+      {/* Airline (if not in title) */}
+      {flight.airline && (
+        <p className="text-xs sm:text-sm text-base-content/70 mt-2">
+          <span className="font-semibold">Airline:</span> {flight.airline}
         </p>
       )}
       
-      {flight.notes && (
-        <p className="text-xs sm:text-sm mt-2 text-base-content/80">{flight.notes}</p>
+      {/* Flight number (if not in title) */}
+      {flight.flight_number && (
+        <p className="text-xs sm:text-sm text-base-content/70">
+          <span className="font-semibold">Flight:</span> {flight.flight_number}
+        </p>
       )}
       
+      {/* Confirmation number */}
+      {flight.confirmation_number && (
+        <p className="text-xs sm:text-sm text-base-content/60 mt-2">
+          <span className="font-semibold">Confirmation:</span> {flight.confirmation_number}
+        </p>
+      )}
+      
+      {/* Flight legs */}
       {flight.legs && flight.legs.length > 0 && (
-        <div className="badge badge-outline badge-sm mt-2">
-          {flight.legs.length} connection{flight.legs.length > 1 ? 's' : ''}
+        <div className="mt-2">
+          <div className="badge badge-outline badge-sm">
+            {flight.legs.length} connection{flight.legs.length > 1 ? 's' : ''}
+          </div>
+        </div>
+      )}
+      
+      {/* Notes */}
+      {flight.notes && (
+        <div className="mt-3 pt-3 border-t border-base-300/50">
+          <p className="text-xs text-base-content/60 mb-1 font-semibold">Notes:</p>
+          <p className="text-xs sm:text-sm text-base-content/80 whitespace-pre-wrap">
+            {flight.notes}
+          </p>
         </div>
       )}
     </>
@@ -56,7 +96,7 @@ export function FlightCard({ flight }: FlightCardProps) {
   
   return (
     <TimelineCard
-      icon={<Plane className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />}
+      icon={<Plane className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />}
       iconColor="primary"
       title={title}
       content={content}

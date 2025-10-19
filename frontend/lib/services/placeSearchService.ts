@@ -207,8 +207,6 @@ export async function searchPlace(input: string): Promise<PlaceSearchResult> {
     }
     
     // Success! Return the normalized place data
-    console.log('Found place:', data);
-    
     return {
       success: true,
       name: data.name,

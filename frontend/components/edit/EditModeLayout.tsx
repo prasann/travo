@@ -64,32 +64,9 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
   
   // Refine mutation hooks for nested entities
   // Disable automatic notifications - we'll show a single success message
-  const { mutateAsync: createEntity } = useCreate({
-    successNotification: false,
-    errorNotification: (data, values, resource) => ({
-      message: `Failed to create ${resource}`,
-      type: 'error',
-      description: data?.message || 'An error occurred'
-    }),
-  });
-  
-  const { mutateAsync: updateEntity } = useUpdate({
-    successNotification: false,
-    errorNotification: (data, values, resource) => ({
-      message: `Failed to update ${resource}`,
-      type: 'error',
-      description: data?.message || 'An error occurred'
-    }),
-  });
-  
-  const { mutateAsync: deleteEntity } = useDelete({
-    successNotification: false,
-    errorNotification: (data, values, resource) => ({
-      message: `Failed to delete ${resource}`,
-      type: 'error',
-      description: data?.message || 'An error occurred'
-    }),
-  });
+  const { mutateAsync: createEntity } = useCreate();
+  const { mutateAsync: updateEntity } = useUpdate();
+  const { mutateAsync: deleteEntity } = useDelete();
   
   // Extract trip data and loading state
   const trip = queryResult?.data?.data as TripWithRelations | undefined;

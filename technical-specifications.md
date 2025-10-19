@@ -275,9 +275,9 @@ syncQueue: {
 trips/{tripId}
   ├── fields: id, name, destination, start_date, end_date, user_access, updated_by, updated_at, created_at
   ├── flights/{flightId}
-  │   └── fields: id, trip_id, direction, updated_by, updated_at
+  │   └── fields: id, trip_id, airline, flight_number, departure_time, arrival_time, departure_location, arrival_location, confirmation_number, notes, updated_by, updated_at
   ├── hotels/{hotelId}
-  │   └── fields: id, trip_id, name, address, city, plus_code, check_in_date, check_out_date, updated_by, updated_at
+  │   └── fields: id, trip_id, name, address, city, plus_code, check_in_time, check_out_time, confirmation_number, phone, notes, updated_by, updated_at
   ├── activities/{activityId}
   │   └── fields: id, trip_id, name, date, time_of_day, city, plus_code, address, notes, order_index, updated_by, updated_at
   └── restaurants/{restaurantId}
@@ -286,10 +286,8 @@ trips/{tripId}
 
 **Key Differences from IndexedDB**:
 - Firestore uses `destination` instead of `description`
-- Flights simplified to just `direction` ('outbound' | 'return')
-- Hotels use `check_in_date`/`check_out_date` (dates only, not timestamps)
-- Activities use `time_of_day` enum instead of `start_time` timestamp
-- No `deleted` flag in Firestore (soft deletes update flag, not stored in schema shown)
+- Activities use `time_of_day` enum instead of `start_time` timestamp (optional field for display)
+- No `deleted` flag in Firestore (soft deletes handled by IndexedDB only)
 
 ---
 

@@ -98,8 +98,26 @@ export function TripTimeline({ trip }: TripTimelineProps) {
       }
     });
     
-    // Create day groups array
-    const dates = Array.from(groups.keys()).sort();
+    // Add all hotel stay dates to ensure every day of the trip has an entry
+    const allDates = new Set(groups.keys());
+    (trip.hotels || []).forEach((hotel) => {
+      if (hotel.check_in_time && hotel.check_out_time) {
+        const checkInDate = hotel.check_in_time.split('T')[0];
+        const checkOutDate = hotel.check_out_time.split('T')[0];
+        const stayDates = getDaysBetween(checkInDate, checkOutDate);
+        
+        // Add each hotel stay date to the groups if not already present
+        stayDates.forEach(date => {
+          if (!allDates.has(date)) {
+            allDates.add(date);
+            groups.set(date, []); // Create empty group for hotel-only days
+          }
+        });
+      }
+    });
+    
+    // Create day groups array from all dates (including hotel-only days)
+    const dates = Array.from(allDates).sort();
     const dayGroupsArray: DayGroup[] = dates.map((date, index) => ({
       date,
       dayNumber: index + 1,
@@ -223,8 +241,10 @@ export function TripTimeline({ trip }: TripTimelineProps) {
             </div>
 
             {/* Timeline Items */}
-            <div className="relative pl-6 md:pl-8">
-              <div className="space-y-4">
+            <div className="relative pl-6 md:pl-8 min-h-[80px]">
+              {/* Vertical timeline line connector */}
+              <div className="absolute left-0 md:left-2 top-0 bottom-0 w-0.5 bg-base-300" />
+              <div className="space-y-4 pb-4">
                 {/* Hotel check-in or continuation */}
                 {day.hotelStay && (
                   day.isCheckInDay ? (
@@ -250,11 +270,19 @@ export function TripTimeline({ trip }: TripTimelineProps) {
                 )}
 
                 {/* Day's activities and flights */}
-                {day.items.map((item) => (
+                {day.items
+                  .filter(item => {
+                    // Filter out hotels that are already shown as hotelStay to avoid duplicate dots
+                    if (isHotel(item) && day.hotelStay && item.id === day.hotelStay.id) {
+                      return false;
+                    }
+                    return true;
+                  })
+                  .map((item) => (
                   <div key={item.id} className="relative">
                     <TimelineDot color={day.color.dot} />
                     {isFlight(item) && <FlightCard flight={item} />}
-                    {isHotel(item) && !day.hotelStay && <HotelCard hotel={item} />}
+                    {isHotel(item) && <HotelCard hotel={item} />}
                     {isActivity(item) && <ActivityCard activity={item} />}
                   </div>
                 ))}

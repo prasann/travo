@@ -42,7 +42,16 @@ export interface FirestoreTrip {
 export interface FirestoreFlight {
   id: string;
   trip_id: string;
-  direction: 'outbound' | 'return';
+  
+  // Flight details
+  airline?: string;
+  flight_number?: string;
+  departure_time?: string; // ISO 8601 datetime
+  arrival_time?: string;   // ISO 8601 datetime
+  departure_location?: string;
+  arrival_location?: string;
+  confirmation_number?: string;
+  notes?: string;
   
   // Audit fields
   updated_by: string;
@@ -73,8 +82,11 @@ export interface FirestoreHotel {
   plus_code?: string;
   city?: string;
   maps_link?: string;
-  check_in_date: string;  // ISO 8601 date
-  check_out_date: string; // ISO 8601 date
+  check_in_time: string;  // ISO 8601 datetime (includes time)
+  check_out_time: string; // ISO 8601 datetime (includes time)
+  confirmation_number?: string;
+  phone?: string;
+  notes?: string;
   
   // Location fields for map view
   google_maps_url?: string;

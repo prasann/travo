@@ -123,13 +123,26 @@ export const tripConverter: FirestoreDataConverter<FirestoreTrip> = {
 
 export const flightConverter: FirestoreDataConverter<FirestoreFlight> = {
   toFirestore(flight: FirestoreFlight): DocumentData {
-    return {
-      id: flight.id,
-      trip_id: flight.trip_id,
-      direction: flight.direction,
-      updated_by: flight.updated_by,
-      updated_at: flight.updated_at,
-    };
+    return buildFirestoreDoc(
+      // Required fields
+      {
+        id: flight.id,
+        trip_id: flight.trip_id,
+        updated_by: flight.updated_by,
+        updated_at: flight.updated_at,
+      },
+      // Optional fields (undefined values filtered automatically)
+      {
+        airline: flight.airline,
+        flight_number: flight.flight_number,
+        departure_time: flight.departure_time,
+        arrival_time: flight.arrival_time,
+        departure_location: flight.departure_location,
+        arrival_location: flight.arrival_location,
+        confirmation_number: flight.confirmation_number,
+        notes: flight.notes,
+      }
+    );
   },
 
   fromFirestore(
@@ -141,7 +154,14 @@ export const flightConverter: FirestoreDataConverter<FirestoreFlight> = {
     return {
       id: snapshot.id,
       trip_id: data.trip_id || '',
-      direction: data.direction || 'outbound',
+      airline: data.airline,
+      flight_number: data.flight_number,
+      departure_time: data.departure_time,
+      arrival_time: data.arrival_time,
+      departure_location: data.departure_location,
+      arrival_location: data.arrival_location,
+      confirmation_number: data.confirmation_number,
+      notes: data.notes,
       updated_by: data.updated_by || '',
       updated_at: typeof data.updated_at === 'string'
         ? data.updated_at
@@ -163,8 +183,8 @@ export const hotelConverter: FirestoreDataConverter<FirestoreHotel> = {
         trip_id: hotel.trip_id,
         name: hotel.name,
         address: hotel.address,
-        check_in_date: hotel.check_in_date,
-        check_out_date: hotel.check_out_date,
+        check_in_time: hotel.check_in_time,
+        check_out_time: hotel.check_out_time,
         updated_by: hotel.updated_by,
         updated_at: hotel.updated_at,
       },
@@ -176,6 +196,9 @@ export const hotelConverter: FirestoreDataConverter<FirestoreHotel> = {
         google_maps_url: hotel.google_maps_url,
         latitude: hotel.latitude,
         longitude: hotel.longitude,
+        confirmation_number: hotel.confirmation_number,
+        phone: hotel.phone,
+        notes: hotel.notes,
       }
     );
   },
@@ -197,8 +220,11 @@ export const hotelConverter: FirestoreDataConverter<FirestoreHotel> = {
       google_maps_url: data.google_maps_url,
       latitude: data.latitude,
       longitude: data.longitude,
-      check_in_date: data.check_in_date || '',
-      check_out_date: data.check_out_date || '',
+      check_in_time: data.check_in_time || '',
+      check_out_time: data.check_out_time || '',
+      confirmation_number: data.confirmation_number,
+      phone: data.phone,
+      notes: data.notes,
       updated_by: data.updated_by || '',
       updated_at: typeof data.updated_at === 'string'
         ? data.updated_at
@@ -378,13 +404,17 @@ export function tripFromFirestore(firestoreTrip: FirestoreTrip): Trip {
  * Transform IndexedDB Flight to Firestore Flight format
  */
 export function flightToFirestore(flight: Flight): FirestoreFlight {
-  const direction: 'outbound' | 'return' = 
-    flight.notes?.toLowerCase().includes('return') ? 'return' : 'outbound';
-  
   return {
     id: flight.id,
     trip_id: flight.trip_id,
-    direction,
+    airline: flight.airline,
+    flight_number: flight.flight_number,
+    departure_time: flight.departure_time,
+    arrival_time: flight.arrival_time,
+    departure_location: flight.departure_location,
+    arrival_location: flight.arrival_location,
+    confirmation_number: flight.confirmation_number,
+    notes: flight.notes,
     updated_by: flight.updated_by,
     updated_at: flight.updated_at,
   };
@@ -397,17 +427,17 @@ export function flightFromFirestore(firestoreFlight: FirestoreFlight): Flight {
   return {
     id: firestoreFlight.id,
     trip_id: firestoreFlight.trip_id,
-    airline: undefined,
-    flight_number: undefined,
-    departure_time: undefined,
-    arrival_time: undefined,
-    departure_location: undefined,
-    arrival_location: undefined,
-    confirmation_number: undefined,
-    notes: `${firestoreFlight.direction} flight`,
+    airline: firestoreFlight.airline,
+    flight_number: firestoreFlight.flight_number,
+    departure_time: firestoreFlight.departure_time,
+    arrival_time: firestoreFlight.arrival_time,
+    departure_location: firestoreFlight.departure_location,
+    arrival_location: firestoreFlight.arrival_location,
+    confirmation_number: firestoreFlight.confirmation_number,
+    notes: firestoreFlight.notes,
     updated_at: firestoreFlight.updated_at,
     updated_by: firestoreFlight.updated_by,
-    legs: [],
+    legs: [], // Flight legs are managed separately
   };
 }
 
@@ -425,8 +455,11 @@ export function hotelToFirestore(hotel: Hotel): FirestoreHotel {
     google_maps_url: hotel.google_maps_url || undefined,
     latitude: hotel.latitude || undefined,
     longitude: hotel.longitude || undefined,
-    check_in_date: hotel.check_in_time?.split('T')[0] || '',
-    check_out_date: hotel.check_out_time?.split('T')[0] || '',
+    check_in_time: hotel.check_in_time || '',
+    check_out_time: hotel.check_out_time || '',
+    confirmation_number: hotel.confirmation_number || undefined,
+    phone: hotel.phone || undefined,
+    notes: hotel.notes || undefined,
     updated_by: hotel.updated_by,
     updated_at: hotel.updated_at,
   };
@@ -446,11 +479,11 @@ export function hotelFromFirestore(firestoreHotel: FirestoreHotel): Hotel {
     google_maps_url: firestoreHotel.google_maps_url,
     latitude: firestoreHotel.latitude,
     longitude: firestoreHotel.longitude,
-    check_in_time: firestoreHotel.check_in_date,
-    check_out_time: firestoreHotel.check_out_date,
-    confirmation_number: undefined,
-    phone: undefined,
-    notes: undefined,
+    check_in_time: firestoreHotel.check_in_time,
+    check_out_time: firestoreHotel.check_out_time,
+    confirmation_number: firestoreHotel.confirmation_number,
+    phone: firestoreHotel.phone,
+    notes: firestoreHotel.notes,
     updated_at: firestoreHotel.updated_at,
     updated_by: firestoreHotel.updated_by,
   };

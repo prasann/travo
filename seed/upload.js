@@ -119,10 +119,17 @@ function transformToFirestoreFormat(trip, userEmail) {
       updated_at: now,
       created_at: now
     }),
-    flights: trip.flights.map((flight, index) => cleanObject({
+    flights: trip.flights.map(flight => cleanObject({
       id: flight.id,
       trip_id: trip.id,
-      direction: index === 0 ? 'outbound' : 'return',
+      airline: flight.airline,
+      flight_number: flight.flight_number,
+      departure_time: flight.departure_time,
+      arrival_time: flight.arrival_time,
+      departure_location: flight.departure_location,
+      arrival_location: flight.arrival_location,
+      confirmation_number: flight.confirmation_number,
+      notes: flight.notes,
       updated_by: userEmail,
       updated_at: now
     })),
@@ -136,8 +143,11 @@ function transformToFirestoreFormat(trip, userEmail) {
       google_maps_url: hotel.google_maps_url,
       latitude: hotel.latitude,
       longitude: hotel.longitude,
-      check_in_date: hotel.check_in_time?.split('T')[0],
-      check_out_date: hotel.check_out_time?.split('T')[0],
+      check_in_time: hotel.check_in_time,
+      check_out_time: hotel.check_out_time,
+      confirmation_number: hotel.confirmation_number,
+      phone: hotel.phone,
+      notes: hotel.notes,
       updated_by: userEmail,
       updated_at: now
     })),

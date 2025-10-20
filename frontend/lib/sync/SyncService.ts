@@ -279,7 +279,15 @@ export async function deleteEntityFromFirestore(
   console.log(`[Sync] Deleting ${entityType} from Firestore: ${entityId} (trip: ${tripId})`);
   
   try {
-    const collectionName = `${entityType}s`; // flights, hotels, activities, restaurants
+    // Map entity type to Firestore collection name
+    const collectionMap: Record<string, string> = {
+      'flight': 'flights',
+      'hotel': 'hotels',
+      'activity': 'activities',
+      'restaurant': 'restaurants'
+    };
+    
+    const collectionName = collectionMap[entityType];
     const entityRef = doc(firestore, 'trips', tripId, collectionName, entityId);
     
     await deleteDoc(entityRef);

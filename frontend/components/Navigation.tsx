@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft, Menu } from 'lucide-react'
 import LoginButton from './LoginButton'
 import { SyncStatus } from './SyncStatus'
@@ -26,7 +27,16 @@ export function Navigation({
             <ArrowLeft className="h-5 w-5" />
           </Link>
         )}
-        <span className="text-xl font-bold ml-2">{title}</span>
+        <Link href="/" className="flex items-center gap-2 ml-2">
+          <Image 
+            src="/travo.png" 
+            alt="Travo Logo" 
+            width={32} 
+            height={32}
+            className="object-contain"
+          />
+          <span className="text-xl font-bold hidden sm:inline">{title}</span>
+        </Link>
       </div>
       
       <div className="navbar-end">

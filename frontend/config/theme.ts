@@ -25,4 +25,6 @@ Available DaisyUI themes:
 - lemonade
 - business
 */
-export const ACTIVE_THEME = 'dracula'
+export const DARK_THEME = 'dim'
+export const LIGHT_THEME = 'corporate'
+export const DEFAULT_THEME = DARK_THEME

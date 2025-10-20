@@ -5,6 +5,7 @@ import { ArrowLeft, Menu } from 'lucide-react'
 import LoginButton from './LoginButton'
 import { SyncStatus } from './SyncStatus'
 import { SettingsMenu } from './SettingsMenu'
+import { ThemeToggle } from './ThemeToggle'
 
 export interface NavigationProps {
   title: string
@@ -30,6 +31,7 @@ export function Navigation({
       
       <div className="navbar-end">
         <SyncStatus />
+        <ThemeToggle />
         <SettingsMenu />
         
         {/* Desktop: Show full login button */}

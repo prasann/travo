@@ -83,6 +83,10 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
   // Initialize form with trip data (including nested entities)
   useEffect(() => {
     if (trip) {
+      // Convert user_access array to comma-separated string (excluding current user)
+      const currentUser = trip.user_access[0]; // First user is typically the owner
+      const sharedUsers = trip.user_access.filter(email => email !== currentUser);
+      
       reset({
         name: trip.name,
         description: trip.description || '',
@@ -90,6 +94,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         end_date: trip.end_date,
         home_location: trip.home_location || '',
         notes: '',
+        shared_users: sharedUsers.join(', '),
         hotels: trip.hotels.map(h => ({
           id: h.id,
           name: h.name,
@@ -152,6 +157,13 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
   // Save handler - processes trip and all nested entities
   const onSubmit = async (data: TripEditFormData) => {
     try {
+      // Convert comma-separated emails to array and add current user
+      const currentUser = trip?.user_access[0] || ''; // Owner
+      const sharedEmails = data.shared_users 
+        ? data.shared_users.split(',').map(email => email.trim()).filter(email => email && email !== currentUser)
+        : [];
+      const userAccess = [currentUser, ...sharedEmails];
+      
       // Save trip basic info (automatic notification & cache invalidation)
       await onFinish({
         name: data.name,
@@ -159,6 +171,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         start_date: data.start_date,
         end_date: data.end_date,
         home_location: data.home_location,
+        user_access: userAccess,
       });
       
       // Process hotel changes
@@ -462,6 +475,25 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
                       className="input input-bordered w-full"
                       placeholder="San Francisco"
                     />
+                  </div>
+                  
+                  {/* Shared Users */}
+                  <div className="form-control w-full">
+                    <label className="label">
+                      <span className="label-text font-medium">Share with Users</span>
+                      <span className="label-text-alt text-xs">Email addresses (comma-separated)</span>
+                    </label>
+                    <input
+                      type="text"
+                      {...register('shared_users')}
+                      className="input input-bordered w-full"
+                      placeholder="friend@example.com, family@example.com"
+                    />
+                    <label className="label">
+                      <span className="label-text-alt text-xs text-base-content/60">
+                        Enter email addresses of people you want to share this trip with
+                      </span>
+                    </label>
                   </div>
                 </div>
               </div>

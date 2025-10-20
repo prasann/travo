@@ -27,6 +27,9 @@ export interface TripEditFormData {
   /** Trip-level notes */
   notes?: string;
   
+  /** Shared with users (email addresses, comma-separated) */
+  shared_users?: string;
+  
   /** Hotels (for tracking additions/deletions) */
   hotels: HotelEditFormData[];
   

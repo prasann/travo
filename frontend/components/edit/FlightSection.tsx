@@ -109,36 +109,38 @@ export default function FlightSection({ register, watch, setValue }: FlightSecti
                   </div>
                   
                   {/* Editable Flight Times */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div className="form-control">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                    <div className="form-control w-full">
                       <label className="label">
                         <span className="label-text">Departure Time</span>
                       </label>
                       <input
                         type="datetime-local"
-                        {...register(`flights.${index}.departure_time`)}
-                        defaultValue={toDateTimeLocalValue(flight.departure_time)}
-                        className="input input-bordered"
+                        value={toDateTimeLocalValue(watch(`flights.${index}.departure_time`))}
+                        className="input input-bordered w-full"
                         onChange={(e) => {
                           if (e.target.value) {
                             setValue(`flights.${index}.departure_time`, new Date(e.target.value).toISOString());
+                          } else {
+                            setValue(`flights.${index}.departure_time`, undefined);
                           }
                         }}
                       />
                     </div>
                     
-                    <div className="form-control">
+                    <div className="form-control w-full">
                       <label className="label">
                         <span className="label-text">Arrival Time</span>
                       </label>
                       <input
                         type="datetime-local"
-                        {...register(`flights.${index}.arrival_time`)}
-                        defaultValue={toDateTimeLocalValue(flight.arrival_time)}
-                        className="input input-bordered"
+                        value={toDateTimeLocalValue(watch(`flights.${index}.arrival_time`))}
+                        className="input input-bordered w-full"
                         onChange={(e) => {
                           if (e.target.value) {
                             setValue(`flights.${index}.arrival_time`, new Date(e.target.value).toISOString());
+                          } else {
+                            setValue(`flights.${index}.arrival_time`, undefined);
                           }
                         }}
                       />
@@ -146,7 +148,7 @@ export default function FlightSection({ register, watch, setValue }: FlightSecti
                   </div>
                   
                   {/* Notes Field (Editable) */}
-                  <div className="form-control">
+                  <div className="form-control w-full">
                     <label className="label">
                       <span className="label-text">Flight Notes</span>
                       <span className="label-text-alt">
@@ -160,7 +162,7 @@ export default function FlightSection({ register, watch, setValue }: FlightSecti
                           message: `Notes must be less than ${MAX_NOTES_LENGTH} characters`
                         }
                       })}
-                      className="textarea textarea-bordered"
+                      className="textarea textarea-bordered w-full"
                       rows={3}
                       placeholder="Add notes about this flight (baggage, seat preferences, connections, etc.)"
                     />

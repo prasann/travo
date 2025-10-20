@@ -25,7 +25,7 @@ export default function NotesSection({ register, notes }: NotesSectionProps) {
       <div className="card-body">
         <h2 className="card-title">Trip Notes</h2>
         
-        <div className="form-control">
+        <div className="form-control w-full">
           <label className="label">
             <span className="label-text">Add notes about your trip</span>
             <span className="label-text-alt">
@@ -39,7 +39,7 @@ export default function NotesSection({ register, notes }: NotesSectionProps) {
                 message: `Notes must be less than ${MAX_NOTES_LENGTH} characters`
               }
             })}
-            className="textarea textarea-bordered h-48"
+            className="textarea textarea-bordered w-full h-48"
             placeholder="Add any notes about your trip here..."
           />
         </div>

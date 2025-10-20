@@ -35,6 +35,9 @@ export interface TripEditFormData {
   
   /** Flights (for tracking additions/deletions) */
   flights: FlightEditFormData[];
+  
+  /** Restaurants (for tracking additions/deletions) */
+  restaurants: RestaurantEditFormData[];
 }
 
 /**
@@ -167,9 +170,53 @@ export interface FlightEditFormData {
 }
 
 /**
+ * Form data for editing/creating a restaurant recommendation
+ */
+export interface RestaurantEditFormData {
+  /** Restaurant ID (undefined for new restaurants) */
+  id?: string;
+  
+  /** Restaurant name (read-only after Google Maps lookup) */
+  name?: string;
+  
+  /** Restaurant address (read-only after Google Maps lookup) */
+  address?: string;
+  
+  /** Plus Code from Google Maps (read-only) */
+  plus_code?: string;
+  
+  /** City name */
+  city?: string;
+  
+  /** Cuisine type */
+  cuisine_type?: string;
+  
+  /** Google Maps URL for direct linking */
+  google_maps_url?: string;
+  
+  /** Latitude coordinate */
+  latitude?: number;
+  
+  /** Longitude coordinate */
+  longitude?: number;
+  
+  /** Restaurant phone number */
+  phone?: string;
+  
+  /** Restaurant website */
+  website?: string;
+  
+  /** Restaurant notes */
+  notes?: string;
+  
+  /** Flag for deletion (internal use) */
+  _deleted?: boolean;
+}
+
+/**
  * Category names for tab navigation
  */
-export type EditCategory = 'info' | 'flights' | 'hotels' | 'activities' | 'notes';
+export type EditCategory = 'info' | 'flights' | 'hotels' | 'activities' | 'restaurants' | 'notes';
 
 /**
  * UI state for Maps Link input component

@@ -23,6 +23,7 @@ import NotesSection from './NotesSection';
 import HotelSection from './HotelSection';
 import ActivitySection from './ActivitySection';
 import FlightSection from './FlightSection';
+import RestaurantSection from './RestaurantSection';
 
 interface EditModeLayoutProps {
   tripId: string;
@@ -130,6 +131,20 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           confirmation_number: f.confirmation_number,
           notes: f.notes,
         })),
+        restaurants: trip.restaurants.map(r => ({
+          id: r.id,
+          name: r.name,
+          address: r.address,
+          plus_code: r.plus_code,
+          city: r.city,
+          cuisine_type: r.cuisine_type,
+          phone: r.phone,
+          website: r.website,
+          notes: r.notes,
+          google_maps_url: r.google_maps_url,
+          latitude: r.latitude,
+          longitude: r.longitude,
+        })),
       });
     }
   }, [trip, reset]);
@@ -177,6 +192,11 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             resource: 'hotels',
             id: hotel.id,
             values: {
+              city: hotel.city,
+              check_in_time: hotel.check_in_time,
+              check_out_time: hotel.check_out_time,
+              confirmation_number: hotel.confirmation_number,
+              phone: hotel.phone,
               notes: hotel.notes,
             },
           });
@@ -232,14 +252,56 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         await bulkUpdateActivities(reorderedActivities);
       }
       
-      // Process flight notes
+      // Process flight changes
       for (const flight of data.flights) {
         if (flight.id) {
           await updateEntity({
             resource: 'flights',
             id: flight.id,
             values: {
+              departure_time: flight.departure_time,
+              arrival_time: flight.arrival_time,
               notes: flight.notes ?? undefined,
+            },
+          });
+        }
+      }
+      
+      // Process restaurant changes
+      for (const restaurant of data.restaurants) {
+        if (restaurant._deleted && restaurant.id) {
+          await deleteEntity({
+            resource: 'restaurants',
+            id: restaurant.id,
+          });
+        } else if (!restaurant.id) {
+          await createEntity({
+            resource: 'restaurants',
+            values: {
+              trip_id: tripId,
+              name: restaurant.name,
+              address: restaurant.address,
+              plus_code: restaurant.plus_code,
+              city: restaurant.city,
+              cuisine_type: restaurant.cuisine_type,
+              phone: restaurant.phone,
+              website: restaurant.website,
+              notes: restaurant.notes,
+              google_maps_url: restaurant.google_maps_url,
+              latitude: restaurant.latitude,
+              longitude: restaurant.longitude,
+            },
+          });
+        } else if (restaurant.id) {
+          await updateEntity({
+            resource: 'restaurants',
+            id: restaurant.id,
+            values: {
+              city: restaurant.city,
+              cuisine_type: restaurant.cuisine_type,
+              phone: restaurant.phone,
+              website: restaurant.website,
+              notes: restaurant.notes,
             },
           });
         }
@@ -324,65 +386,65 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
                 
                 <div className="space-y-4">
                   {/* Trip Name */}
-                  <div className="form-control">
-                    <label className="label py-1">
+                  <div className="form-control w-full">
+                    <label className="label">
                       <span className="label-text font-medium">Trip Name *</span>
                     </label>
                     <input
                       type="text"
                       {...register('name', { required: 'Trip name is required' })}
-                      className="input input-bordered"
+                      className="input input-bordered w-full"
                       placeholder="My Amazing Trip"
                     />
                     {errors.name && (
-                      <label className="label py-1">
+                      <label className="label">
                         <span className="label-text-alt text-error">{errors.name.message}</span>
                       </label>
                     )}
                   </div>
                   
                   {/* Description */}
-                  <div className="form-control">
-                    <label className="label py-1">
+                  <div className="form-control w-full">
+                    <label className="label">
                       <span className="label-text font-medium">Description</span>
                     </label>
                     <textarea
                       {...register('description')}
-                      className="textarea textarea-bordered"
+                      className="textarea textarea-bordered w-full"
                       placeholder="Brief description of your trip"
                       rows={2}
                     />
                   </div>
                   
                   {/* Dates */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="form-control">
-                      <label className="label py-1">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="form-control w-full">
+                      <label className="label">
                         <span className="label-text font-medium">Start Date *</span>
                       </label>
                       <input
                         type="date"
                         {...register('start_date', { required: 'Start date is required' })}
-                        className="input input-bordered"
+                        className="input input-bordered w-full"
                       />
                       {errors.start_date && (
-                        <label className="label py-1">
+                        <label className="label">
                           <span className="label-text-alt text-error">{errors.start_date.message}</span>
                         </label>
                       )}
                     </div>
                     
-                    <div className="form-control">
-                      <label className="label py-1">
+                    <div className="form-control w-full">
+                      <label className="label">
                         <span className="label-text font-medium">End Date *</span>
                       </label>
                       <input
                         type="date"
                         {...register('end_date', { required: 'End date is required' })}
-                        className="input input-bordered"
+                        className="input input-bordered w-full"
                       />
                       {errors.end_date && (
-                        <label className="label py-1">
+                        <label className="label">
                           <span className="label-text-alt text-error">{errors.end_date.message}</span>
                         </label>
                       )}
@@ -390,14 +452,14 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
                   </div>
                   
                   {/* Home Location */}
-                  <div className="form-control">
-                    <label className="label py-1">
+                  <div className="form-control w-full">
+                    <label className="label">
                       <span className="label-text font-medium">Home Location</span>
                     </label>
                     <input
                       type="text"
                       {...register('home_location')}
-                      className="input input-bordered"
+                      className="input input-bordered w-full"
                       placeholder="San Francisco"
                     />
                   </div>
@@ -432,6 +494,15 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
               watch={watch}
               tripStartDate={watchedStartDate}
               tripEndDate={watchedEndDate}
+            />
+          )}
+          
+          {/* Restaurants Section */}
+          {activeCategory === 'restaurants' && (
+            <RestaurantSection
+              register={register}
+              setValue={setValue}
+              watch={watch}
             />
           )}
           

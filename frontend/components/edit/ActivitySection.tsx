@@ -268,7 +268,7 @@ export default function ActivitySection({
                     </div>
                   )}
                   
-                  <div className="form-control mt-4">
+                  <div className="form-control w-full mt-4">
                     <label className="label">
                       <span className="label-text">Date *</span>
                     </label>
@@ -276,21 +276,21 @@ export default function ActivitySection({
                       type="date"
                       value={newActivity.date || ''}
                       onChange={(e) => setNewActivity(prev => ({ ...prev, date: e.target.value }))}
-                      className="input input-bordered"
+                      className="input input-bordered w-full"
                       min={tripStartDate}
                       max={tripEndDate}
                       required
                     />
                   </div>
                   
-                  <div className="form-control mt-4">
+                  <div className="form-control w-full mt-4">
                     <label className="label">
                       <span className="label-text">Notes</span>
                     </label>
                     <textarea
                       value={newActivity.notes || ''}
                       onChange={(e) => setNewActivity(prev => ({ ...prev, notes: e.target.value }))}
-                      className="textarea textarea-bordered"
+                      className="textarea textarea-bordered w-full"
                       rows={2}
                       placeholder="Activity notes..."
                     />

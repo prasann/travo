@@ -61,32 +61,44 @@ export function AuthProvider({ children }: AuthProviderProps) {
       async (firebaseUser) => {
         try {
           if (firebaseUser) {
-            // Check if allowlist is configured
-            if (isAllowlistConfigured()) {
-              // Check if user's email is in the allowlist
-              const userEmail = firebaseUser.email;
+            // Check allowlist - deny access if not configured OR if email not in list
+            const userEmail = firebaseUser.email;
+            
+            if (!isAllowlistConfigured()) {
+              console.error('🚫 Email allowlist not configured - denying access');
               
-              if (!isEmailAllowed(userEmail)) {
-                console.warn('🚫 Unauthorized email attempted sign in:', userEmail);
-                
-                // Sign out the user immediately
-                await signOut();
-                
-                // Set error state
-                setError(new Error(
-                  'Access denied. Your email is not authorized to use this application. ' +
-                  'Please contact the administrator for access.'
-                ));
-                setFirebaseUser(null);
-                setUser(null);
-                setLoading(false);
-                return;
-              }
+              // Sign out the user immediately
+              await signOut();
               
-              console.log('✅ Authorized user signed in:', userEmail);
-            } else {
-              console.warn('⚠️ Email allowlist not configured - all users can access the app');
+              // Set error state
+              setError(new Error(
+                'Access denied. Application is not configured properly. ' +
+                'Please contact the administrator.'
+              ));
+              setFirebaseUser(null);
+              setUser(null);
+              setLoading(false);
+              return;
             }
+            
+            if (!isEmailAllowed(userEmail)) {
+              console.warn('🚫 Unauthorized email attempted sign in:', userEmail);
+              
+              // Sign out the user immediately
+              await signOut();
+              
+              // Set error state
+              setError(new Error(
+                'Access denied. Your email is not authorized to use this application. ' +
+                'Please contact the administrator for access.'
+              ));
+              setFirebaseUser(null);
+              setUser(null);
+              setLoading(false);
+              return;
+            }
+            
+            console.log('✅ Authorized user signed in:', userEmail);
             
             // User is signed in and authorized
             setFirebaseUser(firebaseUser);

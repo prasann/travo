@@ -5,18 +5,24 @@
  * Purpose: Extract place details from Google Maps share links
  * 
  * Flow:
- * 1. User pastes Google Maps link (short or full)
- * 2. Server resolves redirects and extracts place_id
- * 3. Server fetches place details from Google Places API
- * 4. Returns name, address, coordinates
+ * 1. User pastes Google Maps link (short or full URL from mobile/desktop)
+ * 2. Server resolves redirects (for short links)
+ * 3. Server tries multiple strategies to identify the place:
+ *    a. Extract CID (hex-encoded Place ID) from URL data parameter
+ *    b. Use coordinates from URL for location-based lookup
+ *    c. Fallback to text search with location bias
+ * 4. Fetches complete place details using Place Details API
+ * 5. Returns name, address, coordinates, description, photo
  * 
  * Supported URL formats:
  * - https://maps.app.goo.gl/xxx (short link)
- * - https://www.google.com/maps/place/?q=place_id:ChIJxxx
- * - https://www.google.com/maps/place/Tokyo+Skytree/@35.71,...
+ * - https://www.google.com/maps/place/Name/@lat,lng,zoom/data=...
+ * - Any Google Maps share link from browser or mobile app
  * 
  * API Documentation: 
  * - Place Details: https://developers.google.com/maps/documentation/places/web-service/details
+ * - Find Place: https://developers.google.com/maps/documentation/places/web-service/search-find-place
+ * - Nearby Search: https://developers.google.com/maps/documentation/places/web-service/search-nearby
  */
 
 /**

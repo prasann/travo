@@ -156,3 +156,37 @@ export async function clearLocalData(): Promise<Result<void>> {
     });
   }
 }
+
+/**
+ * Save real-time updates from Firestore listener to IndexedDB
+ * Used by the real-time sync listener
+ * 
+ * @param trips Array of trips with relations to save
+ * @returns Result with count of saved trips
+ */
+export async function saveRealtimeUpdates(trips: FirestoreTripWithRelations[]): Promise<Result<number>> {
+  try {
+    console.log(`[Sync] Saving ${trips.length} real-time updates to IndexedDB...`);
+    
+    let successCount = 0;
+    
+    for (const tripData of trips) {
+      const saveResult = await saveTripToIndexedDB(tripData);
+      if (isOk(saveResult)) {
+        successCount++;
+      } else {
+        console.error(`[Sync] Failed to save trip ${tripData.trip.id}:`, unwrapErr(saveResult).message);
+      }
+    }
+    
+    console.log(`[Sync] Successfully saved ${successCount}/${trips.length} real-time updates`);
+    
+    return ok(successCount);
+  } catch (error) {
+    console.error('[Sync] Error saving real-time updates:', error);
+    return err({
+      type: 'database',
+      message: `Failed to save updates: ${error instanceof Error ? error.message : 'Unknown error'}`
+    });
+  }
+}

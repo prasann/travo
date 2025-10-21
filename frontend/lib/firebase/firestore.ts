@@ -17,8 +17,10 @@ import {
   getDocs, 
   doc, 
   getDoc,
+  onSnapshot,
   CollectionReference,
-  DocumentData
+  DocumentData,
+  Unsubscribe
 } from 'firebase/firestore';
 import { db as firestore } from './config';
 import { 
@@ -277,4 +279,65 @@ async function pullRestaurantsForTrip(tripId: string): Promise<Result<FirestoreR
       message: `Failed to pull restaurants: ${error instanceof Error ? error.message : 'Unknown error'}`
     });
   }
+}
+
+/**
+ * Set up real-time listener for trips collection
+ * Automatically syncs changes from Firestore to local IndexedDB
+ * 
+ * @param userEmail User's email address
+ * @param onUpdate Callback when trips are updated (for triggering UI refresh)
+ * @returns Unsubscribe function to stop listening
+ */
+export function setupTripsListener(
+  userEmail: string,
+  onUpdate: (trips: FirestoreTripWithRelations[]) => void
+): Unsubscribe {
+  console.log(`[Firestore] Setting up real-time listener for user: ${userEmail}`);
+  
+  // Query trips where user has access
+  const tripsRef = collection(firestore, 'trips').withConverter(tripConverter);
+  const q = query(
+    tripsRef,
+    where('user_access', 'array-contains', userEmail)
+  );
+  
+  // Set up real-time listener
+  const unsubscribe = onSnapshot(
+    q,
+    async (snapshot) => {
+      console.log(`[Firestore] Real-time update: ${snapshot.docChanges().length} changes`);
+      
+      // Process each changed trip
+      const updatedTrips: FirestoreTripWithRelations[] = [];
+      
+      for (const change of snapshot.docChanges()) {
+        const trip = change.doc.data();
+        if (!trip) continue;
+        
+        console.log(`[Firestore] Trip ${change.type}: ${trip.name}`);
+        
+        // For modified or added trips, pull full data with relations
+        if (change.type === 'added' || change.type === 'modified') {
+          const result = await pullTripWithRelations(trip.id);
+          if (isOk(result)) {
+            updatedTrips.push(unwrap(result));
+          }
+        }
+        
+        // For removed trips, we'll handle via the deleted flag in IndexedDB sync
+      }
+      
+      // Notify callback if there are updates
+      if (updatedTrips.length > 0) {
+        onUpdate(updatedTrips);
+      }
+    },
+    (error) => {
+      console.error('[Firestore] Real-time listener error:', error);
+    }
+  );
+  
+  console.log('[Firestore] Real-time listener active');
+  return unsubscribe;
 }

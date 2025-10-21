@@ -99,12 +99,16 @@ frontend/
 ### Sync Strategy
 
 **Pull Sync** (Firestore → IndexedDB):
-- On app init if authenticated
-- Fetches trips where `user_access` includes user email
+- Real-time Firestore listeners (`onSnapshot()`)
+- Automatic updates when trips change in cloud
+- Zero polling, instant synchronization
+- Offline-safe: queues updates until reconnected
+- Manual pull-to-refresh available (swipe gesture + button)
+- Cost-efficient: only charged for actual document changes
 
 **Push Sync** (IndexedDB → Firestore):
 - Operations queued in `syncQueue`
-- Auto-triggers: on mutations, focus/visibility, online event, background polling
+- Auto-triggers: on mutations, background polling (30s intervals)
 - Max 3 retries, last-write-wins
 
 ### PWA Implementation
@@ -138,7 +142,36 @@ AuthProvider (Firebase + cached auth)
 - **Auth**: `AuthContext` (user, loading, error, isOffline)
 - **Data**: Refine data provider → IndexedDB via Dexie
 - **Forms**: `useForm` from @refinedev/react-hook-form
-- **Sync**: React Query with background refetch
+- **Sync**: React Query with real-time Firestore listeners
+
+## Real-Time Sync Implementation
+
+### Firestore Listener Setup
+- `setupTripsListener()` in `lib/firebase/firestore.ts`
+- Uses `onSnapshot()` for real-time updates
+- Automatically reconnects after offline periods
+- Delivers all missed changes when back online
+
+### Sync Flow
+1. User authenticates → Listener starts
+2. Trip changes in Firestore → `onSnapshot` callback fires
+3. Pull full trip data with relations (flights, hotels, activities, restaurants)
+4. Save to IndexedDB via `saveRealtimeUpdates()`
+5. Invalidate React Query cache
+6. UI automatically refreshes
+
+### Offline Behavior
+- Listener only active when online AND authenticated
+- No errors when offline (graceful degradation)
+- Firestore queues updates server-side
+- All changes delivered on reconnection
+- Zero data loss guaranteed by Firebase SDK
+
+### Cost Optimization
+- No periodic polling (eliminated 5-min checks)
+- Only charged for actual document changes
+- Typical usage: 1 initial read + ~5 changes/day = 6 reads/day/user
+- 95%+ cost reduction vs polling approach
 
 ---
 

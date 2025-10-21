@@ -60,10 +60,11 @@ Offline-first Progressive Web App for trip planning. Stores data locally (Indexe
 - Cached auth (10-day validity) for offline access
 
 **Cloud Sync**:
-- Pull: Download trips from Firestore on login
+- Pull: Real-time Firestore listeners (instant updates from cloud)
 - Push: Auto-upload changes in background
 - Sync queue with retry logic (max 3)
-- Sync status indicator
+- Manual pull-to-refresh gesture and button
+- Expandable sync status indicator with details
 
 **Offline-First**:
 - App starts immediately with cached auth

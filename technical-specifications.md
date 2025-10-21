@@ -9,21 +9,23 @@
 
 **Pattern**: Offline-first Progressive Web App  
 **Rendering**: Server-side generation with client-side hydration  
-**Data Flow**: IndexedDB (local) ↔ Firestore (cloud)
+**Data Flow**: IndexedDB (local) ↔ Firestore (cloud)  
+**PWA Strategy**: Manual service worker with cache-first for app shell, IndexedDB-first for data
 
 ```
-┌─────────────────┐
-│   Next.js App   │
-│   (Frontend)    │
-└────────┬────────┘
-         │
-    ┌────┴─────┐
-    │          │
-┌───▼───┐  ┌──▼──────┐
-│Dexie/ │  │Firebase │
-│IndexDB│  │Firestore│
-└───────┘  └─────────┘
-  Local      Cloud
+┌─────────────────────────────────┐
+│         Next.js App             │
+│         (Frontend)              │
+└────────┬───────────────┬────────┘
+         │               │
+    ┌────┴─────┐    ┌───┴────────┐
+    │          │    │   Service  │
+┌───▼───┐  ┌──▼──────┐  Worker   │
+│Dexie/ │  │Firebase │  (Cache   │
+│IndexDB│  │Firestore│   API)    │
+└───────┘  └─────────┘  └─────────┘
+  Local      Cloud       Offline
+  (Data)    (Sync)     (App Shell)
 ```
 
 ---
@@ -37,6 +39,11 @@
 - **Refine.dev 5.0.4** - Framework for data-intensive applications
   - @refinedev/react-hook-form 5.0.1 - Form integration
   - @tanstack/react-query 5.90.3 - Query management (peer dependency)
+
+### Progressive Web App
+- **Manual Service Worker** - Simple, custom implementation (no plugins)
+- **Cache API** - Browser-native caching for offline support
+- **Web App Manifest** - PWA installability and branding
 
 ### UI & Styling
 - **DaisyUI 5.2.0** - Component library
@@ -77,12 +84,14 @@ frontend/
 │   └── trip/                     # Trip pages
 │       └── [tripId]/
 │           ├── page.tsx          # Trip detail view
+│           ├── activity/         # Activity detail pages
 │           └── edit/
 │               └── page.tsx      # Trip edit mode
 │
 ├── components/                   # React components
 │   ├── DatabaseProvider.tsx     # IndexedDB initialization
 │   ├── SyncProvider.tsx          # Background sync controller
+│   ├── ServiceWorkerRegistration.tsx # PWA service worker registration
 │   ├── TripList.tsx              # Trip card list
 │   ├── TripTimeline.tsx          # Day-by-day timeline
 │   ├── FlightCard.tsx            # Flight display
@@ -154,7 +163,9 @@ frontend/
 │   └── theme.ts                  # Theme settings
 │
 └── public/                       # Static assets
-    └── data/                     # Legacy seed data
+    ├── sw.js                     # Service worker (PWA)
+    ├── manifest.json             # Web app manifest (PWA)
+    └── icons/                    # PWA icons
 ```
 
 ---
@@ -298,6 +309,107 @@ trips/{tripId}
 
 ---
 
+## Progressive Web App (PWA)
+
+### Service Worker
+
+**Implementation**: Manual service worker (`public/sw.js`)  
+**Strategy**: Simple, maintainable caching without build-time plugins  
+**Cache Name**: `travo-v1`
+
+**Caching Strategy**:
+
+1. **Install Phase**:
+   - Cache core assets: `/`, `/manifest.json`, `/travo.png`, icons
+   - `skipWaiting()` for immediate activation
+
+2. **Activate Phase**:
+   - Clean up old caches (versions other than `travo-v1`)
+   - `clients.claim()` to take control immediately
+
+3. **Fetch Phase** (Cache-first with network fallback):
+   - **Cache hit**: Return cached response immediately
+   - **Cache miss**: Fetch from network, then cache if successful
+   - **Cached resources**:
+     - All HTML pages (including dynamic routes like `/trip/[id]/activity/[id]`)
+     - Images (logo, activity images)
+     - Static assets (`/_next/static/`, `/_next/image/`)
+   - **Network-only resources**:
+     - API routes
+     - Non-GET requests
+     - External resources
+
+**Registration**: `ServiceWorkerRegistration.tsx` component
+- Registers on production only
+- Checks for updates on page load
+- Periodic update checks (every hour)
+- No intrusive update prompts (silent background updates)
+
+**Offline Behavior**:
+- Visited pages work offline (served from cache)
+- React app boots from cached HTML/JS
+- Data loaded from IndexedDB (Dexie)
+- Network requests fail gracefully
+- Offline indicator shown in sync status
+
+### Web App Manifest
+
+**File**: `public/manifest.json`  
+**Generated via**: Next.js metadata API in `app/layout.tsx`
+
+**Configuration**:
+```json
+{
+  "name": "Travo",
+  "short_name": "Travo",
+  "description": "Offline-first trip planning",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [...]
+}
+```
+
+**Features**:
+- Add to Home Screen on mobile/desktop
+- Standalone app-like experience
+- Custom splash screen
+- Theme color integration
+
+### Deployment Configuration
+
+**Vercel Headers** (`vercel.json`):
+```json
+{
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+        { "key": "Content-Type", "value": "application/javascript; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/manifest+json" },
+        { "key": "Cache-Control", "value": "public, max-age=3600, must-revalidate" }
+      ]
+    }
+  ]
+}
+```
+
+**Benefits of Manual Approach**:
+- No outdated plugins fighting Next.js 15 App Router
+- Simple, readable ~100 lines of JavaScript
+- Easy to debug and customize
+- No complex build-time configuration
+- Aligns with official Next.js 15 PWA guidance
+
+---
+
 ## Core Integrations
 
 ### Firebase Authentication
@@ -394,7 +506,9 @@ onAuthStateChanged() → User | null
   <DatabaseProvider>              // IndexedDB initialization
     <RefineProvider>              // Refine data/auth/notification
       <SyncProvider>              // Background sync controller
-        {children}                // App content
+        <ServiceWorkerRegistration> // PWA service worker
+          {children}              // App content
+        </ServiceWorkerRegistration>
       </SyncProvider>
     </RefineProvider>
   </DatabaseProvider>
@@ -407,6 +521,7 @@ onAuthStateChanged() → User | null
 3. Firebase verifies in background
 4. DatabaseProvider initializes IndexedDB
 5. SyncProvider starts background sync (if online)
+6. ServiceWorkerRegistration registers PWA (on window load, production only)
 
 ### Local State
 - Component-level: `useState` for UI state
@@ -505,9 +620,16 @@ npm run dev          # Start dev server on localhost:3000
 ### Production Build
 
 ```bash
-npm run build        # Next.js build (static export)
+npm run build        # Next.js build with PWA assets
 npm run start        # Serve production build
 ```
+
+**Build Process**:
+1. Next.js compiles TypeScript and React components
+2. Static assets optimized and bundled
+3. `public/sw.js` copied to build output (no compilation)
+4. `public/manifest.json` served via Next.js metadata
+5. PWA icons copied from `public/icons/`
 
 ### Environment Variables
 
@@ -672,3 +794,6 @@ To add new fields:
 - No undo/redo functionality
 - Sync failures require manual retry after 3 attempts
 - Cached auth expires after 10 days offline (requires re-authentication)
+- PWA offline support requires visiting pages while online first (cache-on-visit)
+- Service worker cache updates on page reload (not real-time)
+- No iOS push notification support (requires app added to home screen)

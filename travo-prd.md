@@ -8,7 +8,7 @@
 
 ## Product Overview
 
-Travo is an offline-first trip planning application that allows users to organize and view their travel itineraries. Built with privacy in mind, it stores trip data locally on the device with optional cloud sync for backup and multi-device access.
+Travo is an offline-first Progressive Web App (PWA) for trip planning that allows users to organize and view their travel itineraries. Built with privacy in mind, it stores trip data locally on the device with optional cloud sync for backup and multi-device access. The app can be installed on mobile and desktop devices and works seamlessly offline after visiting pages while online.
 
 ---
 
@@ -152,7 +152,44 @@ Travo is an offline-first trip planning application that allows users to organiz
 
 ---
 
-### 7. Theme System
+### 7. Progressive Web App (PWA)
+
+**Installability**
+- Add to Home Screen on mobile devices (iOS/Android)
+- Standalone app experience (no browser chrome)
+- Custom app icon and splash screen
+- Desktop installation support (Chrome, Edge)
+
+**Offline Support**
+- Service worker caches visited pages
+- App shell (HTML/JS/CSS) available offline
+- Logo and icons cached on install
+- Static assets cached automatically
+- Works offline after visiting pages while online
+
+**Caching Strategy**
+- Cache-first for visited pages and static assets
+- Network-first for new pages
+- IndexedDB-first for trip data
+- Automatic cache updates on page reload
+
+**Installation Flow**
+1. Visit site on mobile browser
+2. Browser shows "Add to Home Screen" prompt
+3. User installs, gets app icon on home screen
+4. Opens like a native app
+
+**Offline Flow**
+1. User visits pages while online (cached automatically)
+2. Goes offline (airplane mode, no connection)
+3. Opens app - loads from cache
+4. Views cached trips and activities
+5. Data read from IndexedDB
+6. Edit operations queued for sync
+
+---
+
+### 8. Theme System
 
 **Visual Themes**
 - DaisyUI-based theme system
@@ -162,7 +199,7 @@ Travo is an offline-first trip planning application that allows users to organiz
 
 ---
 
-### 8. Location Data
+### 9. Location Data
 
 **Google Plus Codes**
 - Compact, offline-friendly location format
@@ -192,6 +229,15 @@ Travo is an offline-first trip planning application that allows users to organiz
 3. Firebase verifies auth in background (when online)
 4. "Offline" indicator shown in sync status
 5. Full read/write access to cached trips
+6. Service worker serves cached pages
+7. All visited pages work offline
+
+### Install PWA
+1. Visit site on mobile/desktop browser
+2. See "Add to Home Screen" prompt (or manual install via browser menu)
+3. Tap install
+4. App icon appears on home screen/desktop
+5. Opens in standalone mode (no browser UI)
 
 ### View Trip Details
 1. Click trip card from list
@@ -222,18 +268,22 @@ Travo is an offline-first trip planning application that allows users to organiz
 ## Technical Constraints
 
 ### Browser Requirements
-- Modern browsers with IndexedDB support (Chrome, Firefox, Safari, Edge)
+- Modern browsers with IndexedDB and Service Worker support (Chrome, Firefox, Safari, Edge)
 - JavaScript enabled
 - Local storage quota sufficient (~50MB+ available)
+- PWA installation support (optional, but recommended)
 
 ### Network Requirements
+- **First Use**: Internet required for initial setup and data sync
 - **Offline**: Full read/write access with cached auth (up to 10 days), edit operations queued
 - **Online**: Cloud sync, Firebase auth verification, Google Maps API lookups
+- **Offline Pages**: Must visit pages while online first (cache-on-visit strategy)
 
 ### Data Limits
 - No hard limit on trips per user
 - Typical usage: <100 trips, <500 activities per trip
 - Google Maps API quota: Standard free tier limits apply
+- Browser cache storage: ~50-100MB typical, varies by browser
 
 ---
 
@@ -250,6 +300,8 @@ Travo is an offline-first trip planning application that allows users to organiz
 - Photos/media attachments
 - Recurring trips or templates
 - Multi-language support
+- iOS push notifications (requires home screen installation)
+- Background sync API (uses simpler visibility/focus triggers)
 
 ---
 
@@ -262,6 +314,9 @@ Travo is an offline-first trip planning application that allows users to organiz
 - Offline functionality available for all viewing and editing operations
 - Sync queue processes pending operations within 1 minute when online
 - Auth cache valid for 10 days without network connection
+- Visited pages work offline immediately after first visit
+- PWA installs successfully on mobile and desktop browsers
+- Service worker updates smoothly without disrupting user experience
 
 ---
 

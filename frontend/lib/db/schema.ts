@@ -3,7 +3,8 @@
  * 
  * Feature: 005-let-s-introduce (Enhanced Model - Schema v2)
  * Feature: Firebase Integration (Schema v3 - Sharing & Sync)
- * Date: 2025-10-14
+ * Feature: Trip Notes (Schema v9 - Add notes field)
+ * Date: 2025-10-21
  */
 
 import Dexie, { type EntityTable } from 'dexie';
@@ -21,7 +22,7 @@ import type {
  * TravoDatabase - IndexedDB database wrapper using Dexie
  * 
  * Database: TravoLocalDB
- * Version: 6 (Added location fields for map view)
+ * Version: 9 (Added notes field to trips)
  */
 export class TravoDatabase extends Dexie {
   // Declare table types
@@ -221,6 +222,25 @@ export class TravoDatabase extends Dexie {
       console.log('[Migration] Upgrading to v8: Adding authState table for offline-first auth');
       // No data migration needed - authState will be populated on first login
       console.log('[Migration] Schema v8 upgrade complete - offline auth enabled');
+    });
+    
+    // Define schema version 9 (Add notes field to trips)
+    // New optional field: notes (trip-level notes separate from description)
+    // No new indexes needed - this field is for display only
+    this.version(9).stores({
+      trips: 'id, deleted, updated_at, start_date, end_date, *user_access',
+      flights: 'id, trip_id, departure_time, updated_at',
+      flightLegs: 'id, flight_id, [flight_id+leg_number]',
+      hotels: 'id, trip_id, check_in_time, city, updated_at',
+      activities: 'id, trip_id, date, [trip_id+date+order_index], city, updated_at',
+      restaurants: 'id, trip_id, city, updated_at',
+      syncQueue: 'id, entity_type, entity_id, created_at, retries',
+      authState: 'id'
+    }).upgrade(async (trans) => {
+      console.log('[Migration] Upgrading to v9: Adding notes field to trips');
+      // No data migration needed - notes field is optional
+      // Existing trips will continue to work without notes
+      console.log('[Migration] Schema v9 upgrade complete - trip notes field available');
     });
   }
 }

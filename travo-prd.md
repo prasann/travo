@@ -28,13 +28,28 @@ Travo is an offline-first Progressive Web App (PWA) for trip planning that allow
 
 ---
 
-### 2. Day-by-Day Timeline
+### 2. View Modes
 
-**Chronological View**
-- Visual timeline organized by days of the trip
+**Timeline View**
+- Day-by-day chronological view of trip activities
 - Color-coded day indicators for easy navigation
 - Carousel navigation between days with prev/next controls
 - Smooth scrolling to specific days
+
+**Map View**
+- Visual map showing all trip locations
+- Hotels, activities, and restaurants plotted on map
+- Interactive markers with place details
+
+**Notes View**
+- Trip-level notes for planning and reference
+- Inline editing (double-click to edit)
+- Supports long-form text with multiple paragraphs
+- Changes saved immediately to local database
+
+### 3. Day-by-Day Timeline
+
+**Chronological View**
 
 **Timeline Items**
 - **Flights**: Airline, flight number, departure/arrival times and locations, confirmation number, notes
@@ -89,10 +104,9 @@ Travo is an offline-first Progressive Web App (PWA) for trip planning that allow
 - View existing flights (read-only details from seed data)
 - Add flight-specific notes
 
-**Notes System**
-- Trip-level notes (general trip information)
-- Entity-level notes (specific to flights, hotels, activities)
-- Notes display contextually in view mode
+**Entity-Level Notes**
+- Flight, hotel, activity, and restaurant notes (edited in edit mode)
+- Notes display contextually in timeline view
 
 **Data Restrictions**
 - Auto-populated fields (name, address from Maps API) are read-only
@@ -185,7 +199,8 @@ Travo is an offline-first Progressive Web App (PWA) for trip planning that allow
 3. Opens app - loads from cache
 4. Views cached trips and activities
 5. Data read from IndexedDB
-6. Edit operations queued for sync
+6. Can edit trip notes (Notes tab)
+7. Edit Trip button disabled (requires internet for Maps API)
 
 ---
 
@@ -242,18 +257,22 @@ Travo is an offline-first Progressive Web App (PWA) for trip planning that allow
 ### View Trip Details
 1. Click trip card from list
 2. View trip header with dates and description
-3. Navigate day-by-day timeline
-4. Click day buttons to jump to specific date
-5. View restaurants section below timeline
+3. Switch between Timeline, Map, and Notes views using tabs
+4. Timeline: Navigate day-by-day, click day buttons to jump to specific date
+5. Map: View all locations plotted on interactive map
+6. Notes: View and edit trip notes with double-click
+7. View restaurants section below (in Timeline/Map views)
 
 ### Edit Trip
-1. Click "Edit" button on trip page
-2. Select category (Flights, Hotels, Attractions, Notes)
+1. Click "Edit" button on trip page (requires internet connection)
+2. Select category (Flights, Hotels, Attractions, Restaurants)
 3. Add items via Google Maps links
 4. Reorder items with drag-and-drop
-5. Add notes to trip or individual items
+5. Add notes to individual items
 6. Changes save automatically to IndexedDB
 7. Changes sync to Firestore in background
+
+**Note**: Edit mode is disabled when offline since adding places requires Google Maps API lookups.
 
 ### Add Activity
 1. Enter edit mode → Attractions section
@@ -262,6 +281,15 @@ Travo is an offline-first Progressive Web App (PWA) for trip planning that allow
 4. System fetches place details automatically
 5. Confirm and save
 6. Activity appears in timeline immediately
+
+### Edit Trip Notes
+1. Navigate to trip detail page
+2. Click "Notes" tab (next to Timeline and Map)
+3. Double-click notes area or click "Edit" button
+4. Type or edit notes (supports multiple paragraphs)
+5. Click "Save Notes" or "Cancel"
+6. Changes saved immediately to local database
+7. Syncs to cloud in background
 
 ---
 

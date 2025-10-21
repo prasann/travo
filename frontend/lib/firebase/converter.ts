@@ -78,17 +78,24 @@ function buildFirestoreDoc<T extends DocumentData>(
 
 export const tripConverter: FirestoreDataConverter<FirestoreTrip> = {
   toFirestore(trip: FirestoreTrip): DocumentData {
-    return {
-      id: trip.id,
-      name: trip.name,
-      destination: trip.destination,
-      start_date: trip.start_date,
-      end_date: trip.end_date,
-      user_access: trip.user_access,
-      updated_by: trip.updated_by,
-      updated_at: trip.updated_at,
-      created_at: trip.created_at || getCurrentISOTimestamp(),
-    };
+    return buildFirestoreDoc(
+      // Required fields
+      {
+        id: trip.id,
+        name: trip.name,
+        destination: trip.destination,
+        start_date: trip.start_date,
+        end_date: trip.end_date,
+        user_access: trip.user_access,
+        updated_by: trip.updated_by,
+        updated_at: trip.updated_at,
+        created_at: trip.created_at || getCurrentISOTimestamp(),
+      },
+      // Optional fields
+      {
+        notes: trip.notes,
+      }
+    );
   },
 
   fromFirestore(
@@ -103,6 +110,7 @@ export const tripConverter: FirestoreDataConverter<FirestoreTrip> = {
       destination: data.destination || '',
       start_date: data.start_date || '',
       end_date: data.end_date || '',
+      notes: data.notes,
       user_access: data.user_access || [],
       updated_by: data.updated_by || '',
       updated_at: typeof data.updated_at === 'string'
@@ -377,6 +385,7 @@ export function tripToFirestore(trip: Trip): FirestoreTrip {
     destination: trip.description || trip.name,
     start_date: trip.start_date,
     end_date: trip.end_date,
+    notes: trip.notes,
     user_access: trip.user_access,
     updated_by: trip.updated_by,
     updated_at: trip.updated_at,
@@ -395,6 +404,7 @@ export function tripFromFirestore(firestoreTrip: FirestoreTrip): Trip {
     start_date: firestoreTrip.start_date,
     end_date: firestoreTrip.end_date,
     home_location: undefined,
+    notes: firestoreTrip.notes,
     updated_at: firestoreTrip.updated_at,
     deleted: false,
     user_access: firestoreTrip.user_access,

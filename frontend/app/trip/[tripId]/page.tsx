@@ -6,11 +6,14 @@ import { Navigation } from '@/components/Navigation'
 import { TripTimeline } from '@/components/TripTimeline'
 import { RestaurantList } from '@/components/RestaurantList'
 import TripMapView from '@/components/TripMapView'
+import TripNotes from '@/components/TripNotes'
 import { formatDate } from '@/lib/dateTime'
 import { useEffect, useState } from 'react'
+import { useNetworkStatus } from '@/hooks/useNetworkStatus'
+import { Calendar, Map, FileText } from 'lucide-react'
 import type { TripWithRelations } from '@/lib/db'
 
-type ViewMode = 'timeline' | 'map';
+type ViewMode = 'timeline' | 'map' | 'notes';
 
 interface TripPageProps {
   params: Promise<{
@@ -32,6 +35,7 @@ interface TripPageProps {
 export default function TripPage({ params }: TripPageProps) {
   const [tripId, setTripId] = useState<string>('');
   const [viewMode, setViewMode] = useState<ViewMode>('timeline');
+  const isOnline = useNetworkStatus();
 
   useEffect(() => {
     params.then(p => {
@@ -72,11 +76,25 @@ export default function TripPage({ params }: TripPageProps) {
         <div className="container mx-auto max-w-4xl">
           {/* Trip Header */}
           <div className="mb-4 sm:mb-6">
-            <div className="flex justify-between items-start mb-1">
+            <div className="flex justify-between items-start gap-2 mb-1">
               <h1 className="text-2xl sm:text-4xl font-bold">{trip.name}</h1>
-              <a href={`/trip/${tripId}/edit`} className="btn btn-primary btn-sm">
-                Edit Trip
-              </a>
+              <div className="flex flex-col items-end gap-1">
+                <a 
+                  href={isOnline ? `/trip/${tripId}/edit` : undefined}
+                  className={`btn btn-primary btn-sm ${!isOnline ? 'btn-disabled' : ''}`}
+                  title={!isOnline ? 'Edit mode requires internet connection' : 'Edit trip details'}
+                  onClick={(e) => {
+                    if (!isOnline) {
+                      e.preventDefault();
+                    }
+                  }}
+                >
+                  Edit Trip
+                </a>
+                {!isOnline && (
+                  <span className="text-xs text-warning">Offline</span>
+                )}
+              </div>
             </div>
           <p className="text-base-content/60 text-sm sm:text-base">
             {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
@@ -98,13 +116,22 @@ export default function TripPage({ params }: TripPageProps) {
               className={`tab ${viewMode === 'timeline' ? 'tab-active' : ''}`}
               onClick={() => setViewMode('timeline')}
             >
-              📅 Timeline
+              <Calendar className="w-4 h-4 mr-1" />
+              Timeline
             </button>
             <button
               className={`tab ${viewMode === 'map' ? 'tab-active' : ''}`}
               onClick={() => setViewMode('map')}
+            > 
+            <Map className="w-4 h-4 mr-1" />
+            Map
+            </button>
+            <button
+              className={`tab ${viewMode === 'notes' ? 'tab-active' : ''}`}
+              onClick={() => setViewMode('notes')}
             >
-              🗺️ Map
+              <FileText className="w-4 h-4 mr-1" />
+              Notes
             </button>
           </div>
         </div>
@@ -120,6 +147,13 @@ export default function TripPage({ params }: TripPageProps) {
         {viewMode === 'map' && (
           <div>
             <TripMapView trip={trip} />
+          </div>
+        )}
+        
+        {/* Notes View */}
+        {viewMode === 'notes' && (
+          <div>
+            <TripNotes trip={trip} onUpdate={() => query.refetch()} />
           </div>
         )}
 

@@ -26,6 +26,7 @@ export interface FirestoreTrip {
   destination: string;
   start_date: string; // ISO 8601 date string
   end_date: string;   // ISO 8601 date string
+  notes?: string;     // Trip-level notes
   
   // Sharing fields
   user_access: string[];  // Array of email addresses with access

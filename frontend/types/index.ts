@@ -5,6 +5,7 @@ export interface Trip {
   start_date: string;
   end_date: string;
   home_location?: string;
+  notes?: string;
   updated_at: string;
   flights?: Flight[];
   hotels?: Hotel[];

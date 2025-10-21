@@ -94,17 +94,19 @@ frontend/
 │   ├── ServiceWorkerRegistration.tsx # PWA service worker registration
 │   ├── TripList.tsx              # Trip card list
 │   ├── TripTimeline.tsx          # Day-by-day timeline
+│   ├── TripMapView.tsx           # Map view with location markers
+│   ├── TripNotes.tsx             # Trip notes with inline editing
 │   ├── FlightCard.tsx            # Flight display
 │   ├── HotelCard.tsx             # Hotel display
 │   ├── ActivityCard.tsx          # Activity display
 │   ├── RestaurantList.tsx        # Restaurant recommendations
 │   └── edit/                     # Edit mode components
 │       ├── EditModeLayout.tsx    # Edit mode wrapper
-│       ├── CategoryNav.tsx       # Category navigation
+│       ├── CategoryNav.tsx       # Category navigation (5 tabs)
 │       ├── FlightSection.tsx     # Flight editing
 │       ├── HotelSection.tsx      # Hotel editing
-│       ├── AttractionSection.tsx # Activity editing
-│       └── NotesSection.tsx      # Notes editing
+│       ├── ActivitySection.tsx   # Activity editing
+│       └── RestaurantSection.tsx # Restaurant editing
 │
 ├── lib/                          # Core logic
 │   ├── refine/                   # Refine.dev integration

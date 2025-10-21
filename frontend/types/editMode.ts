@@ -24,9 +24,6 @@ export interface TripEditFormData {
   /** Home/starting location */
   home_location?: string;
   
-  /** Trip-level notes */
-  notes?: string;
-  
   /** Shared with users (email addresses, comma-separated) */
   shared_users?: string;
   
@@ -222,7 +219,7 @@ export interface RestaurantEditFormData {
 /**
  * Category names for tab navigation
  */
-export type EditCategory = 'info' | 'flights' | 'hotels' | 'activities' | 'restaurants' | 'notes';
+export type EditCategory = 'info' | 'flights' | 'hotels' | 'activities' | 'restaurants';
 
 /**
  * UI state for Maps Link input component

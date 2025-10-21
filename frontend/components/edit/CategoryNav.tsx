@@ -20,7 +20,6 @@ const categories: { id: EditCategory; label: string }[] = [
   { id: 'hotels', label: 'Hotels' },
   { id: 'activities', label: 'Activities' },
   { id: 'restaurants', label: 'Restaurants' },
-  { id: 'notes', label: 'Notes' },
 ];
 
 export default function CategoryNav({ activeCategory, onCategoryChange }: CategoryNavProps) {

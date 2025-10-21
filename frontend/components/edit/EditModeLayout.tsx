@@ -19,7 +19,6 @@ import type { TripEditFormData, EditCategory } from '@/types/editMode';
 import type { TripWithRelations } from '@/lib/db/models';
 import { bulkUpdateActivities } from '@/lib/db/operations/activities';
 import CategoryNav from './CategoryNav';
-import NotesSection from './NotesSection';
 import HotelSection from './HotelSection';
 import ActivitySection from './ActivitySection';
 import FlightSection from './FlightSection';
@@ -76,16 +75,15 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
   const queryError = queryResult?.error;
 
   // Watch form fields for conditional rendering
-  const watchedNotes = watch('notes');
   const watchedStartDate = watch('start_date');
   const watchedEndDate = watch('end_date');
   
   // Initialize form with trip data (including nested entities)
   useEffect(() => {
     if (trip) {
-      // Convert user_access array to comma-separated string (excluding current user)
-      const currentUser = trip.user_access[0]; // First user is typically the owner
-      const sharedUsers = trip.user_access.filter(email => email !== currentUser);
+      // Convert user_access array to comma-separated string
+      // Show all users in the text field so it's editable
+      const sharedUsers = trip.user_access.join(', ');
       
       reset({
         name: trip.name,
@@ -93,8 +91,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         start_date: trip.start_date,
         end_date: trip.end_date,
         home_location: trip.home_location || '',
-        notes: '',
-        shared_users: sharedUsers.join(', '),
+        shared_users: sharedUsers,
         hotels: trip.hotels.map(h => ({
           id: h.id,
           name: h.name,
@@ -157,12 +154,13 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
   // Save handler - processes trip and all nested entities
   const onSubmit = async (data: TripEditFormData) => {
     try {
-      // Convert comma-separated emails to array and add current user
-      const currentUser = trip?.user_access[0] || ''; // Owner
-      const sharedEmails = data.shared_users 
-        ? data.shared_users.split(',').map(email => email.trim()).filter(email => email && email !== currentUser)
+      // Convert comma-separated emails to array
+      const userAccess = data.shared_users 
+        ? data.shared_users.split(',').map(email => email.trim()).filter(email => email.length > 0)
         : [];
-      const userAccess = [currentUser, ...sharedEmails];
+      
+      // Ensure at least one user (fallback to existing user_access if empty)
+      const finalUserAccess = userAccess.length > 0 ? userAccess : trip?.user_access || [];
       
       // Save trip basic info (automatic notification & cache invalidation)
       await onFinish({
@@ -171,7 +169,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         start_date: data.start_date,
         end_date: data.end_date,
         home_location: data.home_location,
-        user_access: userAccess,
+        user_access: finalUserAccess,
       });
       
       // Process hotel changes
@@ -547,11 +545,6 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
               setValue={setValue}
               watch={watch}
             />
-          )}
-          
-          {/* Notes Section */}
-          {activeCategory === 'notes' && (
-            <NotesSection register={register} notes={watchedNotes} />
           )}
           
           {/* Save Button */}

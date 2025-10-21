@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { DEFAULT_THEME } from "@/config/theme";
 import { DatabaseProvider } from "@/components/DatabaseProvider";
@@ -18,12 +18,15 @@ export const metadata: Metadata = {
     apple: '/icons/apple-touch-icon.png',
   },
   manifest: '/manifest.json',
-  themeColor: '#1d232a',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'Travo',
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#1d232a',
 };
 
 export default function RootLayout({

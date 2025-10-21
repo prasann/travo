@@ -32,6 +32,7 @@ export class TravoDatabase extends Dexie {
   activities!: EntityTable<DailyActivity, 'id'>;
   restaurants!: EntityTable<RestaurantRecommendation, 'id'>;
   syncQueue!: EntityTable<SyncQueueEntry, 'id'>;
+  authState!: EntityTable<{ id: string; user: any; lastVerified: number }, 'id'>;
 
   constructor() {
     super('TravoLocalDB');
@@ -203,6 +204,23 @@ export class TravoDatabase extends Dexie {
       // Existing activities will continue to work without description
       // New activities will include description from Google Places API
       console.log('[Migration] Schema v7 upgrade complete - description field available');
+    });
+    
+    // Define schema version 8 (Add authState table for offline-first authentication)
+    // Store cached authentication state to enable app to start offline
+    this.version(8).stores({
+      trips: 'id, deleted, updated_at, start_date, end_date, *user_access',
+      flights: 'id, trip_id, departure_time, updated_at',
+      flightLegs: 'id, flight_id, [flight_id+leg_number]',
+      hotels: 'id, trip_id, check_in_time, city, updated_at',
+      activities: 'id, trip_id, date, [trip_id+date+order_index], city, updated_at',
+      restaurants: 'id, trip_id, city, updated_at',
+      syncQueue: 'id, entity_type, entity_id, created_at, retries',
+      authState: 'id' // Single-row table to cache current auth state
+    }).upgrade(async (trans) => {
+      console.log('[Migration] Upgrading to v8: Adding authState table for offline-first auth');
+      // No data migration needed - authState will be populated on first login
+      console.log('[Migration] Schema v8 upgrade complete - offline auth enabled');
     });
   }
 }

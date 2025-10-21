@@ -17,29 +17,38 @@ import { useAuth } from '@/contexts/AuthContext';
 import { isEmailAllowed, isAllowlistConfigured } from '@/lib/auth/allowlist';
 
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, isOffline } = useAuth();
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Wait for auth to finish loading before initializing database
-    if (authLoading) {
-      console.log('[DatabaseProvider] Waiting for auth...');
-      return;
-    }
-
     async function init() {
-      console.log('[DatabaseProvider] Initializing database...');
-      console.log('[DatabaseProvider] User:', user?.email || 'not authenticated');
-      
       // SECURITY: Check allowlist before downloading any data
       if (user?.email && isAllowlistConfigured()) {
         if (!isEmailAllowed(user.email)) {
-          console.warn('[DatabaseProvider] 🚫 User not in allowlist, skipping data sync');
-          // Don't initialize database with user email - this prevents Firestore sync
-          // The AuthContext will handle signing the user out
+          console.warn('[DatabaseProvider] User not in allowlist, skipping data sync');
           return;
         }
+      }
+      
+      // If we're using cached auth (offline mode), don't wait for Firebase verification
+      // Just initialize the database without syncing
+      if (isOffline) {
+        const result = await initializeDatabase(undefined); // No user email = no Firestore sync
+        
+        if (isOk(result)) {
+          setIsInitialized(true);
+        } else {
+          const error = unwrapErr(result);
+          console.error('[DatabaseProvider] Database initialization failed:', error);
+          setError(error.message);
+        }
+        return;
+      }
+      
+      // Wait for auth to finish loading before syncing from Firestore
+      if (authLoading) {
+        return;
       }
       
       // Pass user email to enable Firestore sync if authenticated and authorized
@@ -47,17 +56,16 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       const result = await initializeDatabase(userEmail);
       
       if (isOk(result)) {
-        console.log('[DatabaseProvider] ✓ Database initialized successfully');
         setIsInitialized(true);
       } else {
         const error = unwrapErr(result);
-        console.error('[DatabaseProvider] ✗ Database initialization failed:', error);
+        console.error('[DatabaseProvider] Database initialization failed:', error);
         setError(error.message);
       }
     }
 
     init();
-  }, [user, authLoading]);
+  }, [user, authLoading, isOffline]);
 
   // Show loading state while initializing
   if (!isInitialized && !error) {

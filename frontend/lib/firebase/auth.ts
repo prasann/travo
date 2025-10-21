@@ -62,7 +62,11 @@ export async function checkRedirectResult(): Promise<UserCredential | null> {
       console.log('✅ Redirect sign in successful');
     }
     return result;
-  } catch (error) {
+  } catch (error: any) {
+    // Silently ignore network errors when offline
+    if (error?.code === 'auth/network-request-failed') {
+      return null;
+    }
     console.error('❌ Error getting redirect result:', error);
     throw error;
   }
@@ -70,6 +74,7 @@ export async function checkRedirectResult(): Promise<UserCredential | null> {
 
 /**
  * Sign out current user
+ * Also clears cached auth state from IndexedDB
  * @throws Error if sign-out fails
  */
 export async function signOut(): Promise<void> {
@@ -77,6 +82,7 @@ export async function signOut(): Promise<void> {
   
   try {
     await firebaseSignOut(auth);
+    // Clear cached auth will be handled by AuthContext's onAuthStateChanged listener
   } catch (error) {
     console.error('Error signing out:', error);
     throw error;

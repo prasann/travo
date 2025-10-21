@@ -255,6 +255,12 @@ syncQueue: {
   retries: number
   last_error?: string
 }
+
+authState: {
+  id: string (PK, always 'current')
+  user: AppUser | null (cached user object)
+  lastVerified: number (timestamp of last Firebase verification)
+}
 ```
 
 **Indexes**:
@@ -264,6 +270,7 @@ syncQueue: {
 - Activities: `id`, `trip_id`, `date`, `[trip_id+date+order_index]`, `city`, `updated_at`
 - Restaurants: `id`, `trip_id`, `city`, `updated_at`
 - SyncQueue: `id`, `entity_type`, `entity_id`, `created_at`, `retries`
+- AuthState: `id` (single-row table for cached auth)
 
 ---
 
@@ -303,14 +310,36 @@ trips/{tripId}
 // Sign in with Google popup
 signInWithGoogle() → Firebase User
 
-// Sign out
+// Sign out (also clears cached auth)
 signOut() → void
 
 // Auth state observer
 onAuthStateChanged() → User | null
 ```
 
-**Context**: `AuthContext` wraps entire app, provides `user`, `loading`, `error` state.
+**Offline-First Architecture**:
+1. **Cached Auth State** (`lib/db/operations/authState.ts`):
+   - User authentication cached in IndexedDB
+   - 10-day cache validity period
+   - App starts immediately with cached user (no network wait)
+   
+2. **Three-Phase Loading** (`contexts/AuthContext.tsx`):
+   - **Phase 1**: Load cached auth from IndexedDB (instant, non-blocking)
+   - **Phase 2**: Check for OAuth redirect result (if returning from sign-in)
+   - **Phase 3**: Subscribe to Firebase auth state (background verification)
+   
+3. **State Synchronization**:
+   - Cached state used for immediate app start
+   - Firebase verification runs in background
+   - Cache updated when Firebase confirms user
+   - Cache cleared on sign out or auth failure
+   
+4. **Offline Indicator**:
+   - `isOffline` flag indicates using cached auth
+   - Visual indicator in sync status component
+   - Full read/write access with cached auth
+
+**Context**: `AuthContext` wraps entire app, provides `user`, `firebaseUser`, `loading`, `error`, `isOffline` state.
 
 ---
 
@@ -361,14 +390,23 @@ onAuthStateChanged() → User | null
 ### Provider Hierarchy
 
 ```typescript
-<AuthProvider>                    // Firebase auth state
+<AuthProvider>                    // Firebase auth state (with cached auth)
   <DatabaseProvider>              // IndexedDB initialization
-    <SyncProvider>                // Background sync controller
-      {children}                  // App content
-    </SyncProvider>
+    <RefineProvider>              // Refine data/auth/notification
+      <SyncProvider>              // Background sync controller
+        {children}                // App content
+      </SyncProvider>
+    </RefineProvider>
   </DatabaseProvider>
 </AuthProvider>
 ```
+
+**Load Sequence**:
+1. AuthProvider loads cached auth from IndexedDB (instant)
+2. App can render immediately with cached user
+3. Firebase verifies in background
+4. DatabaseProvider initializes IndexedDB
+5. SyncProvider starts background sync (if online)
 
 ### Local State
 - Component-level: `useState` for UI state
@@ -587,7 +625,7 @@ allow write: if request.auth != null
 
 ### Database Migrations
 
-Dexie handles schema migrations automatically. Current version: **v5**
+Dexie handles schema migrations automatically. Current version: **v8**
 
 **Migration v2 → v3**:
 - Added `user_access`, `updated_by` fields
@@ -600,6 +638,19 @@ Dexie handles schema migrations automatically. Current version: **v5**
 **Migration v4 → v5**:
 - Removed deprecated `places` table
 - No data transformation required (table was unused)
+
+**Migration v5 → v6**:
+- Added location fields (`google_maps_url`, `latitude`, `longitude`)
+- No data migration required (optional fields)
+
+**Migration v6 → v7**:
+- Added `description` field to activities
+- No data migration required (optional field)
+
+**Migration v7 → v8**:
+- Added `authState` table for offline-first authentication
+- Enables app to start with cached auth (no network wait)
+- 10-day cache validity with automatic expiration
 
 ### Future Migrations
 
@@ -620,3 +671,4 @@ To add new fields:
 - Short link resolution requires network (can't be fully offline)
 - No undo/redo functionality
 - Sync failures require manual retry after 3 attempts
+- Cached auth expires after 10 days offline (requires re-authentication)

@@ -108,11 +108,18 @@ Travo is an offline-first trip planning application that allows users to organiz
 - Firebase Authentication integration
 - Login button on home page when not authenticated
 
+**Offline-First Authentication**
+- Authentication state cached in IndexedDB (10-day validity)
+- App starts immediately with cached user data, even offline
+- Firebase verifies auth in background when online
+- Seamless transition from cached to verified state
+- Automatic cache refresh on successful verification
+
 **Cloud Sync**
 - **Pull Sync**: Download trips from Firestore on login
 - **Push Sync**: Upload local changes to Firestore automatically
 - Background sync with retry logic for failed uploads
-- Sync status indicator showing pending/failed operations
+- Sync status indicator showing pending/failed/offline operations
 
 **Sync Queue**
 - Automatic queuing of create, update, delete operations
@@ -134,12 +141,14 @@ Travo is an offline-first trip planning application that allows users to organiz
 - All data available offline after initial sync
 - Persistent across browser sessions
 - No network required for viewing or editing
+- Cached authentication state for offline access
 
 **Data Model**
 - Trips with associated flights, hotels, activities, restaurants
 - Soft delete support (trips can be recovered)
 - Updated timestamps for sync tracking
 - Referential integrity between trips and nested entities
+- Auth state cache with last verification timestamp
 
 ---
 
@@ -174,7 +183,15 @@ Travo is an offline-first trip planning application that allows users to organiz
 1. Open app → See login prompt
 2. Sign in with Google
 3. Database initializes and syncs from Firestore
-4. View trip list (if trips exist in cloud)
+4. Auth state cached for offline access
+5. View trip list (if trips exist in cloud)
+
+### Returning User (Offline)
+1. Open app → Loads cached auth from IndexedDB
+2. App starts immediately with existing data
+3. Firebase verifies auth in background (when online)
+4. "Offline" indicator shown in sync status
+5. Full read/write access to cached trips
 
 ### View Trip Details
 1. Click trip card from list
@@ -210,8 +227,8 @@ Travo is an offline-first trip planning application that allows users to organiz
 - Local storage quota sufficient (~50MB+ available)
 
 ### Network Requirements
-- **Offline**: Full read access, edit operations queued
-- **Online**: Cloud sync, Google Maps API lookups
+- **Offline**: Full read/write access with cached auth (up to 10 days), edit operations queued
+- **Online**: Cloud sync, Firebase auth verification, Google Maps API lookups
 
 ### Data Limits
 - No hard limit on trips per user
@@ -238,11 +255,13 @@ Travo is an offline-first trip planning application that allows users to organiz
 
 ## Success Metrics
 
-- Users can view trip details within 2 seconds of page load
+- Users can view trip details within 2 seconds of page load (even offline)
+- App starts immediately with cached auth (no network wait)
 - Edit operations complete in under 30 seconds (including Maps lookup)
 - 100% data persistence across browser sessions
-- Offline functionality available for all viewing operations
+- Offline functionality available for all viewing and editing operations
 - Sync queue processes pending operations within 1 minute when online
+- Auth cache valid for 10 days without network connection
 
 ---
 

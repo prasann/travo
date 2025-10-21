@@ -90,6 +90,15 @@ export {
   deleteRestaurant
 } from './operations/restaurants';
 
+// Auth state operations (for offline-first authentication)
+export {
+  getCachedAuthState,
+  saveCachedAuthState,
+  clearCachedAuthState,
+  hasCachedAuth
+} from './operations/authState';
+export type { CachedAuthState } from './operations/authState';
+
 // Sync operations
 export { 
   processQueue,

@@ -46,8 +46,6 @@ export async function isInitialized(): Promise<boolean> {
  */
 export async function initializeDatabase(userEmail?: string): Promise<Result<void>> {
   return wrapDatabaseOperation(async () => {
-    console.log('[DB Init] Initializing database...');
-    
     // Opening the database will automatically create tables based on schema
     // and run any pending migrations (e.g., v2 -> v3)
     await db.open();
@@ -62,34 +60,24 @@ export async function initializeDatabase(userEmail?: string): Promise<Result<voi
     
     // If user is authenticated, sync from Firestore
     if (userEmail) {
-      console.log(`[DB Init] User authenticated: ${userEmail}`);
-      
       // Check if we already have data
       const hasData = await isInitialized();
       if (hasData) {
-        console.log('[DB Init] Database already has data, skipping initial sync');
         return;
       }
       
       // Pull trips from Firestore
-      console.log('[DB Init] Pulling trips from Firestore...');
       const syncResult = await syncTripsFromFirestore(userEmail);
       
       if (!isOk(syncResult)) {
         console.error('[DB Init] Failed to sync from Firestore:', unwrapErr(syncResult).message);
         // Don't throw - allow app to continue even if sync fails
-        // User can retry or add trips manually
-      } else {
-        console.log(`[DB Init] Successfully synced ${unwrap(syncResult)} trips from Firestore`);
       }
     } else {
-      console.log('[DB Init] No user authenticated, skipping Firestore sync');
-      
       // For development/testing: load seed data if database is empty and no user
       if (process.env.NODE_ENV === 'development') {
         const hasData = await isInitialized();
         if (!hasData) {
-          console.log('[DB Init] Loading seed data for development...');
           const seedResult = await loadSeedData();
           if (!isOk(seedResult)) {
             console.warn('[DB Init] Failed to load seed data:', unwrapErr(seedResult).message);
@@ -97,7 +85,5 @@ export async function initializeDatabase(userEmail?: string): Promise<Result<voi
         }
       }
     }
-    
-    console.log('[DB Init] Database initialization complete');
   });
 }

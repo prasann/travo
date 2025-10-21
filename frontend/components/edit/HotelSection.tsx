@@ -3,6 +3,7 @@
  * 
  * Feature: 006-edit-mode-for
  * Purpose: Manage hotels in edit mode with Plus Code lookup
+ * Updated: 2025-10-21 - Added timezone preservation support
  */
 
 'use client';
@@ -12,6 +13,13 @@ import { UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form'
 import type { TripEditFormData, HotelEditFormData } from '@/types/editMode';
 import MapsLinkInput from './MapsLinkInput';
 import { Lock } from 'lucide-react';
+import { 
+  toDateTimeLocalValue, 
+  toIsoWithOriginalTimezone,
+  getTimezoneAbbreviation,
+  getCommonTimezones,
+  extractTimezoneInfo
+} from '@/lib/timezoneUtils';
 
 interface HotelSectionProps {
   register: UseFormRegister<TripEditFormData>;
@@ -19,30 +27,13 @@ interface HotelSectionProps {
   watch: UseFormWatch<TripEditFormData>;
 }
 
-/**
- * Convert ISO datetime string to datetime-local input format (YYYY-MM-DDTHH:mm)
- */
-function toDateTimeLocalValue(isoString?: string): string {
-  if (!isoString) return '';
-  try {
-    const date = new Date(isoString);
-    // Format: YYYY-MM-DDTHH:mm
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  } catch {
-    return '';
-  }
-}
-
 export default function HotelSection({ register, setValue, watch }: HotelSectionProps) {
   const hotels = watch('hotels') || [];
   const [newHotel, setNewHotel] = useState<Partial<HotelEditFormData>>({});
   const [plusCode, setPlusCode] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [newHotelCheckInTz, setNewHotelCheckInTz] = useState('+05:30'); // Default to IST
+  const [newHotelCheckOutTz, setNewHotelCheckOutTz] = useState('+05:30');
   
   const handlePlusCodeSuccess = (result: { 
     name: string; 
@@ -181,42 +172,152 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                       </div>
                     </div>
                     
-                    {/* Row 2: Check-in and Check-out */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                      <div className="form-control w-full">
-                        <label className="label">
-                          <span className="label-text text-sm">Check-in</span>
-                        </label>
-                        <input
-                          type="datetime-local"
-                          value={toDateTimeLocalValue(watch(`hotels.${index}.check_in_time`))}
-                          className="input input-bordered w-full"
-                          onChange={(e) => {
-                            if (e.target.value) {
-                              setValue(`hotels.${index}.check_in_time`, new Date(e.target.value).toISOString());
-                            } else {
-                              setValue(`hotels.${index}.check_in_time`, undefined);
-                            }
-                          }}
-                        />
+                    {/* Row 2: Check-in and Check-out with Timezone */}
+                    <div className="space-y-3">
+                      {/* Check-in */}
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                        <div className="form-control w-full lg:col-span-2">
+                          <label className="label">
+                            <span className="label-text text-sm">Check-in</span>
+                            {watch(`hotels.${index}.check_in_time`) && (
+                              <span className="label-text-alt badge badge-ghost badge-sm">
+                                {getTimezoneAbbreviation(watch(`hotels.${index}.check_in_time`)!)}
+                              </span>
+                            )}
+                          </label>
+                          <input
+                            type="datetime-local"
+                            value={toDateTimeLocalValue(watch(`hotels.${index}.check_in_time`))}
+                            className="input input-bordered w-full"
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                const newValue = toIsoWithOriginalTimezone(
+                                  e.target.value,
+                                  watch(`hotels.${index}.check_in_time`)
+                                );
+                                setValue(`hotels.${index}.check_in_time`, newValue);
+                              } else {
+                                setValue(`hotels.${index}.check_in_time`, undefined);
+                              }
+                            }}
+                          />
+                        </div>
+                        
+                        <div className="form-control w-full">
+                          <label className="label">
+                            <span className="label-text text-sm">Timezone</span>
+                          </label>
+                          <select
+                            className="select select-bordered w-full"
+                            value={(() => {
+                              const checkInTime = watch(`hotels.${index}.check_in_time`);
+                              if (!checkInTime) return '+05:30'; // Default to IST
+                              const { offset } = extractTimezoneInfo(checkInTime);
+                              const exists = getCommonTimezones().some(tz => tz.offset === offset);
+                              return exists ? offset : '+05:30';
+                            })()}
+                            onChange={(e) => {
+                              const selectedOffset = e.target.value;
+                              
+                              const currentTime = watch(`hotels.${index}.check_in_time`);
+                              if (currentTime) {
+                                const localValue = toDateTimeLocalValue(currentTime);
+                                const newValue = toIsoWithOriginalTimezone(
+                                  localValue,
+                                  `2025-01-01T00:00:00${selectedOffset}`
+                                );
+                                setValue(`hotels.${index}.check_in_time`, newValue);
+                              } else {
+                                const now = new Date();
+                                const year = now.getFullYear();
+                                const month = String(now.getMonth() + 1).padStart(2, '0');
+                                const day = String(now.getDate()).padStart(2, '0');
+                                const defaultTime = `${year}-${month}-${day}T15:00`;
+                                const newValue = toIsoWithOriginalTimezone(defaultTime, `2025-01-01T00:00:00${selectedOffset}`);
+                                setValue(`hotels.${index}.check_in_time`, newValue);
+                              }
+                            }}
+                          >
+                            {getCommonTimezones().map((tz) => (
+                              <option key={tz.offset} value={tz.offset}>
+                                {tz.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                       
-                      <div className="form-control w-full">
-                        <label className="label">
-                          <span className="label-text text-sm">Check-out</span>
-                        </label>
-                        <input
-                          type="datetime-local"
-                          value={toDateTimeLocalValue(watch(`hotels.${index}.check_out_time`))}
-                          className="input input-bordered w-full"
-                          onChange={(e) => {
-                            if (e.target.value) {
-                              setValue(`hotels.${index}.check_out_time`, new Date(e.target.value).toISOString());
-                            } else {
-                              setValue(`hotels.${index}.check_out_time`, undefined);
-                            }
-                          }}
-                        />
+                      {/* Check-out */}
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                        <div className="form-control w-full lg:col-span-2">
+                          <label className="label">
+                            <span className="label-text text-sm">Check-out</span>
+                            {watch(`hotels.${index}.check_out_time`) && (
+                              <span className="label-text-alt badge badge-ghost badge-sm">
+                                {getTimezoneAbbreviation(watch(`hotels.${index}.check_out_time`)!)}
+                              </span>
+                            )}
+                          </label>
+                          <input
+                            type="datetime-local"
+                            value={toDateTimeLocalValue(watch(`hotels.${index}.check_out_time`))}
+                            className="input input-bordered w-full"
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                const newValue = toIsoWithOriginalTimezone(
+                                  e.target.value,
+                                  watch(`hotels.${index}.check_out_time`)
+                                );
+                                setValue(`hotels.${index}.check_out_time`, newValue);
+                              } else {
+                                setValue(`hotels.${index}.check_out_time`, undefined);
+                              }
+                            }}
+                          />
+                        </div>
+                        
+                        <div className="form-control w-full">
+                          <label className="label">
+                            <span className="label-text text-sm">Timezone</span>
+                          </label>
+                          <select
+                            className="select select-bordered w-full"
+                            value={(() => {
+                              const checkOutTime = watch(`hotels.${index}.check_out_time`);
+                              if (!checkOutTime) return '+05:30'; // Default to IST
+                              const { offset } = extractTimezoneInfo(checkOutTime);
+                              const exists = getCommonTimezones().some(tz => tz.offset === offset);
+                              return exists ? offset : '+05:30';
+                            })()}
+                            onChange={(e) => {
+                              const selectedOffset = e.target.value;
+                              
+                              const currentTime = watch(`hotels.${index}.check_out_time`);
+                              if (currentTime) {
+                                const localValue = toDateTimeLocalValue(currentTime);
+                                const newValue = toIsoWithOriginalTimezone(
+                                  localValue,
+                                  `2025-01-01T00:00:00${selectedOffset}`
+                                );
+                                setValue(`hotels.${index}.check_out_time`, newValue);
+                              } else {
+                                const now = new Date();
+                                const year = now.getFullYear();
+                                const month = String(now.getMonth() + 1).padStart(2, '0');
+                                const day = String(now.getDate()).padStart(2, '0');
+                                const defaultTime = `${year}-${month}-${day}T11:00`;
+                                const newValue = toIsoWithOriginalTimezone(defaultTime, `2025-01-01T00:00:00${selectedOffset}`);
+                                setValue(`hotels.${index}.check_out_time`, newValue);
+                              }
+                            }}
+                          >
+                            {getCommonTimezones().map((tz) => (
+                              <option key={tz.offset} value={tz.offset}>
+                                {tz.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     </div>
                     
@@ -318,30 +419,128 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                       </div>
                     </div>
                     
-                    {/* Row 2: Check-in and Check-out */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                      <div className="form-control w-full">
-                        <label className="label">
-                          <span className="label-text">Check-in</span>
-                        </label>
-                        <input
-                          type="datetime-local"
-                          value={newHotel.check_in_time || ''}
-                          onChange={(e) => setNewHotel(prev => ({ ...prev, check_in_time: e.target.value }))}
-                          className="input input-bordered w-full"
-                        />
+                    {/* Row 2: Check-in and Check-out with Timezone */}
+                    <div className="space-y-3">
+                      {/* Check-in */}
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                        <div className="form-control w-full lg:col-span-2">
+                          <label className="label">
+                            <span className="label-text">Check-in</span>
+                          </label>
+                          <input
+                            type="datetime-local"
+                            value={newHotel.check_in_time 
+                              ? toDateTimeLocalValue(newHotel.check_in_time) 
+                              : ''}
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                const isoValue = toIsoWithOriginalTimezone(
+                                  e.target.value,
+                                  `2025-01-01T00:00:00${newHotelCheckInTz}`
+                                );
+                                setNewHotel(prev => ({ ...prev, check_in_time: isoValue }));
+                              } else {
+                                setNewHotel(prev => ({ ...prev, check_in_time: undefined }));
+                              }
+                            }}
+                            className="input input-bordered w-full"
+                          />
+                        </div>
+                        
+                        <div className="form-control w-full">
+                          <label className="label">
+                            <span className="label-text">Timezone</span>
+                          </label>
+                          <select
+                            className="select select-bordered w-full"
+                            value={(() => {
+                              if (newHotel.check_in_time) {
+                                const { offset } = extractTimezoneInfo(newHotel.check_in_time);
+                                return offset;
+                              }
+                              return newHotelCheckInTz;
+                            })()}
+                            onChange={(e) => {
+                              const selectedOffset = e.target.value;
+                              setNewHotelCheckInTz(selectedOffset);
+                              if (newHotel.check_in_time) {
+                                const localValue = toDateTimeLocalValue(newHotel.check_in_time);
+                                const newValue = toIsoWithOriginalTimezone(
+                                  localValue,
+                                  `2025-01-01T00:00:00${selectedOffset}`
+                                );
+                                setNewHotel(prev => ({ ...prev, check_in_time: newValue }));
+                              }
+                            }}
+                          >
+                            {getCommonTimezones().map((tz) => (
+                              <option key={tz.offset} value={tz.offset}>
+                                {tz.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                       
-                      <div className="form-control w-full">
-                        <label className="label">
-                          <span className="label-text">Check-out</span>
-                        </label>
-                        <input
-                          type="datetime-local"
-                          value={newHotel.check_out_time || ''}
-                          onChange={(e) => setNewHotel(prev => ({ ...prev, check_out_time: e.target.value }))}
-                          className="input input-bordered w-full"
-                        />
+                      {/* Check-out */}
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                        <div className="form-control w-full lg:col-span-2">
+                          <label className="label">
+                            <span className="label-text">Check-out</span>
+                          </label>
+                          <input
+                            type="datetime-local"
+                            value={newHotel.check_out_time 
+                              ? toDateTimeLocalValue(newHotel.check_out_time) 
+                              : ''}
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                const isoValue = toIsoWithOriginalTimezone(
+                                  e.target.value,
+                                  `2025-01-01T00:00:00${newHotelCheckOutTz}`
+                                );
+                                setNewHotel(prev => ({ ...prev, check_out_time: isoValue }));
+                              } else {
+                                setNewHotel(prev => ({ ...prev, check_out_time: undefined }));
+                              }
+                            }}
+                            className="input input-bordered w-full"
+                          />
+                        </div>
+                        
+                        <div className="form-control w-full">
+                          <label className="label">
+                            <span className="label-text">Timezone</span>
+                          </label>
+                          <select
+                            className="select select-bordered w-full"
+                            value={(() => {
+                              if (newHotel.check_out_time) {
+                                const { offset } = extractTimezoneInfo(newHotel.check_out_time);
+                                return offset;
+                              }
+                              return newHotelCheckOutTz;
+                            })()}
+                            onChange={(e) => {
+                              const selectedOffset = e.target.value;
+                              setNewHotelCheckOutTz(selectedOffset);
+                              if (newHotel.check_out_time) {
+                                const localValue = toDateTimeLocalValue(newHotel.check_out_time);
+                                const newValue = toIsoWithOriginalTimezone(
+                                  localValue,
+                                  `2025-01-01T00:00:00${selectedOffset}`
+                                );
+                                setNewHotel(prev => ({ ...prev, check_out_time: newValue }));
+                              }
+                            }}
+                          >
+                            {getCommonTimezones().map((tz) => (
+                              <option key={tz.offset} value={tz.offset}>
+                                {tz.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     </div>
                     

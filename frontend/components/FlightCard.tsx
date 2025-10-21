@@ -1,11 +1,12 @@
 /**
  * FlightCard component - displays flight information
  * Feature: Enhanced Trip Data Model & Itinerary Management
+ * Updated: 2025-10-21 - Added timezone display support
  */
 
 import { Plane } from 'lucide-react';
 import type { Flight } from '@/types';
-import { formatTime } from '@/lib/dateTime';
+import { formatTimeWithTz } from '@/lib/dateTime';
 import { TimelineCard } from './TimelineCard';
 
 interface FlightCardProps {
@@ -27,7 +28,7 @@ export function FlightCard({ flight }: FlightCardProps) {
       )}
       {flight.departure_time && (
         <p className="text-xs text-base-content/60 mt-0.5">
-          {formatTime(flight.departure_time)}
+          {formatTimeWithTz(flight.departure_time)}
         </p>
       )}
     </>
@@ -42,12 +43,12 @@ export function FlightCard({ flight }: FlightCardProps) {
           <div>
             <p className="text-xs text-base-content/60 mb-1">Departure</p>
             <p className="font-medium text-xs sm:text-sm">{flight.departure_location}</p>
-            <p className="text-xs sm:text-sm">{formatTime(flight.departure_time)}</p>
+            <p className="text-xs sm:text-sm">{formatTimeWithTz(flight.departure_time)}</p>
           </div>
           <div>
             <p className="text-xs text-base-content/60 mb-1">Arrival</p>
             <p className="font-medium text-xs sm:text-sm">{flight.arrival_location}</p>
-            <p className="text-xs sm:text-sm">{formatTime(flight.arrival_time)}</p>
+            <p className="text-xs sm:text-sm">{formatTimeWithTz(flight.arrival_time)}</p>
           </div>
         </div>
       )}

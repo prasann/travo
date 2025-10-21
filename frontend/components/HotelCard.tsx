@@ -1,11 +1,12 @@
 /**
  * HotelCard component - displays hotel information
  * Feature: Enhanced Trip Data Model & Itinerary Management
+ * Updated: 2025-10-21 - Added timezone display support
  */
 
 import { Hotel as HotelIcon, MapPin, ExternalLink } from 'lucide-react';
 import type { Hotel } from '@/types';
-import { formatTime } from '@/lib/dateTime';
+import { formatTimeWithTz } from '@/lib/dateTime';
 import { getGoogleMapsUrl } from '@/lib/mapsUtils';
 import { TimelineCard } from './TimelineCard';
 
@@ -35,14 +36,14 @@ export function HotelCard({ hotel }: HotelCardProps) {
   const content = (
     <>
       {hotel.check_in_time && hotel.check_out_time && (
-        <div className="flex gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div>
             <p className="text-xs text-base-content/60">Check-in</p>
-            <p className="text-xs sm:text-sm font-medium">{formatTime(hotel.check_in_time)}</p>
+            <p className="text-xs sm:text-sm font-medium">{formatTimeWithTz(hotel.check_in_time, true)}</p>
           </div>
           <div>
             <p className="text-xs text-base-content/60">Check-out</p>
-            <p className="text-xs sm:text-sm font-medium">{formatTime(hotel.check_out_time)}</p>
+            <p className="text-xs sm:text-sm font-medium">{formatTimeWithTz(hotel.check_out_time, true)}</p>
           </div>
         </div>
       )}

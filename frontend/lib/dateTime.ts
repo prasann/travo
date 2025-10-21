@@ -2,9 +2,11 @@
  * Date and time formatting utilities with timezone support
  * Feature: Enhanced Trip Data Model & Itinerary Management
  * Refactored: Using date-fns for better maintainability
+ * Updated: 2025-10-21 - Added timezone display support
  */
 
 import { format, parseISO } from 'date-fns';
+import { formatTimeWithTimezone, getTimezoneAbbreviation } from './timezoneUtils';
 
 /**
  * Format ISO datetime string with timezone to readable format
@@ -22,14 +24,48 @@ export function formatDateTime(
 }
 
 /**
- * Format ISO datetime to time only
+ * Format ISO datetime to time only (without timezone)
  * 
  * @param isoString ISO 8601 datetime with timezone
  * @returns Time string (e.g., "10:30 AM")
+ * 
+ * @deprecated Use formatTimeWithTimezone() for better timezone clarity
  */
 export function formatTime(isoString: string): string {
   const date = parseISO(isoString);
   return format(date, "h:mm a");
+}
+
+/**
+ * Format ISO datetime to time with timezone abbreviation
+ * Recommended for displaying flight/hotel times
+ * 
+ * @param isoString ISO 8601 datetime with timezone
+ * @param includeDate Whether to include date in output
+ * @returns Time string with timezone (e.g., "10:30 AM UTC-7")
+ * 
+ * @example
+ * formatTimeWithTz("2025-04-01T11:00:00-07:00")
+ * // => "11:00 AM UTC-7"
+ * 
+ * formatTimeWithTz("2025-04-02T14:30:00+09:00", true)
+ * // => "Apr 2, 2:30 PM UTC+9"
+ */
+export function formatTimeWithTz(
+  isoString: string,
+  includeDate: boolean = false
+): string {
+  return formatTimeWithTimezone(isoString, includeDate);
+}
+
+/**
+ * Get just the timezone abbreviation from ISO string
+ * 
+ * @param isoString ISO 8601 datetime with timezone
+ * @returns Timezone abbreviation (e.g., "UTC-7", "UTC+9")
+ */
+export function getTimezone(isoString: string): string {
+  return getTimezoneAbbreviation(isoString);
 }
 
 /**

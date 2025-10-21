@@ -5,6 +5,8 @@ import { DatabaseProvider } from "@/components/DatabaseProvider";
 import { SyncProvider } from "@/components/SyncProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { RefineProvider } from "@/lib/refine/RefineProvider";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 
 export const metadata: Metadata = {
   title: "Travo - Trip Planner",
@@ -27,6 +29,8 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme={DEFAULT_THEME} suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
+        <ServiceWorkerRegistration />
+        <OfflineIndicator />
         <AuthProvider>
           <DatabaseProvider>
             <RefineProvider>

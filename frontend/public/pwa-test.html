@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PWA Diagnostics</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #1d232a;
+      color: #fff;
+    }
+    .section {
+      background: #2a323c;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+    .pass { color: #36d399; }
+    .fail { color: #f87272; }
+    .warn { color: #fbbd23; }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    pre {
+      background: #191e24;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Travo PWA Diagnostics</h1>
+  
+  <div class="section">
+    <h2>Quick Actions</h2>
+    <button onclick="runFullDiagnostics()">🔍 Run Full Diagnostics</button>
+    <button onclick="testOfflineMode()">📴 Test Offline Mode</button>
+    <button onclick="clearAllCaches()">🗑️ Clear All Caches</button>
+    <button onclick="forceUpdateSW()">🔄 Force Update Service Worker</button>
+  </div>
+
+  <div class="section">
+    <h2>Diagnostics Results</h2>
+    <div id="results"></div>
+  </div>
+
+  <div class="section">
+    <h2>Live Logs</h2>
+    <div id="logs"></div>
+  </div>
+
+  <script>
+    const results = document.getElementById('results');
+    const logs = document.getElementById('logs');
+
+    function log(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      const timestamp = new Date().toLocaleTimeString();
+      entry.textContent = `[${timestamp}] ${message}`;
+      logs.insertBefore(entry, logs.firstChild);
+      console.log(message);
+    }
+
+    function addResult(title, status, details = '') {
+      const statusClass = status ? 'pass' : 'fail';
+      const statusIcon = status ? '✅' : '❌';
+      results.innerHTML += `
+        <div>
+          <strong class="${statusClass}">${statusIcon} ${title}</strong>
+          ${details ? `<pre>${details}</pre>` : ''}
+        </div>
+      `;
+    }
+
+    function addWarning(title, details) {
+      results.innerHTML += `
+        <div>
+          <strong class="warn">⚠️ ${title}</strong>
+          ${details ? `<pre>${details}</pre>` : ''}
+        </div>
+      `;
+    }
+
+    async function runFullDiagnostics() {
+      results.innerHTML = '<p>Running diagnostics...</p>';
+      log('Starting full diagnostics');
+
+      // 1. Check Service Worker Support
+      const swSupported = 'serviceWorker' in navigator;
+      addResult('Service Worker Support', swSupported);
+      if (!swSupported) {
+        addWarning('Service Workers not supported', 'This browser does not support service workers.');
+        return;
+      }
+
+      // 2. Check Service Worker Registration
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        addResult('Service Worker Registered', registrations.length > 0, 
+          `Found ${registrations.length} registration(s)`);
+        
+        registrations.forEach((reg, i) => {
+          const state = reg.active?.state || 'no active worker';
+          const scope = reg.scope;
+          log(`SW ${i + 1}: ${scope} - State: ${state}`);
+          results.innerHTML += `<pre>  Scope: ${scope}\n  State: ${state}</pre>`;
+        });
+      } catch (error) {
+        addResult('Service Worker Check', false, error.message);
+      }
+
+      // 3. Check Cache Storage
+      try {
+        const cacheNames = await caches.keys();
+        addResult('Cache Storage', cacheNames.length > 0, 
+          `Found ${cacheNames.length} cache(s)`);
+        
+        cacheNames.forEach(name => {
+          log(`Cache: ${name}`);
+          results.innerHTML += `<pre>  - ${name}</pre>`;
+        });
+
+        // Check what's in the caches
+        for (const cacheName of cacheNames.slice(0, 3)) { // First 3 caches
+          const cache = await caches.open(cacheName);
+          const keys = await cache.keys();
+          log(`Cache ${cacheName} has ${keys.length} entries`);
+        }
+      } catch (error) {
+        addResult('Cache Storage Check', false, error.message);
+      }
+
+      // 4. Check IndexedDB
+      try {
+        const dbs = await window.indexedDB.databases();
+        addResult('IndexedDB', dbs.length > 0, 
+          `Found ${dbs.length} database(s)`);
+        
+        dbs.forEach(db => {
+          log(`IndexedDB: ${db.name} v${db.version}`);
+          results.innerHTML += `<pre>  - ${db.name} (v${db.version})</pre>`;
+        });
+      } catch (error) {
+        addResult('IndexedDB Check', false, error.message);
+      }
+
+      // 5. Check Manifest
+      const manifestLink = document.querySelector('link[rel="manifest"]');
+      if (manifestLink) {
+        try {
+          const response = await fetch(manifestLink.href);
+          const manifest = await response.json();
+          addResult('Manifest', true, JSON.stringify(manifest, null, 2));
+          log('Manifest loaded successfully');
+        } catch (error) {
+          addResult('Manifest', false, error.message);
+        }
+      } else {
+        addResult('Manifest Link', false, 'No manifest link found in HTML');
+      }
+
+      // 6. Check Online Status
+      const isOnline = navigator.onLine;
+      addResult('Network Status', true, `Currently: ${isOnline ? 'Online ✅' : 'Offline 📴'}`);
+      log(`Network status: ${isOnline ? 'online' : 'offline'}`);
+
+      // 7. Check HTTPS
+      const isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost';
+      addResult('HTTPS/Localhost', isHTTPS, 
+        isHTTPS ? 'Running on secure context ✅' : 'Service workers require HTTPS!');
+
+      log('Diagnostics complete');
+    }
+
+    async function testOfflineMode() {
+      log('Testing offline mode...');
+      results.innerHTML = '<p>Testing offline functionality...</p>';
+
+      if (!navigator.onLine) {
+        addWarning('Already Offline', 'You are already offline. Try loading different pages.');
+        return;
+      }
+
+      addWarning('Manual Test Required', 
+        'To test offline mode:\n' +
+        '1. Open Chrome DevTools (F12)\n' +
+        '2. Go to Application tab → Service Workers\n' +
+        '3. Check "Offline" checkbox\n' +
+        '4. Try navigating to different pages\n' +
+        '5. Check if pages load from cache'
+      );
+    }
+
+    async function clearAllCaches() {
+      if (!confirm('Clear all caches? This will remove offline functionality until you reload.')) {
+        return;
+      }
+
+      log('Clearing all caches...');
+      try {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        log(`Cleared ${cacheNames.length} cache(s)`, 'pass');
+        alert(`Cleared ${cacheNames.length} cache(s). Reload the page to rebuild caches.`);
+      } catch (error) {
+        log(`Error clearing caches: ${error.message}`, 'fail');
+      }
+    }
+
+    async function forceUpdateSW() {
+      log('Forcing service worker update...');
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        if (registrations.length === 0) {
+          alert('No service worker registered');
+          return;
+        }
+
+        for (const registration of registrations) {
+          await registration.update();
+          log('Service worker update triggered', 'pass');
+        }
+        
+        alert('Update triggered. If a new version is available, you will be prompted to reload.');
+      } catch (error) {
+        log(`Error updating service worker: ${error.message}`, 'fail');
+      }
+    }
+
+    // Auto-run diagnostics on load
+    window.addEventListener('load', () => {
+      log('Page loaded');
+      runFullDiagnostics();
+    });
+
+    // Listen for online/offline events
+    window.addEventListener('online', () => log('Network: ONLINE', 'pass'));
+    window.addEventListener('offline', () => log('Network: OFFLINE', 'warn'));
+
+    // Listen for SW updates
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        log('Service Worker controller changed!', 'pass');
+      });
+    }
+  </script>
+</body>
+</html>

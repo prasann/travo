@@ -1,7 +1,10 @@
 // Travo Service Worker
 // Simple caching strategy for offline-first PWA with IndexedDB
 
-const CACHE_NAME = 'travo-v1';
+// IMPORTANT: Change this version number when deploying updates
+// This forces the service worker to update and clear old caches
+const CACHE_VERSION = '2025-10-21-01'; // Format: YYYY-MM-DD-XX
+const CACHE_NAME = `travo-v${CACHE_VERSION}`;
 const OFFLINE_URL = '/';
 
 // Assets to cache on install

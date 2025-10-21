@@ -67,9 +67,3 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
-
-# PWA service worker files
-frontend/public/sw.js
-frontend/public/sw.js.map
-frontend/public/workbox-*.js
-frontend/public/workbox-*.js.map

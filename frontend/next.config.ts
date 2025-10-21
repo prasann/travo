@@ -21,6 +21,7 @@ export default withPWA({
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
   publicExcludes: ['!pwa-test.html', '!debug-sw.js'], // Exclude debug files from SW precache
+  buildExcludes: ['app-build-manifest.json'], // Exclude build manifest that may not be deployed
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*/i,

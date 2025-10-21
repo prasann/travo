@@ -44,8 +44,8 @@ frontend/
 
 ## Documentation
 When making significant changes to features, data models, or architecture:
-- Update `/travo-prd.md` if user-facing features change
-- Update `/technical-specifications.md` if implementation details change
+- Update `/specs/product-requirements.md` if user-facing features change
+- Update `/specs/technical-specifications.md` if implementation details change
 - Keep both documents in sync with the actual codebase
 
 <!-- MANUAL ADDITIONS START -->

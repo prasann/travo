@@ -1,7 +1,6 @@
-# Travo - Trip Planner App
+# Travo - Trip Planner
 
-## Overview
-A lightweight, privacy-friendly trip planner app to organize itineraries offline-first. Built with Next.js and DaisyUI for a clean, simple codebase. The app allows users to view trips and places with Google Maps Plus Codes for location precision.
+A privacy-friendly, offline-first Progressive Web App for organizing travel itineraries. View your trips, hotels, flights, and activities with a clean, simple interface. Works offline after installation.
 
 ## 🚀 Quick Start
 
@@ -13,116 +12,61 @@ npm run dev
 
 Visit http://localhost:3000
 
-For detailed setup and deployment, see [frontend/README.md](./frontend/README.md)
+## ✨ Features
 
----
-
-## 🧩 Current Features (MVP)
-
-### Functional
-
-- View **trips** with details (name, dates, description)
-- View **places** within trips (with Plus Code, name, notes)
-- Multiple color themes (default, blue, green, red, violet)
-- Offline-first with static export
-- Responsive design (desktop + mobile)
-
-### Non-functional
-
-- Fast page loads with Next.js static generation
-- Clean, minimalist UI using DaisyUI + Tailwind
-- TypeScript type safety throughout
-- Simple codebase with reduced complexity
-
----
-
-## 💡 Future Enhancements
-
-- Create, edit, and delete trips
-- Add and reorder places within trips
-- Persistent storage (IndexedDB or Supabase)
-- Embedded Google Maps search and selection  
-- Smart trip insights (travel time, best route)  
-- Collaborative trip editing (multi-user sync)  
-- Export/share trip itinerary as PDF  
-- AI-generated travel recommendations
-
----
+- **Offline-First**: Works without internet after initial sync
+- **Timeline View**: Day-by-day itinerary with flights, hotels, activities
+- **Map View**: See all your locations on an interactive map
+- **Edit Mode**: Add places via Google Maps links, drag-drop to reorder
+- **PWA**: Install on mobile/desktop, works like a native app
+- **Cloud Sync**: Optional Firebase sync across devices
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology | Notes |
-|-------|-------------|-------|
-| Framework | Next.js 15 | App Router with static export |
-| Language | TypeScript 5 | Strict mode enabled |
-| UI Library | DaisyUI 5 | Simplified component styling |
-| Styling | Tailwind CSS 4 | Latest stable version |
-| Icons | Lucide React | Lightweight icon library |
-
----
-
-## 🌍 Location Data
-
-Each place is stored with a **Plus Code** (from Google Maps):
-
-```json
-{
-  "name": "Tokyo Skytree",
-  "plus_code": "8Q7XQXXR+33",
-  "notes": "Great city view at sunset"
-}
-```
-
-Plus Codes are compact, offline-friendly, and can be resolved via Google Maps URLs
-
----
-
-## 🔄 Data Model (MVP)
-
-```mermaid
-erDiagram
-    TRIP {
-        string id
-        string name
-        string description
-        datetime start_date
-        datetime end_date
-        datetime updated_at
-    }
-
-    PLACE {
-        string id
-        string trip_id
-        string name
-        string plus_code
-        string notes
-        int order_index
-        datetime updated_at
-    }
-
-    TRIP ||--o{ PLACE : contains
-```
-
----
+- **Next.js 15** + **React 19** + **TypeScript**
+- **DaisyUI** + **Tailwind CSS** for styling
+- **IndexedDB** (via Dexie.js) for local storage
+- **Firebase** for authentication and cloud sync
+- **Google Maps API** for place lookups
 
 ## 📂 Project Structure
 
 ```
-frontend/              # Next.js application
-  ├── app/             # App Router pages
-  ├── components/      # React components
-  ├── config/          # Configuration files (theme)
-  ├── data/            # trips.json data file
-  ├── lib/             # Utility functions
-  └── types/           # TypeScript interfaces
-specs/                 # Feature specifications
+frontend/         # Next.js app
+├── app/          # Pages and routes
+├── components/   # React components
+├── lib/          # Core logic (db, firebase, sync)
+└── public/       # PWA assets (service worker, manifest)
+
+specs/            # Documentation for AI assistants
+├── product-requirements.md
+└── technical-specifications.md
 ```
 
+## � Documentation
+
+- **For Humans**: [Frontend README](./frontend/README.md) - Setup and deployment guide
+- **For AI Assistants**: [Product Requirements](./specs/product-requirements.md) - Feature specs and user flows
+- **For AI Assistants**: [Technical Specifications](./specs/technical-specifications.md) - Architecture and implementation details
+
+## 🌍 Location Data
+
+Uses **Google Plus Codes** for precise, offline-friendly locations:
+```json
+{
+  "name": "Tokyo Skytree",
+  "plus_code": "8Q7XQXXR+33",
+  "notes": "Great view at sunset"
+}
+```
+
+## 🔐 Privacy
+
+- Data stored locally on your device
+- Cloud sync optional (via Google sign-in)
+- No tracking or analytics
+
 ---
 
-## 📖 Documentation
-
-- [Quick Start Guide](./frontend/README.md)
-- [Feature Specifications](./specs/)
-
----
+**License**: MIT  
+**Status**: Active development

@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 import withPWA from 'next-pwa';
 
 const nextConfig: NextConfig = {
-  trailingSlash: true,
   images: {
     unoptimized: true,
   },
@@ -18,7 +17,7 @@ const nextConfig: NextConfig = {
 
 export default withPWA({
   dest: 'public',
-  register: true,
+  register: false, // We register manually in ServiceWorkerRegistration component
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
   runtimeCaching: [

@@ -9,43 +9,61 @@ export function ServiceWorkerRegistration() {
       'serviceWorker' in navigator &&
       process.env.NODE_ENV === 'production'
     ) {
-      navigator.serviceWorker
-        .register('/sw.js', { scope: '/' })
-        .then((registration) => {
-          console.log('✅ Service Worker registered:', registration.scope);
-          
-          // Check for updates
-          registration.update();
-          
-          // Listen for updates
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            console.log('🔄 Service Worker update found');
+      // Wait for page to load before registering
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/sw.js', { scope: '/' })
+          .then((registration) => {
+            console.log('✅ Service Worker registered successfully');
+            console.log('   Scope:', registration.scope);
+            console.log('   Active:', registration.active?.state);
             
-            newWorker?.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('✨ New Service Worker installed, reload to update');
-                // Optionally show a toast/notification to user to reload
-                if (window.confirm('New version available! Reload to update?')) {
-                  window.location.reload();
-                }
+            // Check for updates periodically
+            setInterval(() => {
+              registration.update();
+            }, 60000); // Check every minute
+            
+            // Listen for updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              console.log('🔄 Service Worker update found');
+              
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  console.log('   New SW state:', newWorker.state);
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('✨ New Service Worker installed');
+                    // Optionally notify user
+                    if (confirm('New version available! Reload to update?')) {
+                      newWorker.postMessage({ type: 'SKIP_WAITING' });
+                      window.location.reload();
+                    }
+                  }
+                });
               }
             });
+          })
+          .catch((error) => {
+            console.error('❌ Service Worker registration failed');
+            console.error('   Error:', error);
+            console.error('   This might be due to:');
+            console.error('   - Missing sw.js file');
+            console.error('   - HTTPS not enabled');
+            console.error('   - Browser doesn\'t support Service Workers');
           });
-        })
-        .catch((error) => {
-          console.error('❌ Service Worker registration failed:', error);
+
+        // Listen for controller changes
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          console.log('🔄 Service Worker controller changed - reloading page');
+          window.location.reload();
         });
-
-      // Listen for controller change (new SW activated)
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        console.log('🔄 Service Worker controller changed');
       });
-
-      // Listen for messages from service worker
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        console.log('📨 Message from Service Worker:', event.data);
-      });
+    } else {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('ℹ️ Service Worker disabled in development');
+      } else if (!('serviceWorker' in navigator)) {
+        console.warn('⚠️ Service Worker not supported in this browser');
+      }
     }
   }, []);
 

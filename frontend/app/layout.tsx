@@ -6,7 +6,6 @@ import { SyncProvider } from "@/components/SyncProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { RefineProvider } from "@/lib/refine/RefineProvider";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
-import { OfflineIndicator } from "@/components/OfflineIndicator";
 
 export const metadata: Metadata = {
   title: "Travo - Trip Planner",
@@ -28,9 +27,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme={DEFAULT_THEME} suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#1d232a" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      </head>
       <body className="antialiased" suppressHydrationWarning>
         <ServiceWorkerRegistration />
-        <OfflineIndicator />
         <AuthProvider>
           <DatabaseProvider>
             <RefineProvider>

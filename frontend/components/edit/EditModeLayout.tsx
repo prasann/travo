@@ -180,10 +180,12 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           await deleteEntity({
             resource: 'hotels',
             id: hotel.id,
+            successNotification: false,
           });
         } else if (!hotel.id) {
           await createEntity({
             resource: 'hotels',
+            successNotification: false,
             values: {
               trip_id: tripId,
               name: hotel.name,
@@ -204,6 +206,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           await updateEntity({
             resource: 'hotels',
             id: hotel.id,
+            successNotification: false,
             values: {
               city: hotel.city,
               check_in_time: hotel.check_in_time,
@@ -224,10 +227,12 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           await deleteEntity({
             resource: 'activities',
             id: activity.id,
+            successNotification: false,
           });
         } else if (!activity.id) {
           await createEntity({
             resource: 'activities',
+            successNotification: false,
             values: {
               trip_id: tripId,
               name: activity.name,
@@ -254,6 +259,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           await updateEntity({
             resource: 'activities',
             id: activity.id,
+            successNotification: false,
             values: {
               notes: activity.notes ?? null,
             },
@@ -272,6 +278,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           await updateEntity({
             resource: 'flights',
             id: flight.id,
+            successNotification: false,
             values: {
               departure_time: flight.departure_time,
               arrival_time: flight.arrival_time,
@@ -287,10 +294,12 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           await deleteEntity({
             resource: 'restaurants',
             id: restaurant.id,
+            successNotification: false,
           });
         } else if (!restaurant.id) {
           await createEntity({
             resource: 'restaurants',
+            successNotification: false,
             values: {
               trip_id: tripId,
               name: restaurant.name,
@@ -310,6 +319,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           await updateEntity({
             resource: 'restaurants',
             id: restaurant.id,
+            successNotification: false,
             values: {
               city: restaurant.city,
               cuisine_type: restaurant.cuisine_type,

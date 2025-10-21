@@ -8,6 +8,7 @@ const OFFLINE_URL = '/';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
+  '/travo.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
 ];
@@ -67,13 +68,18 @@ self.addEventListener('fetch', (event) => {
         // Clone the response
         const responseToCache = response.clone();
 
-        // Cache successful responses for HTML pages and static assets
+        // Cache successful responses for HTML pages, images, and static assets
         const url = new URL(event.request.url);
-        if (
+        const shouldCache = 
           url.origin === location.origin &&
-          (event.request.destination === 'document' ||
-           event.request.url.includes('/_next/static/'))
-        ) {
+          (
+            event.request.destination === 'document' ||
+            event.request.destination === 'image' ||
+            event.request.url.includes('/_next/static/') ||
+            event.request.url.includes('/_next/image/')
+          );
+        
+        if (shouldCache) {
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
           });

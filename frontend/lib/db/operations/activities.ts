@@ -10,9 +10,24 @@
 
 import { db } from '../schema';
 import type { DailyActivity, ActivityInput, Result } from '../models';
-import { wrapDatabaseOperation } from '../errors';
+import { wrapDatabaseOperation, createNotFoundError } from '../errors';
 import { getByTripId, createEntity, updateEntity, deleteEntity } from './base';
 import { addToQueue } from '@/lib/sync/SyncQueue';
+
+/**
+ * Get activity by ID
+ */
+export async function getActivityById(id: string): Promise<Result<DailyActivity>> {
+  return wrapDatabaseOperation(async () => {
+    const activity = await db.activities.get(id);
+    
+    if (!activity) {
+      throw createNotFoundError('Activity', id);
+    }
+    
+    return activity;
+  });
+}
 
 /**
  * Get all activities for a trip

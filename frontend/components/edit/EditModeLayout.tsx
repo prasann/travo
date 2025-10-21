@@ -241,6 +241,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
               latitude: activity.latitude,
               longitude: activity.longitude,
               description: activity.description,
+              generative_summary: activity.generative_summary,
               image_url: activity.image_url,
             },
           });

@@ -33,14 +33,32 @@ export function formatTime(isoString: string): string {
 }
 
 /**
- * Format ISO date string to readable format
- * 
- * @param isoDate ISO 8601 date (YYYY-MM-DD)
- * @returns Formatted date (e.g., "Apr 1, 2025")
+ * Format ISO date string to human-readable format
+ * Example: "2025-10-12" => "Oct 12, 2025"
  */
 export function formatDate(isoDate: string): string {
-  const date = parseISO(isoDate + 'T00:00:00');
-  return format(date, "MMM d, yyyy");
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC'
+  });
+}
+
+/**
+ * Format ISO date string to long format
+ * Example: "2025-10-12" => "Saturday, October 12, 2025"
+ */
+export function formatDateLong(isoDate: string): string {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC'
+  });
 }
 
 /**

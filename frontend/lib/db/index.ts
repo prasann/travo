@@ -76,6 +76,7 @@ export {
 // Activity operations
 export { 
   getActivitiesByTripId,
+  getActivityById,
   createActivity,
   updateActivity,
   deleteActivity,

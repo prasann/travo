@@ -130,6 +130,9 @@ export interface ActivityEditFormData {
   /** Editorial summary from Google Places API */
   description?: string;
   
+  /** AI-generated summary from Google Gemini */
+  generative_summary?: string;
+  
   /** Photo URL from Google Places Photos API */
   image_url?: string;
   

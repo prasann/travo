@@ -59,6 +59,7 @@ export default function ActivitySection({
       lng: number;
     };
     description?: string;
+    generativeSummary?: string;
     photoUrl?: string;
   }) => {
     setNewActivity(prev => ({
@@ -71,6 +72,7 @@ export default function ActivitySection({
       latitude: result.location?.lat,
       longitude: result.location?.lng,
       description: result.description,
+      generative_summary: result.generativeSummary,
       image_url: result.photoUrl,
     }));
   };
@@ -103,6 +105,7 @@ export default function ActivitySection({
       latitude: newActivity.latitude,
       longitude: newActivity.longitude,
       description: newActivity.description,
+      generative_summary: newActivity.generative_summary,
       image_url: newActivity.image_url,
     };
     

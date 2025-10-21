@@ -25,6 +25,7 @@ interface MapsLinkInputProps {
       lng: number;
     };
     description?: string;
+    generativeSummary?: string;
     photoUrl?: string;
   }) => void;
   onLookupError: (error: string) => void;
@@ -68,6 +69,7 @@ export default function MapsLinkInput({
         placeId: result.placeId,
         location: result.location,
         description: result.description,
+        generativeSummary: result.generativeSummary,
         photoUrl: result.photoUrl
       });
     } else {

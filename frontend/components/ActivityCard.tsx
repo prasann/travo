@@ -1,20 +1,27 @@
 /**
  * ActivityCard component - displays activity information
  * Feature: Enhanced Trip Data Model & Itinerary Management
+ * 
+ * Updates:
+ * - Collapsed view shows description only
+ * - "More →" link to dedicated activity detail page
+ * - Expanded view shows location details without notes
  */
 
 'use client'
 
-import { MapPin, ExternalLink } from 'lucide-react';
+import { MapPin, ExternalLink, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 import type { DailyActivity } from '@/types';
 import { getGoogleMapsUrl } from '@/lib/mapsUtils';
 import { TimelineCard } from './TimelineCard';
 
 interface ActivityCardProps {
   activity: DailyActivity;
+  tripId: string;
 }
 
-export function ActivityCard({ activity }: ActivityCardProps) {
+export function ActivityCard({ activity, tripId }: ActivityCardProps) {
   const mapsUrl = getGoogleMapsUrl(activity);
   
   // Make title clickable if we have a maps URL
@@ -53,24 +60,26 @@ export function ActivityCard({ activity }: ActivityCardProps) {
     <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
   );
   
-  // Collapsed view: Show description if available, otherwise show city
+  // Collapsed view: Show description only, with "More →" link
   const content = (
     <>
       {activity.description && (
-        <p className="text-xs sm:text-sm text-base-content/70 line-clamp-2">
+        <p className="text-xs sm:text-sm text-base-content/70 line-clamp-2 mb-2">
           {activity.description}
         </p>
       )}
-      {!activity.description && activity.city && (
-        <p className="text-xs text-base-content/60">
-          {activity.city}
-        </p>
-      )}
+      <Link 
+        href={`/trip/${tripId}/activity/${activity.id}`}
+        className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium"
+      >
+        More
+        <ChevronRight className="w-3 h-3" />
+      </Link>
     </>
   );
   
-  // Expanded view: Show all details
-  const details = (activity.description || activity.address || activity.city || activity.notes || activity.plus_code || activity.latitude || activity.longitude) ? (
+  // Expanded view: Show location details only (no notes, no AI summary)
+  const details = (activity.description || activity.address || activity.city || activity.plus_code || activity.latitude || activity.longitude) ? (
     <>
       {/* Description */}
       {activity.description && (
@@ -106,16 +115,6 @@ export function ActivityCard({ activity }: ActivityCardProps) {
           <MapPin className="w-3 h-3 text-base-content/40" />
           <p className="text-xs text-base-content/60 font-mono">
             {activity.plus_code}
-          </p>
-        </div>
-      )}
-      
-      {/* Notes */}
-      {activity.notes && (
-        <div className="mt-3 pt-3 border-t border-base-300/50">
-          <p className="text-xs text-base-content/60 mb-1 font-semibold">Notes:</p>
-          <p className="text-xs sm:text-sm text-base-content/80 whitespace-pre-wrap">
-            {activity.notes}
           </p>
         </div>
       )}

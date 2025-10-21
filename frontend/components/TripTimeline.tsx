@@ -283,7 +283,7 @@ export function TripTimeline({ trip }: TripTimelineProps) {
                     <TimelineDot color={day.color.dot} />
                     {isFlight(item) && <FlightCard flight={item} />}
                     {isHotel(item) && <HotelCard hotel={item} />}
-                    {isActivity(item) && <ActivityCard activity={item} />}
+                    {isActivity(item) && <ActivityCard activity={item} tripId={trip.id} />}
                   </div>
                 ))}
               </div>

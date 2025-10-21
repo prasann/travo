@@ -11,8 +11,8 @@
  *    a. Extract CID (hex-encoded Place ID) from URL data parameter
  *    b. Use coordinates from URL for location-based lookup
  *    c. Fallback to text search with location bias
- * 4. Fetches complete place details using Place Details API
- * 5. Returns name, address, coordinates, description, photo
+ * 4. Fetches complete place details using Places API (New) v1
+ * 5. Returns name, address, coordinates, description, AI summary, photo
  * 
  * Supported URL formats:
  * - https://maps.app.goo.gl/xxx (short link)
@@ -20,9 +20,9 @@
  * - Any Google Maps share link from browser or mobile app
  * 
  * API Documentation: 
- * - Place Details: https://developers.google.com/maps/documentation/places/web-service/details
- * - Find Place: https://developers.google.com/maps/documentation/places/web-service/search-find-place
- * - Nearby Search: https://developers.google.com/maps/documentation/places/web-service/search-nearby
+ * - Place Details (New): https://developers.google.com/maps/documentation/places/web-service/place-details
+ * - Text Search: https://developers.google.com/maps/documentation/places/web-service/search-text
+ * - Generative Summary: Enterprise + Atmosphere SKU
  */
 
 /**
@@ -56,6 +56,9 @@ export interface PlaceSearchResult {
   /** Editorial summary/description from Google Places (if available) */
   description?: string;
   
+  /** AI-generated summary from Google Gemini (if available) */
+  generativeSummary?: string;
+  
   /** Photo URL from Google Places Photos API (if available) */
   photoUrl?: string;
   
@@ -81,6 +84,7 @@ interface PlaceLookupResponse {
     lng: number;
   };
   description?: string;
+  generativeSummary?: string;
   photoUrl?: string;
 }
 
@@ -222,6 +226,7 @@ export async function searchPlace(input: string): Promise<PlaceSearchResult> {
       placeId: data.placeId,
       location: data.location,
       description: data.description,
+      generativeSummary: data.generativeSummary,
       photoUrl: data.photoUrl
     };
     

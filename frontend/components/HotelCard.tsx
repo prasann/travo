@@ -32,18 +32,18 @@ export function HotelCard({ hotel }: HotelCardProps) {
     hotel.name || 'Hotel'
   );
   
-  // Collapsed view: Only show check-in/check-out times
+  // Collapsed view: Show check-in/check-out times compactly
   const content = (
     <>
       {hotel.check_in_time && hotel.check_out_time && (
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <div>
-            <p className="text-xs text-base-content/60">Check-in</p>
-            <p className="text-xs sm:text-sm font-medium">{formatTimeWithTz(hotel.check_in_time, true)}</p>
+        <div className="text-xs sm:text-sm text-base-content/80">
+          <div className="flex items-baseline gap-1 flex-wrap">
+            <span className="text-base-content/60">Check-in:</span>
+            <span className="font-medium">{formatTimeWithTz(hotel.check_in_time, true)}</span>
           </div>
-          <div>
-            <p className="text-xs text-base-content/60">Check-out</p>
-            <p className="text-xs sm:text-sm font-medium">{formatTimeWithTz(hotel.check_out_time, true)}</p>
+          <div className="flex items-baseline gap-1 flex-wrap mt-0.5">
+            <span className="text-base-content/60">Check-out:</span>
+            <span className="font-medium">{formatTimeWithTz(hotel.check_out_time, true)}</span>
           </div>
         </div>
       )}

@@ -2,10 +2,15 @@
  * Timezone utilities for displaying and managing timezones
  * Feature: Timezone Support
  * Date: 2025-10-21
- * Updated: Using date-fns for reliable date/time handling
+ * Updated: 2025-10-23 - Direct string parsing to preserve original timezone
  * 
  * Handles timezone extraction, display, and conversion for flights and hotels.
  * Focuses on display-only timezone support without requiring user's local timezone.
+ * 
+ * Note: We use direct string parsing instead of date-fns format() because:
+ * - Our data contains timezone offsets ("+07:00"), not IANA names ("Asia/Bangkok")
+ * - date-fns format() converts to local timezone, which changes the displayed time
+ * - We want to preserve and display the original time as stored
  */
 
 import { parseISO, format as formatDate } from 'date-fns';
@@ -82,8 +87,8 @@ export function formatTimezoneOffset(offset: string): string {
 
 /**
  * Format datetime with timezone for display
- * Shows time with timezone abbreviation
- * Uses date-fns for reliable date parsing and formatting
+ * Shows time with timezone abbreviation WITHOUT converting to local time
+ * Extracts time directly from ISO string to preserve original timezone
  * 
  * @param isoString ISO 8601 datetime with timezone
  * @param includeDate Whether to include the date in output
@@ -103,18 +108,34 @@ export function formatTimeWithTimezone(
   try {
     const { abbreviation } = extractTimezoneInfo(isoString);
     
-    // parseISO from date-fns handles ISO 8601 strings with timezone offsets correctly
-    // It parses the full string and converts to the appropriate Date object
-    const date = parseISO(isoString);
+    // Extract date and time directly from ISO string WITHOUT timezone conversion
+    // Format: YYYY-MM-DDTHH:mm:ss±HH:MM
+    const match = isoString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+    
+    if (!match) {
+      throw new Error('Invalid ISO datetime format');
+    }
+    
+    const [, year, month, day, hours, minutes] = match;
+    
+    // Convert to 12-hour format with AM/PM
+    const hoursNum = parseInt(hours, 10);
+    const isPM = hoursNum >= 12;
+    const hours12 = hoursNum === 0 ? 12 : hoursNum > 12 ? hoursNum - 12 : hoursNum;
+    const ampm = isPM ? 'PM' : 'AM';
+    
+    const timeString = `${hours12}:${minutes} ${ampm}`;
     
     if (includeDate) {
       // Format: "Oct 31, 3:00 PM UTC+7"
-      const formatted = formatDate(date, 'MMM d, h:mm a');
-      return `${formatted} ${abbreviation}`;
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthName = monthNames[parseInt(month, 10) - 1];
+      const dayNum = parseInt(day, 10);
+      
+      return `${monthName} ${dayNum}, ${timeString} ${abbreviation}`;
     } else {
       // Format: "3:00 PM UTC+7"
-      const formatted = formatDate(date, 'h:mm a');
-      return `${formatted} ${abbreviation}`;
+      return `${timeString} ${abbreviation}`;
     }
   } catch (error) {
     console.error('Error formatting time with timezone:', error);

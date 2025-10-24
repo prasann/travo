@@ -408,7 +408,7 @@ export function tripFromFirestore(firestoreTrip: FirestoreTrip): Trip {
   return {
     id: firestoreTrip.id,
     name: firestoreTrip.name,
-    description: `Trip to ${firestoreTrip.destination}`,
+    description: firestoreTrip.destination,
     start_date: firestoreTrip.start_date,
     end_date: firestoreTrip.end_date,
     home_location: undefined,

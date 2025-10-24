@@ -10,7 +10,6 @@
 import { useState } from 'react';
 import { UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import type { TripEditFormData, ActivityEditFormData } from '@/types/editMode';
-import { getPhotoUrl } from '@/lib/imageUtils';
 import MapsLinkInput from './MapsLinkInput';
 import ActivityItem from './SortableActivityItem';
 
@@ -61,7 +60,6 @@ export default function ActivitySection({
     };
     description?: string;
     generativeSummary?: string;
-    photoUrl?: string;
   }) => {
     setNewActivity(prev => ({
       ...prev,
@@ -74,7 +72,6 @@ export default function ActivitySection({
       longitude: result.location?.lng,
       description: result.description,
       generative_summary: result.generativeSummary,
-      image_url: result.photoUrl,
     }));
   };
   
@@ -107,7 +104,6 @@ export default function ActivitySection({
       longitude: newActivity.longitude,
       description: newActivity.description,
       generative_summary: newActivity.generative_summary,
-      image_url: newActivity.image_url,
     };
     
     setValue('activities', [...activities, activity]);
@@ -255,20 +251,6 @@ export default function ActivitySection({
                     <div className="mt-3 p-3 bg-base-200 rounded-lg">
                       <p className="text-xs font-semibold text-base-content/60 mb-1">Description</p>
                       <p className="text-sm text-base-content/80">{newActivity.description}</p>
-                    </div>
-                  )}
-                  
-                  {/* Show photo if available */}
-                  {newActivity.image_url && (
-                    <div className="mt-3">
-                      <img 
-                        src={getPhotoUrl(newActivity.image_url)} 
-                        alt={newActivity.name}
-                        className="w-full max-h-48 object-cover rounded-lg"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
                     </div>
                   )}
                   

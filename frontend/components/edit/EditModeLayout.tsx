@@ -122,7 +122,6 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
           latitude: a.latitude,
           longitude: a.longitude,
           description: a.description,
-          image_url: a.image_url,
         })),
         flights: trip.flights.map(f => ({
           id: f.id,
@@ -253,7 +252,6 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
               longitude: activity.longitude,
               description: activity.description,
               generative_summary: activity.generative_summary,
-              image_url: activity.image_url,
             },
           });
         } else if (activity.id) {

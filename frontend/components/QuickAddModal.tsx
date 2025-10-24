@@ -37,7 +37,6 @@ export default function QuickAddModal({ trip, isOpen, onClose, onSuccess }: Quic
     location?: { lat: number; lng: number };
     description?: string;
     generativeSummary?: string;
-    photoUrl?: string;
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
@@ -134,7 +133,6 @@ export default function QuickAddModal({ trip, isOpen, onClose, onSuccess }: Quic
           longitude: placeData.location?.lng,
           description: placeData.description,
           generative_summary: placeData.generativeSummary,
-          image_url: placeData.photoUrl,
         });
 
         if (isOk(result)) {

@@ -1,7 +1,7 @@
 # Travo - Technical Specifications
 
-**Version**: 1.0  
-**Last Updated**: October 21, 2025
+**Version**: 1.1  
+**Last Updated**: October 24, 2025
 
 ---
 
@@ -42,7 +42,11 @@
 ```
 frontend/
 ├── app/                  # Next.js App Router (pages, layouts, API)
-├── components/           # React components (UI + edit mode)
+├── components/           # React components
+│   ├── edit/            # Edit mode components (category sections, maps input)
+│   ├── QuickAddButton   # Floating action button for quick add
+│   ├── QuickAddModal    # Modal for adding activities/restaurants
+│   └── RecosTab         # Restaurant recommendations with city filter
 ├── lib/                  # Core logic
 │   ├── db/              # Database layer (Dexie schema, operations)
 │   ├── firebase/        # Firebase integration (auth, firestore, sync)
@@ -108,6 +112,44 @@ frontend/
 3. Firebase verifies in background when online
 4. Full read/write access with cached auth
 
+### Quick Add Feature
+**Components**: `QuickAddButton.tsx`, `QuickAddModal.tsx`
+
+**Flow**:
+1. Floating action button (FAB) on trip detail page
+2. Modal opens with type selection (Activity/Restaurant)
+3. Date dropdown for activities ("Day N - Date" format)
+4. Google Maps link input triggers place lookup API
+5. Auto-populates: name, address, city, coordinates, description, photo
+6. Save to IndexedDB via `createActivity()` or `createRestaurant()`
+7. Page refetches to show new item in timeline
+
+**UX Design**:
+- Mobile-optimized (bottom-left positioning)
+- Minimal friction: 3 clicks (FAB → paste link → save)
+- Auto-assigns order_index for activities
+- Restaurants saved trip-wide (no date required)
+
+### Restaurant Recommendations Tab
+**Component**: `RecosTab.tsx`
+
+**Features**:
+- Separate tab view (Timeline | Map | Recos | Notes)
+- City filter dropdown with counts
+- Reuses `RestaurantList` component
+- Filters client-side from IndexedDB data
+
+### Edit Page UX Improvements
+**Navigation**:
+- View Trip button for quick return to timeline
+- Uses Next.js `router.push()` for client-side navigation
+
+**Notifications**:
+- Toast notifications (bottom-left corner)
+- DaisyUI `toast` component with `toast-bottom toast-start`
+- Auto-dismiss after 3 seconds
+- Mobile-friendly positioning (no overlap with buttons)
+
 ### Sync Strategy
 
 **Pull Sync** (Firestore → IndexedDB):
@@ -155,6 +197,7 @@ AuthProvider (Firebase + cached auth)
 - **Data**: Refine data provider → IndexedDB via Dexie
 - **Forms**: `useForm` from @refinedev/react-hook-form
 - **Sync**: React Query with real-time Firestore listeners
+- **UI**: Local React state for modals, toasts, filters (QuickAddModal, RecosTab)
 
 ## Real-Time Sync Implementation
 

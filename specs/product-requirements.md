@@ -1,7 +1,7 @@
 # Travo - Product Requirements Document
 
-**Version**: 1.0  
-**Last Updated**: October 21, 2025
+**Version**: 1.1  
+**Last Updated**: October 24, 2025
 
 ---
 
@@ -25,10 +25,16 @@ Offline-first Progressive Web App for trip planning. Stores data locally (Indexe
 - Color-coded days with carousel navigation
 - Flights, hotels, activities organized by date
 - Hotel continuity indicators (multi-day stays)
+- Floating Quick Add button for adding activities/restaurants
 
 **Map View**:
 - All trip locations plotted on interactive map
 - Markers for hotels, activities, restaurants
+
+**Recos View**:
+- Restaurant recommendations with city filter
+- Filter dropdown to view by specific city or all cities
+- Quick access to all dining options for the trip
 
 **Notes View**:
 - Trip-level notes with inline editing
@@ -39,7 +45,7 @@ Offline-first Progressive Web App for trip planning. Stores data locally (Indexe
 **Flights**: Airline, flight number, departure/arrival times/locations, confirmation, notes  
 **Hotels**: Name, address, city, check-in/out dates, confirmation, notes  
 **Activities**: Name, date, start time, duration, address, city, notes, display order  
-**Restaurants**: Name, cuisine, address, city, notes (separate from timeline)
+**Restaurants**: Name, cuisine, address, city, notes (viewable in Recos tab)
 
 ### 4. Edit Mode
 
@@ -52,8 +58,23 @@ Offline-first Progressive Web App for trip planning. Stores data locally (Indexe
 - Add/edit notes per item
 - Delete items (no confirmation)
 - Auto-populated fields are read-only (delete + re-add to correct)
+- View Trip button for quick navigation back to timeline
+- Toast notifications (bottom-left) for save confirmations
 
-### 5. Authentication & Sync
+### 5. Quick Add Feature
+
+**Access**: Floating action button (FAB) on trip detail page
+
+**Features**:
+- Quick modal for adding activities or restaurants
+- Type selection: Activity (default) or Restaurant
+- Date picker: "Day N - Date" format (activities only)
+- Google Maps link input with auto-validation
+- Auto-populates name, address, city, coordinates
+- One-click save to IndexedDB
+- No manual ordering required (handled in edit mode)
+
+### 6. Authentication & Sync
 
 **Google Sign-In**:
 - Firebase Authentication
@@ -71,7 +92,7 @@ Offline-first Progressive Web App for trip planning. Stores data locally (Indexe
 - Firebase verifies in background when online
 - Full access to cached data offline
 
-### 6. Progressive Web App
+### 7. Progressive Web App
 
 **Installability**:
 - Add to Home Screen (mobile/desktop)
@@ -84,7 +105,7 @@ Offline-first Progressive Web App for trip planning. Stores data locally (Indexe
 - IndexedDB-first for data
 - Cache-first for app shell
 
-### 7. Location Data
+### 8. Location Data
 
 **Google Plus Codes**:
 - Compact, offline-friendly location format
@@ -114,16 +135,19 @@ Offline-first Progressive Web App for trip planning. Stores data locally (Indexe
 
 ### View Trip
 1. Click trip card
-2. View Timeline/Map/Notes tabs
+2. View Timeline/Map/Recos/Notes tabs
 3. Navigate day-by-day in timeline
-4. Double-click notes to edit
+4. Filter restaurants by city in Recos tab
+5. Click FAB to quickly add activity/restaurant
+6. Double-click notes to edit
 
 ### Edit Trip
 1. Click Edit (requires internet)
 2. Select category (Flights/Hotels/Attractions/Restaurants)
 3. Add items via Maps links
 4. Drag-drop to reorder
-5. Changes save to IndexedDB, sync in background
+5. Save changes (toast notification confirms)
+6. Click View Trip to return to timeline
 
 ---
 

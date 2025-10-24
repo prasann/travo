@@ -36,22 +36,38 @@ export function ActivityCard({ activity, tripId }: ActivityCardProps) {
       
       {/* Content */}
       <div className="flex-1 min-w-0">
-        {/* Title */}
-        <h3 className="font-semibold text-sm sm:text-base mb-1">
-          {mapsUrl ? (
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-accent transition-colors inline-flex items-center gap-1.5 group"
+        {/* Title with expand/collapse button */}
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <h3 className="font-semibold text-sm sm:text-base">
+            {mapsUrl ? (
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent transition-colors inline-flex items-center gap-1.5 group"
+              >
+                {activity.name}
+                <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </a>
+            ) : (
+              activity.name
+            )}
+          </h3>
+          
+          {hasDetails && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex-shrink-0 text-primary hover:text-primary-focus transition-colors"
+              aria-label={isExpanded ? "Collapse" : "Expand"}
             >
-              {activity.name}
-              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </a>
-          ) : (
-            activity.name
+              {isExpanded ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </button>
           )}
-        </h3>
+        </div>
         
         {/* Collapsed view: Description only */}
         {!isExpanded && (
@@ -60,15 +76,6 @@ export function ActivityCard({ activity, tripId }: ActivityCardProps) {
               <p className="text-xs sm:text-sm text-base-content/70 line-clamp-2 mb-2">
                 {activity.description}
               </p>
-            )}
-            
-            {hasDetails && (
-              <button
-                onClick={() => setIsExpanded(true)}
-                className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-1"
-              >
-                <ChevronDown className="w-3 h-3" />
-              </button>
             )}
             
             <Link 
@@ -113,13 +120,6 @@ export function ActivityCard({ activity, tripId }: ActivityCardProps) {
                 <span className="font-semibold">Plus Code:</span> {activity.plus_code}
               </p>
             )}
-            
-            <button
-              onClick={() => setIsExpanded(false)}
-              className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-3"
-            >
-              <ChevronUp className="w-3 h-3" />
-            </button>
           </>
         )}
       </div>

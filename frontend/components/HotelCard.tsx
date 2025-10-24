@@ -34,22 +34,38 @@ export function HotelCard({ hotel }: HotelCardProps) {
       
       {/* Content */}
       <div className="flex-1 min-w-0">
-        {/* Hotel name */}
-        <h3 className="font-semibold text-sm sm:text-base mb-1">
-          {mapsUrl ? (
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-secondary transition-colors inline-flex items-center gap-1.5 group"
+        {/* Hotel name with expand/collapse button */}
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <h3 className="font-semibold text-sm sm:text-base">
+            {mapsUrl ? (
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-secondary transition-colors inline-flex items-center gap-1.5 group"
+              >
+                {hotel.name}
+                <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </a>
+            ) : (
+              hotel.name
+            )}
+          </h3>
+          
+          {hasDetails && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex-shrink-0 text-primary hover:text-primary-focus transition-colors"
+              aria-label={isExpanded ? "Collapse" : "Expand"}
             >
-              {hotel.name}
-              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </a>
-          ) : (
-            hotel.name
+              {isExpanded ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </button>
           )}
-        </h3>
+        </div>
         
         {/* Collapsed view: Check-in/out times */}
         {!isExpanded && (
@@ -64,15 +80,6 @@ export function HotelCard({ hotel }: HotelCardProps) {
                 <span className="text-base-content/70">{checkOutTime}</span>
               </div>
             </div>
-            
-            {hasDetails && (
-              <button
-                onClick={() => setIsExpanded(true)}
-                className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-1"
-              >
-                <ChevronDown className="w-3 h-3" />
-              </button>
-            )}
           </>
         )}
         
@@ -134,13 +141,6 @@ export function HotelCard({ hotel }: HotelCardProps) {
                 </p>
               </div>
             )}
-            
-            <button
-              onClick={() => setIsExpanded(false)}
-              className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-3"
-            >
-              <ChevronUp className="w-3 h-3" />
-            </button>
           </>
         )}
       </div>

@@ -32,10 +32,26 @@ export function FlightCard({ flight }: FlightCardProps) {
       
       {/* Content */}
       <div className="flex-1 min-w-0">
-        {/* Title */}
-        <h3 className="font-semibold text-sm sm:text-base mb-1">
-          {flight.airline} {flight.flight_number}
-        </h3>
+        {/* Title with expand/collapse button */}
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <h3 className="font-semibold text-sm sm:text-base">
+            {flight.airline} {flight.flight_number}
+          </h3>
+          
+          {hasDetails && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex-shrink-0 text-primary hover:text-primary-focus transition-colors"
+              aria-label={isExpanded ? "Collapse" : "Expand"}
+            >
+              {isExpanded ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </button>
+          )}
+        </div>
         
         {/* Collapsed view: Compact route info */}
         {!isExpanded && (
@@ -54,15 +70,6 @@ export function FlightCard({ flight }: FlightCardProps) {
                 <span className="text-base-content/70">{arrivalTime}</span>
               </div>
             </div>
-            
-            {hasDetails && (
-              <button
-                onClick={() => setIsExpanded(true)}
-                className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-1"
-              >
-                <ChevronDown className="w-3 h-3" />
-              </button>
-            )}
           </>
         )}
         
@@ -114,13 +121,6 @@ export function FlightCard({ flight }: FlightCardProps) {
                 </p>
               </div>
             )}
-            
-            <button
-              onClick={() => setIsExpanded(false)}
-              className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-3"
-            >
-              <ChevronUp className="w-3 h-3" />
-            </button>
           </>
         )}
       </div>

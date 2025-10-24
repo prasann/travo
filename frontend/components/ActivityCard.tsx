@@ -10,7 +10,7 @@
 
 'use client'
 
-import { MapPin, ExternalLink, ChevronRight, ChevronDown } from 'lucide-react';
+import { MapPin, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import type { DailyActivity } from '@/types';
@@ -67,8 +67,7 @@ export function ActivityCard({ activity, tripId }: ActivityCardProps) {
                 onClick={() => setIsExpanded(true)}
                 className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-1"
               >
-                More
-                <ChevronRight className="w-3 h-3" />
+                <ChevronDown className="w-3 h-3" />
               </button>
             )}
             
@@ -119,8 +118,7 @@ export function ActivityCard({ activity, tripId }: ActivityCardProps) {
               onClick={() => setIsExpanded(false)}
               className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-3"
             >
-              Less
-              <ChevronDown className="w-3 h-3" />
+              <ChevronUp className="w-3 h-3" />
             </button>
           </>
         )}

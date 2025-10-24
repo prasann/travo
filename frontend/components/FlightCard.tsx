@@ -1,6 +1,6 @@
 'use client'
 
-import { Plane, ChevronRight, ChevronDown } from 'lucide-react';
+import { Plane, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import type { Flight } from '@/types';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -60,8 +60,7 @@ export function FlightCard({ flight }: FlightCardProps) {
                 onClick={() => setIsExpanded(true)}
                 className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-1"
               >
-                More
-                <ChevronRight className="w-3 h-3" />
+                <ChevronDown className="w-3 h-3" />
               </button>
             )}
           </>
@@ -120,8 +119,7 @@ export function FlightCard({ flight }: FlightCardProps) {
               onClick={() => setIsExpanded(false)}
               className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-3"
             >
-              Less
-              <ChevronDown className="w-3 h-3" />
+              <ChevronUp className="w-3 h-3" />
             </button>
           </>
         )}

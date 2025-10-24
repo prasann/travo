@@ -1,6 +1,6 @@
 'use client'
 
-import { Building2, ExternalLink, ChevronRight, ChevronDown } from 'lucide-react';
+import { Building2, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import type { Hotel } from '@/types';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -70,8 +70,7 @@ export function HotelCard({ hotel }: HotelCardProps) {
                 onClick={() => setIsExpanded(true)}
                 className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-1"
               >
-                More
-                <ChevronRight className="w-3 h-3" />
+                <ChevronDown className="w-3 h-3" />
               </button>
             )}
           </>
@@ -140,8 +139,7 @@ export function HotelCard({ hotel }: HotelCardProps) {
               onClick={() => setIsExpanded(false)}
               className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-focus transition-colors font-medium mt-3"
             >
-              Less
-              <ChevronDown className="w-3 h-3" />
+              <ChevronUp className="w-3 h-3" />
             </button>
           </>
         )}

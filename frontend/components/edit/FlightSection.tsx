@@ -128,11 +128,9 @@ export default function FlightSection({ register, watch, setValue }: FlightSecti
                           <span className="label-text">Timezone</span>
                         </label>
                         <select
+                          {...register(`flights.${index}.departure_timezone`)}
                           className="select select-bordered w-full text-sm"
-                          value={watch(`flights.${index}.departure_timezone`) || getDefaultTimezone()}
-                          onChange={(e) => {
-                            setValue(`flights.${index}.departure_timezone`, e.target.value);
-                          }}
+                          defaultValue={getDefaultTimezone()}
                         >
                           {COMMON_TIMEZONES.map((tz) => (
                             <option key={tz.value} value={tz.value}>
@@ -173,11 +171,9 @@ export default function FlightSection({ register, watch, setValue }: FlightSecti
                           <span className="label-text">Timezone</span>
                         </label>
                         <select
+                          {...register(`flights.${index}.arrival_timezone`)}
                           className="select select-bordered w-full text-sm"
-                          value={watch(`flights.${index}.arrival_timezone`) || getDefaultTimezone()}
-                          onChange={(e) => {
-                            setValue(`flights.${index}.arrival_timezone`, e.target.value);
-                          }}
+                          defaultValue={getDefaultTimezone()}
                         >
                           {COMMON_TIMEZONES.map((tz) => (
                             <option key={tz.value} value={tz.value}>

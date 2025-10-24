@@ -203,12 +203,9 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                             <span className="label-text text-sm">Timezone</span>
                           </label>
                           <select
+                            {...register(`hotels.${index}.check_in_timezone`)}
                             className="select select-bordered w-full text-sm"
-                            value={watch(`hotels.${index}.check_in_timezone`) || getDefaultTimezone()}
-                            onChange={(e) => {
-                              const newTimezone = e.target.value;
-                              setValue(`hotels.${index}.check_in_timezone`, newTimezone);
-                            }}
+                            defaultValue={getDefaultTimezone()}
                           >
                             {COMMON_TIMEZONES.map((tz) => (
                               <option key={tz.value} value={tz.value}>
@@ -249,12 +246,9 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                             <span className="label-text text-sm">Timezone</span>
                           </label>
                           <select
+                            {...register(`hotels.${index}.check_out_timezone`)}
                             className="select select-bordered w-full text-sm"
-                            value={watch(`hotels.${index}.check_out_timezone`) || getDefaultTimezone()}
-                            onChange={(e) => {
-                              const newTimezone = e.target.value;
-                              setValue(`hotels.${index}.check_out_timezone`, newTimezone);
-                            }}
+                            defaultValue={getDefaultTimezone()}
                           >
                             {COMMON_TIMEZONES.map((tz) => (
                               <option key={tz.value} value={tz.value}>

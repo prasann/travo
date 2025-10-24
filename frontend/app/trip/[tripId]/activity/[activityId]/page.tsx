@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MapPin, Calendar, ExternalLink, ArrowLeft, Sparkles } from 'lucide-react';
 import { getGoogleMapsUrl } from '@/lib/mapsUtils';
+import { getPhotoUrl } from '@/lib/imageUtils';
 import { formatDateLong } from '@/lib/dateTime';
 import { getActivityById, updateActivity } from '@/lib/db';
 import type { DailyActivity } from '@/types';
@@ -150,7 +151,7 @@ export default function ActivityDetailPage({ params }: ActivityDetailPageProps) 
         {activity.image_url && (
           <div className="mb-6 rounded-lg overflow-hidden shadow-lg">
             <img
-              src={activity.image_url}
+              src={getPhotoUrl(activity.image_url)}
               alt={activity.name}
               className="w-full h-64 sm:h-96 object-cover"
               onError={(e) => {

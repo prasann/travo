@@ -10,6 +10,7 @@
 import { useState } from 'react';
 import { UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import type { TripEditFormData, ActivityEditFormData } from '@/types/editMode';
+import { getPhotoUrl } from '@/lib/imageUtils';
 import MapsLinkInput from './MapsLinkInput';
 import ActivityItem from './SortableActivityItem';
 
@@ -261,7 +262,7 @@ export default function ActivitySection({
                   {newActivity.image_url && (
                     <div className="mt-3">
                       <img 
-                        src={newActivity.image_url} 
+                        src={getPhotoUrl(newActivity.image_url)} 
                         alt={newActivity.name}
                         className="w-full max-h-48 object-cover rounded-lg"
                         onError={(e) => {

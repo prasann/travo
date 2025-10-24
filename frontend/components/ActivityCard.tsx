@@ -14,6 +14,7 @@ import { MapPin, ExternalLink, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import type { DailyActivity } from '@/types';
 import { getGoogleMapsUrl } from '@/lib/mapsUtils';
+import { getPhotoUrl } from '@/lib/imageUtils';
 import { TimelineCard } from './TimelineCard';
 
 interface ActivityCardProps {
@@ -40,9 +41,10 @@ export function ActivityCard({ activity, tripId }: ActivityCardProps) {
   );
   
   // Icon or image with fallback
-  const icon = activity.image_url ? (
+  const photoUrl = getPhotoUrl(activity.image_url);
+  const icon = photoUrl ? (
     <img
-      src={activity.image_url}
+      src={photoUrl}
       alt={activity.name}
       loading="lazy"
       decoding="async"

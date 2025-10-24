@@ -180,8 +180,9 @@ export async function GET(request: NextRequest) {
     // Photo URL (v1 API format)
     if (place.photos && place.photos.length > 0) {
       const photoName = place.photos[0].name;
-      // Photo URL format: https://places.googleapis.com/v1/{photoName}/media
-      photoUrl = `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=800&key=${apiKey}`;
+      // Store just the photo name (not the full URL with API key)
+      // The client will generate the full URL with the API key on-demand
+      photoUrl = photoName;
     }
     
     // Step 9: Return normalized data

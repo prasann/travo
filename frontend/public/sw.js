@@ -3,7 +3,7 @@
 
 // IMPORTANT: Change this version number when deploying updates
 // This forces the service worker to update and clear old caches
-const CACHE_VERSION = '2025-10-21-02'; // Format: YYYY-MM-DD-XX
+const CACHE_VERSION = '2025-10-24-01'; // Format: YYYY-MM-DD-XX
 const CACHE_NAME = `travo-v${CACHE_VERSION}`;
 const OFFLINE_URL = '/';
 
@@ -42,7 +42,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - network-first for documents/scripts, cache-first for images
 self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (event.request.method !== 'GET') {
@@ -54,48 +54,66 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      // Return cached response if found
-      if (cachedResponse) {
-        return cachedResponse;
-      }
+  const url = new URL(event.request.url);
+  const isDocument = event.request.destination === 'document';
+  const isScript = event.request.destination === 'script';
+  const isStyle = event.request.destination === 'style';
+  const isImage = event.request.destination === 'image';
 
-      // Otherwise fetch from network
-      return fetch(event.request).then((response) => {
-        // Don't cache non-successful responses
-        if (!response || response.status !== 200 || response.type === 'error') {
+  // Network-first strategy for HTML/JS/CSS (always get fresh content)
+  if (isDocument || isScript || isStyle || url.pathname.includes('/_next/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Cache successful responses
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
           return response;
-        }
-
-        // Clone the response
-        const responseToCache = response.clone();
-
-        // Cache successful responses for HTML pages, images, and static assets
-        const url = new URL(event.request.url);
-        const shouldCache = 
-          url.origin === location.origin &&
-          (
-            event.request.destination === 'document' ||
-            event.request.destination === 'image' ||
-            event.request.url.includes('/_next/static/') ||
-            event.request.url.includes('/_next/image/')
-          );
-        
-        if (shouldCache) {
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
+        })
+        .catch(() => {
+          // Fallback to cache if network fails
+          return caches.match(event.request).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+            // Return offline page for documents
+            if (isDocument) {
+              return caches.match(OFFLINE_URL);
+            }
           });
-        }
+        })
+    );
+    return;
+  }
 
-        return response;
-      }).catch(() => {
-        // If network fails and no cache, return offline page for navigation requests
-        if (event.request.destination === 'document') {
-          return caches.match(OFFLINE_URL);
+  // Cache-first strategy for images (they rarely change)
+  if (isImage) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
         }
-      });
-    })
+        return fetch(event.request).then((response) => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return response;
+        });
+      })
+    );
+    return;
+  }
+
+  // For everything else, try network first
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });
 

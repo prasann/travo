@@ -66,7 +66,7 @@ export async function createActivity(input: ActivityInput, userEmail?: string): 
  */
 export async function updateActivity(
   id: string,
-  updates: Partial<Omit<DailyActivity, 'id' | 'trip_id' | 'date' | 'updated_at'>>,
+  updates: Partial<Omit<DailyActivity, 'id' | 'trip_id' | 'updated_at'>>,
   userEmail?: string
 ): Promise<Result<DailyActivity>> {
   return updateEntity<DailyActivity>(

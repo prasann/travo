@@ -267,6 +267,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             id: activity.id,
             successNotification: false,
             values: {
+              date: activity.date,
               notes: activity.notes ?? null,
             },
           });

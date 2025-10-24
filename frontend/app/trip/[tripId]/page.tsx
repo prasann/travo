@@ -4,16 +4,17 @@ import { notFound } from 'next/navigation'
 import { useShow } from '@refinedev/core'
 import { Navigation } from '@/components/Navigation'
 import { TripTimeline } from '@/components/TripTimeline'
-import { RestaurantList } from '@/components/RestaurantList'
 import TripMapView from '@/components/TripMapView'
 import TripNotes from '@/components/TripNotes'
+import QuickAddButton from '@/components/QuickAddButton'
+import RecosTab from '@/components/RecosTab'
 import { formatDate } from '@/lib/dateTime'
 import { useEffect, useState } from 'react'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
-import { Calendar, Map, FileText } from 'lucide-react'
+import { Calendar, Map, FileText, UtensilsCrossed } from 'lucide-react'
 import type { TripWithRelations } from '@/lib/db'
 
-type ViewMode = 'timeline' | 'map' | 'notes';
+type ViewMode = 'timeline' | 'map' | 'recos' | 'notes';
 
 interface TripPageProps {
   params: Promise<{
@@ -127,6 +128,13 @@ export default function TripPage({ params }: TripPageProps) {
             Map
             </button>
             <button
+              className={`tab ${viewMode === 'recos' ? 'tab-active' : ''}`}
+              onClick={() => setViewMode('recos')}
+            >
+              <UtensilsCrossed className="w-4 h-4 mr-1" />
+              Recos
+            </button>
+            <button
               className={`tab ${viewMode === 'notes' ? 'tab-active' : ''}`}
               onClick={() => setViewMode('notes')}
             >
@@ -150,6 +158,13 @@ export default function TripPage({ params }: TripPageProps) {
           </div>
         )}
         
+        {/* Recos View */}
+        {viewMode === 'recos' && (
+          <div>
+            <RecosTab restaurants={trip.restaurants || []} />
+          </div>
+        )}
+        
         {/* Notes View */}
         {viewMode === 'notes' && (
           <div>
@@ -157,10 +172,11 @@ export default function TripPage({ params }: TripPageProps) {
           </div>
         )}
 
-          {/* Restaurant Recommendations */}
-          {trip.restaurants && trip.restaurants.length > 0 && (
-            <RestaurantList restaurants={trip.restaurants} />
-          )}
+        {/* Quick Add Button (Floating Action Button) */}
+        <QuickAddButton 
+          trip={trip} 
+          onSuccess={() => query.refetch()} 
+        />
         </div>
       </div>
     </main>

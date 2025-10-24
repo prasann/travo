@@ -26,5 +26,5 @@ Available DaisyUI themes:
 - business
 */
 export const DARK_THEME = 'dim'
-export const LIGHT_THEME = 'cupcake'
+export const LIGHT_THEME = 'autumn'
 export const DEFAULT_THEME = DARK_THEME

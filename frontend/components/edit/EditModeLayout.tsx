@@ -388,14 +388,7 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             <h1 className="text-2xl sm:text-4xl font-bold">Edit: {trip.name}</h1>
           </div>
           
-          {/* Success Message */}
-        {successMessage && (
-          <div className="alert alert-success mb-4">
-            <span>{successMessage}</span>
-          </div>
-        )}
-        
-        {/* Error Message */}
+          {/* Error Message */}
         {queryError && (
           <div className="alert alert-error mb-4">
             <span>{queryError.message}</span>
@@ -557,8 +550,15 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
             />
           )}
           
-          {/* Save Button */}
+          {/* Action Buttons */}
           <div className="flex justify-end gap-4 mt-6">
+            <button
+              type="button"
+              onClick={() => router.push(`/trip/${tripId}`)}
+              className="btn btn-outline"
+            >
+              View Trip
+            </button>
             <button
               type="submit"
               className="btn btn-primary"
@@ -577,6 +577,15 @@ export default function EditModeLayout({ tripId }: EditModeLayoutProps) {
         </form>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {successMessage && (
+        <div className="toast toast-bottom toast-start z-50">
+          <div className="alert alert-success">
+            <span>✓ {successMessage}</span>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

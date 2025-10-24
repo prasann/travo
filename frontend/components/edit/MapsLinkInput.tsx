@@ -102,9 +102,6 @@ export default function MapsLinkInput({
     <div className="form-control">
       <label className="label">
         <span className="label-text">{label}</span>
-        <span className="label-text-alt text-xs text-base-content/60">
-          Paste Google Maps share link
-        </span>
       </label>
       
       <div className="join">

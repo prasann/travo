@@ -2,7 +2,7 @@
 
 import { Building2, ExternalLink } from 'lucide-react';
 import type { Hotel } from '@/types';
-import { formatInTimezone } from '@/lib/dateTime';
+import { formatInTimeZone } from 'date-fns-tz';
 import { getGoogleMapsUrl } from '@/lib/mapsUtils';
 
 interface HotelCardProps {
@@ -10,17 +10,13 @@ interface HotelCardProps {
 }
 
 export function HotelCard({ hotel }: HotelCardProps) {
-  const checkInTime = formatInTimezone(
-    hotel.check_in_time,
-    hotel.check_in_timezone,
-    'MMM dd, h:mm a'
-  );
+  const checkInTime = hotel.check_in_time && hotel.check_in_timezone
+    ? formatInTimeZone(hotel.check_in_time, hotel.check_in_timezone, 'MMM dd, h:mm a')
+    : 'N/A';
   
-  const checkOutTime = formatInTimezone(
-    hotel.check_out_time,
-    hotel.check_out_timezone,
-    'MMM dd, h:mm a'
-  );
+  const checkOutTime = hotel.check_out_time && hotel.check_out_timezone
+    ? formatInTimeZone(hotel.check_out_time, hotel.check_out_timezone, 'MMM dd, h:mm a')
+    : 'N/A';
   
   const mapsUrl = getGoogleMapsUrl(hotel);
   

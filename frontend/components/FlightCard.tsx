@@ -2,24 +2,20 @@
 
 import { Plane } from 'lucide-react';
 import type { Flight } from '@/types';
-import { formatInTimezone } from '@/lib/dateTime';
+import { formatInTimeZone } from 'date-fns-tz';
 
 interface FlightCardProps {
   flight: Flight;
 }
 
 export function FlightCard({ flight }: FlightCardProps) {
-  const departureTime = formatInTimezone(
-    flight.departure_time,
-    flight.departure_timezone,
-    'MMM dd, h:mm a'
-  );
+  const departureTime = flight.departure_time && flight.departure_timezone
+    ? formatInTimeZone(flight.departure_time, flight.departure_timezone, 'MMM dd, h:mm a')
+    : 'N/A';
   
-  const arrivalTime = formatInTimezone(
-    flight.arrival_time,
-    flight.arrival_timezone,
-    'MMM dd, h:mm a'
-  );
+  const arrivalTime = flight.arrival_time && flight.arrival_timezone
+    ? formatInTimeZone(flight.arrival_time, flight.arrival_timezone, 'MMM dd, h:mm a')
+    : 'N/A';
   
   return (
     <div className="flex gap-3 p-3 sm:p-4 bg-base-100 rounded-lg shadow hover:shadow-md transition-shadow">

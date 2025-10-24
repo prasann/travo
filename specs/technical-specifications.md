@@ -32,7 +32,7 @@
 
 ### Utilities
 - **@tanstack/react-query 5.90.3** - Data fetching/caching
-- **date-fns 4.1.0** - Date/time handling
+- **date-fns 4.1.0** + **date-fns-tz** - Date/time handling with timezone support
 - **react-hook-form** - Form management
 
 ---
@@ -60,14 +60,14 @@ frontend/
 
 ## Data Architecture
 
-### IndexedDB Schema (Dexie v8)
+### IndexedDB Schema (Dexie v10)
 
 **Database**: `TravoLocalDB`
 
 **Tables**:
 - `trips` - id, name, description, start_date, end_date, home_location, deleted, user_access[], updated_at, updated_by
-- `flights` - id, trip_id, airline, flight_number, departure/arrival times/locations, confirmation_number, notes
-- `hotels` - id, trip_id, name, address, city, plus_code, check_in/out times, confirmation_number, notes
+- `flights` - id, trip_id, airline, flight_number, departure/arrival times (UTC), departure/arrival timezones (IANA), departure/arrival locations, confirmation_number, notes
+- `hotels` - id, trip_id, name, address, city, plus_code, check_in/out times (UTC), check_in/out timezones (IANA), confirmation_number, notes
 - `activities` - id, trip_id, name, date, start_time, duration_minutes, order_index, city, plus_code, address, notes
 - `restaurants` - id, trip_id, name, city, cuisine_type, address, plus_code, notes
 - `syncQueue` - id, entity_type, entity_id, operation, data, created_at, retries, last_error
@@ -85,6 +85,18 @@ frontend/
 - Uses `destination` (not `description`)
 - Activities use `time_of_day` enum (not `start_time`)
 - No `deleted` flag (soft deletes in IndexedDB only)
+
+### Timezone Handling
+
+**Storage Format**:
+- Times stored as UTC: `"2025-04-01T18:00:00.000Z"`
+- Separate timezone fields: `departure_timezone: "America/Denver"`, `arrival_timezone: "Asia/Tokyo"`
+- Uses IANA timezone names for DST-aware conversions
+
+**Display**:
+- `formatTimeInZone()` converts UTC → local timezone using date-fns-tz
+- Manual timezone selection in edit forms (31 common travel destinations)
+- Collapsed flight cards show times in their respective timezones
 
 ---
 

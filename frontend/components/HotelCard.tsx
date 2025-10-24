@@ -39,11 +39,11 @@ export function HotelCard({ hotel }: HotelCardProps) {
         <div className="text-xs sm:text-sm text-base-content/80">
           <div className="flex items-baseline gap-1 flex-wrap">
             <span className="text-base-content/60">Check-in:</span>
-            <span className="font-medium">{formatTimeWithTz(hotel.check_in_time, true)}</span>
+            <span className="font-medium">{formatTimeWithTz(hotel.check_in_time, hotel.check_in_timezone, true)}</span>
           </div>
           <div className="flex items-baseline gap-1 flex-wrap mt-0.5">
             <span className="text-base-content/60">Check-out:</span>
-            <span className="font-medium">{formatTimeWithTz(hotel.check_out_time, true)}</span>
+            <span className="font-medium">{formatTimeWithTz(hotel.check_out_time, hotel.check_out_timezone, true)}</span>
           </div>
         </div>
       )}

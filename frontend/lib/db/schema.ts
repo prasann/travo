@@ -242,6 +242,28 @@ export class TravoDatabase extends Dexie {
       // Existing trips will continue to work without notes
       console.log('[Migration] Schema v9 upgrade complete - trip notes field available');
     });
+    
+    // Define schema version 10 (Add timezone fields to flights and hotels)
+    // New optional fields: departure_timezone, arrival_timezone, check_in_timezone, check_out_timezone
+    // Times now stored in UTC format with separate timezone field (IANA timezone names)
+    // No new indexes needed - timezone fields are for display only
+    // No data migration - clean slate approach (DB will be reset and reseeded)
+    this.version(10).stores({
+      trips: 'id, deleted, updated_at, start_date, end_date, *user_access',
+      flights: 'id, trip_id, departure_time, updated_at',
+      flightLegs: 'id, flight_id, [flight_id+leg_number]',
+      hotels: 'id, trip_id, check_in_time, city, updated_at',
+      activities: 'id, trip_id, date, [trip_id+date+order_index], city, updated_at',
+      restaurants: 'id, trip_id, city, updated_at',
+      syncQueue: 'id, entity_type, entity_id, created_at, retries',
+      authState: 'id'
+    }).upgrade(async (trans) => {
+      console.log('[Migration] Upgrading to v10: Adding timezone fields to flights and hotels');
+      console.log('[Migration] IMPORTANT: Times are now stored in UTC with separate timezone field');
+      console.log('[Migration] Format: departure_time="2025-11-03T12:30:00Z", departure_timezone="Asia/Bangkok"');
+      console.log('[Migration] Schema v10 upgrade complete - timezone fields available');
+      // No data migration - clean slate approach (reset DB and reseed with new format)
+    });
   }
 }
 

@@ -13,12 +13,14 @@
       "updated_at": "2025-10-11T10:00:00.000Z",
       "airline": "United Airlines",
       "flight_number": "UA837",
-      "departure_time": "2025-04-01T11:00:00-07:00",
-      "arrival_time": "2025-04-02T14:30:00+09:00",
+      "departure_time": "2025-04-01T18:00:00.000Z",
+      "arrival_time": "2025-04-02T05:30:00.000Z",
       "departure_location": "San Francisco (SFO)",
       "arrival_location": "Tokyo Narita (NRT)",
       "confirmation_number": "ABC123XYZ",
-      "notes": "Premium economy seats, meal preference: vegetarian"
+      "notes": "Premium economy seats, meal preference: vegetarian",
+      "departure_timezone": "America/Denver",
+      "arrival_timezone": "Asia/Tokyo"
     },
     {
       "id": "flight-002",
@@ -26,11 +28,13 @@
       "updated_at": "2025-10-11T10:00:00.000Z",
       "airline": "United Airlines",
       "flight_number": "UA838",
-      "departure_time": "2025-04-07T16:00:00+09:00",
-      "arrival_time": "2025-04-07T09:30:00-07:00",
+      "departure_time": "2025-04-07T07:00:00.000Z",
+      "arrival_time": "2025-04-07T16:30:00.000Z",
       "departure_location": "Tokyo Narita (NRT)",
       "arrival_location": "San Francisco (SFO)",
-      "confirmation_number": "ABC123XYZ"
+      "confirmation_number": "ABC123XYZ",
+      "departure_timezone": "Asia/Tokyo",
+      "arrival_timezone": "America/Denver"
     }
   ],
   "hotels": [
@@ -44,11 +48,13 @@
       "latitude": 35.6938,
       "longitude": 139.7036,
       "google_maps_url": "https://www.google.com/maps/place/Shinjuku,+Tokyo",
-      "check_in_time": "2025-04-02T15:00:00+09:00",
-      "check_out_time": "2025-04-07T11:00:00+09:00",
+      "check_in_time": "2025-04-02T06:00:00.000Z",
+      "check_out_time": "2025-04-07T02:00:00.000Z",
       "confirmation_number": "HTL789456",
       "phone": "+81-3-1234-5678",
-      "notes": "Non-smoking room, high floor preference"
+      "notes": "Non-smoking room, high floor preference",
+      "check_in_timezone": "Asia/Tokyo",
+      "check_out_timezone": "Asia/Tokyo"
     }
   ],
   "activities": [

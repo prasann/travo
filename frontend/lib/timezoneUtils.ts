@@ -1,244 +1,113 @@
 /**
- * Timezone utilities for displaying and managing timezones
- * Feature: Timezone Support
- * Date: 2025-10-21
- * Updated: 2025-10-23 - Direct string parsing to preserve original timezone
- * 
- * Handles timezone extraction, display, and conversion for flights and hotels.
- * Focuses on display-only timezone support without requiring user's local timezone.
- * 
- * Note: We use direct string parsing instead of date-fns format() because:
- * - Our data contains timezone offsets ("+07:00"), not IANA names ("Asia/Bangkok")
- * - date-fns format() converts to local timezone, which changes the displayed time
- * - We want to preserve and display the original time as stored
+ * Timezone utilities using UTC storage + IANA timezones
+ * Times stored as UTC, displayed in specific timezones using date-fns-tz
  */
 
-import { parseISO, format as formatDate } from 'date-fns';
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 
-/**
- * Extract timezone offset from ISO 8601 datetime string
- * 
- * @param isoString ISO 8601 datetime with timezone (e.g., "2025-04-01T11:00:00-07:00")
- * @returns Object with offset string and timezone abbreviation
- * 
- * @example
- * extractTimezoneInfo("2025-04-01T11:00:00-07:00")
- * // => { offset: "-07:00", abbreviation: "UTC-7" }
- * 
- * extractTimezoneInfo("2025-04-02T14:30:00+09:00")
- * // => { offset: "+09:00", abbreviation: "UTC+9" }
- */
-export function extractTimezoneInfo(isoString: string): {
-  offset: string;
-  abbreviation: string;
-} {
-  // Match timezone offset pattern: +HH:MM or -HH:MM
-  const timezonePattern = /([+-]\d{2}:\d{2})$/;
-  const match = isoString.match(timezonePattern);
+/** Common travel destination timezones for dropdown selection */
+export const COMMON_TIMEZONES = [
+  // Asia/Pacific
+  { value: 'Asia/Bangkok', label: 'Bangkok (UTC+7)' },
+  { value: 'Asia/Hong_Kong', label: 'Hong Kong (UTC+8)' },
+  { value: 'Asia/Tokyo', label: 'Tokyo (UTC+9)' },
+  { value: 'Asia/Seoul', label: 'Seoul (UTC+9)' },
+  { value: 'Asia/Singapore', label: 'Singapore/Malaysia (UTC+8)' },
+  { value: 'Asia/Dubai', label: 'Dubai (UTC+4)' },
+  { value: 'Asia/Kolkata', label: 'India (UTC+5:30)' },
+  { value: 'Asia/Shanghai', label: 'Shanghai (UTC+8)' },
+  { value: 'Asia/Jakarta', label: 'Jakarta (UTC+7)' },
+  { value: 'Australia/Sydney', label: 'Sydney (UTC+10/+11)' },
+  { value: 'Pacific/Auckland', label: 'Auckland (UTC+12/+13)' },
   
-  if (!match) {
-    // No timezone info, assume UTC
-    return {
-      offset: '+00:00',
-      abbreviation: 'UTC'
-    };
-  }
+  // Europe
+  { value: 'Europe/London', label: 'London (UTC+0/+1)' },
+  { value: 'Europe/Paris', label: 'Paris (UTC+1/+2)' },
+  { value: 'Europe/Berlin', label: 'Berlin (UTC+1/+2)' },
+  { value: 'Europe/Rome', label: 'Rome (UTC+1/+2)' },
+  { value: 'Europe/Amsterdam', label: 'Amsterdam (UTC+1/+2)' },
+  { value: 'Europe/Madrid', label: 'Madrid (UTC+1/+2)' },
+  { value: 'Europe/Istanbul', label: 'Istanbul (UTC+3)' },
+  { value: 'Europe/Moscow', label: 'Moscow (UTC+3)' },
   
-  const offset = match[1];
+  // Americas
+  { value: 'America/New_York', label: 'New York (UTC-5/-4)' },
+  { value: 'America/Chicago', label: 'Chicago (UTC-6/-5)' },
+  { value: 'America/Denver', label: 'Denver (UTC-7/-6)' },
+  { value: 'America/Los_Angeles', label: 'Los Angeles (UTC-8/-7)' },
+  { value: 'America/Toronto', label: 'Toronto (UTC-5/-4)' },
+  { value: 'America/Vancouver', label: 'Vancouver (UTC-8/-7)' },
+  { value: 'America/Mexico_City', label: 'Mexico City (UTC-6)' },
+  { value: 'America/Sao_Paulo', label: 'São Paulo (UTC-3)' },
+  { value: 'America/Buenos_Aires', label: 'Buenos Aires (UTC-3)' },
   
-  // Convert offset to readable abbreviation
-  const abbreviation = formatTimezoneOffset(offset);
-  
-  return {
-    offset,
-    abbreviation
-  };
-}
+  // Middle East & Africa
+  { value: 'Africa/Cairo', label: 'Cairo (UTC+2)' },
+  { value: 'Africa/Johannesburg', label: 'Johannesburg (UTC+2)' },
+] as const;
 
-/**
- * Format timezone offset to human-readable abbreviation
- * 
- * @param offset Timezone offset string (e.g., "-07:00", "+09:00")
- * @returns Readable timezone abbreviation
- * 
- * @example
- * formatTimezoneOffset("-07:00") // => "UTC-7"
- * formatTimezoneOffset("+09:00") // => "UTC+9"
- * formatTimezoneOffset("+00:00") // => "UTC"
- */
-export function formatTimezoneOffset(offset: string): string {
-  if (offset === '+00:00' || offset === '-00:00') {
-    return 'UTC';
-  }
-  
-  // Extract hours and minutes
-  const sign = offset[0];
-  const [hours, minutes] = offset.slice(1).split(':');
-  const hoursNum = parseInt(hours, 10);
-  const minutesNum = parseInt(minutes, 10);
-  
-  // Format as UTC±H or UTC±H:MM
-  if (minutesNum === 0) {
-    return `UTC${sign}${hoursNum}`;
-  } else {
-    return `UTC${sign}${hoursNum}:${minutes}`;
-  }
-}
-
-/**
- * Format datetime with timezone for display
- * Shows time with timezone abbreviation WITHOUT converting to local time
- * Extracts time directly from ISO string to preserve original timezone
- * 
- * @param isoString ISO 8601 datetime with timezone
- * @param includeDate Whether to include the date in output
- * @returns Formatted string with timezone
- * 
- * @example
- * formatTimeWithTimezone("2025-04-01T11:00:00-07:00")
- * // => "11:00 AM UTC-7"
- * 
- * formatTimeWithTimezone("2025-04-02T14:30:00+09:00", true)
- * // => "Apr 2, 2:30 PM UTC+9"
- */
-export function formatTimeWithTimezone(
-  isoString: string,
+/** Format UTC time in specific timezone for display */
+export function formatTimeInZone(
+  utcTime: string | undefined,
+  timezone: string | undefined,
   includeDate: boolean = false
 ): string {
+  if (!utcTime || !timezone) {
+    return 'N/A';
+  }
+  
   try {
-    const { abbreviation } = extractTimezoneInfo(isoString);
-    
-    // Extract date and time directly from ISO string WITHOUT timezone conversion
-    // Format: YYYY-MM-DDTHH:mm:ss±HH:MM
-    const match = isoString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-    
-    if (!match) {
-      throw new Error('Invalid ISO datetime format');
-    }
-    
-    const [, year, month, day, hours, minutes] = match;
-    
-    // Convert to 12-hour format with AM/PM
-    const hoursNum = parseInt(hours, 10);
-    const isPM = hoursNum >= 12;
-    const hours12 = hoursNum === 0 ? 12 : hoursNum > 12 ? hoursNum - 12 : hoursNum;
-    const ampm = isPM ? 'PM' : 'AM';
-    
-    const timeString = `${hours12}:${minutes} ${ampm}`;
-    
-    if (includeDate) {
-      // Format: "Oct 31, 3:00 PM UTC+7"
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const monthName = monthNames[parseInt(month, 10) - 1];
-      const dayNum = parseInt(day, 10);
-      
-      return `${monthName} ${dayNum}, ${timeString} ${abbreviation}`;
-    } else {
-      // Format: "3:00 PM UTC+7"
-      return `${timeString} ${abbreviation}`;
-    }
+    const format = includeDate ? 'MMM d, h:mm a' : 'h:mm a';
+    return formatInTimeZone(utcTime, timezone, format);
   } catch (error) {
-    console.error('Error formatting time with timezone:', error);
-    return 'Invalid date';
+    console.error('Error formatting time in timezone:', error);
+    return 'Invalid time';
   }
 }
 
-/**
- * Get timezone abbreviation from ISO string for compact display
- * 
- * @param isoString ISO 8601 datetime with timezone
- * @returns Timezone abbreviation (e.g., "UTC-7", "UTC+9")
- */
-export function getTimezoneAbbreviation(isoString: string): string {
-  return extractTimezoneInfo(isoString).abbreviation;
-}
-
-/**
- * Convert datetime-local input value to ISO string with timezone
- * Preserves the timezone from the original value
- * 
- * @param localValue Value from datetime-local input (YYYY-MM-DDTHH:mm)
- * @param originalIsoString Original ISO string to extract timezone from
- * @returns ISO string with original timezone preserved
- * 
- * @example
- * toIsoWithOriginalTimezone("2025-04-01T11:00", "2025-04-01T10:00:00-07:00")
- * // => "2025-04-01T11:00:00-07:00"
- */
-export function toIsoWithOriginalTimezone(
+/** Convert local datetime-local input to UTC for storage */
+export function localToUTC(
   localValue: string,
-  originalIsoString?: string
+  timezone: string
 ): string {
-  if (!localValue) {
+  if (!localValue || !timezone) {
     return '';
   }
-  
-  // Extract timezone offset from original string, default to UTC
-  const { offset } = originalIsoString 
-    ? extractTimezoneInfo(originalIsoString)
-    : { offset: '+00:00' };
-  
-  // Append seconds and timezone offset
-  return `${localValue}:00${offset}`;
-}
-
-/**
- * Convert ISO string to datetime-local input value
- * Extracts the local time portion without timezone conversion
- * Uses simple regex extraction for efficiency
- * 
- * @param isoString ISO 8601 datetime with timezone
- * @returns datetime-local format (YYYY-MM-DDTHH:mm)
- * 
- * @example
- * toDateTimeLocalValue("2025-04-01T11:00:00-07:00")
- * // => "2025-04-01T11:00"
- */
-export function toDateTimeLocalValue(isoString?: string): string {
-  if (!isoString) return '';
   
   try {
-    // Extract the date and time portion before the timezone
-    // ISO format: YYYY-MM-DDTHH:mm:ss±HH:MM -> YYYY-MM-DDTHH:mm
-    const match = isoString.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/);
-    
-    if (match) {
-      return match[1];
-    }
-    
-    // Fallback: try parsing with date-fns
-    const date = parseISO(isoString);
-    return formatDate(date, "yyyy-MM-dd'T'HH:mm");
+    const date = fromZonedTime(localValue, timezone);
+    return date.toISOString();
   } catch (error) {
-    console.error('Error converting to datetime-local:', error);
+    console.error('Error converting local time to UTC:', error);
     return '';
   }
 }
 
-/**
- * Get a list of common timezone offsets for selection
- * Useful for timezone picker dropdowns
- * 
- * @returns Array of timezone options with offset and label in UTC format
- */
-export function getCommonTimezones(): Array<{
-  offset: string;
-  label: string;
-}> {
-  return [
-    { offset: '+05:30', label: 'UTC+5:30 (India)' },
-    { offset: '+09:00', label: 'UTC+9 (Tokyo)' },
-    { offset: '+08:00', label: 'UTC+8 (Singapore/Hong Kong)' },
-    { offset: '+07:00', label: 'UTC+7 (Bangkok)' },
-    { offset: '+04:00', label: 'UTC+4 (Dubai)' },
-    { offset: '+01:00', label: 'UTC+1 (Paris/Berlin)' },
-    { offset: '+00:00', label: 'UTC (London)' },
-    { offset: '-04:00', label: 'UTC-4 (New York DST)' },
-    { offset: '-05:00', label: 'UTC-5 (New York)' },
-    { offset: '-06:00', label: 'UTC-6 (Chicago)' },
-    { offset: '-07:00', label: 'UTC-7 (Los Angeles DST)' },
-    { offset: '-08:00', label: 'UTC-8 (Los Angeles)' },
-    { offset: '+11:00', label: 'UTC+11 (Sydney DST)' },
-    { offset: '+10:00', label: 'UTC+10 (Sydney)' },
-  ];
+/** Convert UTC time to local datetime-local format for form inputs */
+export function utcToLocal(
+  utcTime: string | undefined,
+  timezone: string | undefined
+): string {
+  if (!utcTime || !timezone) {
+    return '';
+  }
+  
+  try {
+    return formatInTimeZone(utcTime, timezone, "yyyy-MM-dd'T'HH:mm");
+  } catch (error) {
+    console.error('Error converting UTC to local:', error);
+    return '';
+  }
+}
+
+/** Get friendly label for timezone (e.g., 'Bangkok (UTC+7)' for 'Asia/Bangkok') */
+export function getTimezoneLabel(timezone: string | undefined): string {
+  if (!timezone) return '';
+  const found = COMMON_TIMEZONES.find(tz => tz.value === timezone);
+  return found ? found.label : timezone;
+}
+
+/** Get default timezone */
+export function getDefaultTimezone(): string {
+  return 'Asia/Bangkok';
 }

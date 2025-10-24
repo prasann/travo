@@ -59,11 +59,17 @@ export interface HotelEditFormData {
   /** City name */
   city?: string;
   
-  /** Check-in timestamp with timezone */
+  /** Check-in timestamp (UTC) */
   check_in_time?: string;
   
-  /** Check-out timestamp with timezone */
+  /** Check-in timezone (IANA) */
+  check_in_timezone?: string;
+  
+  /** Check-out timestamp (UTC) */
   check_out_time?: string;
+  
+  /** Check-out timezone (IANA) */
+  check_out_timezone?: string;
   
   /** Confirmation/reservation number */
   confirmation_number?: string;
@@ -150,11 +156,17 @@ export interface FlightEditFormData {
   /** Flight number */
   flight_number?: string;
   
-  /** Departure timestamp with timezone */
+  /** Departure timestamp (UTC) */
   departure_time?: string;
   
-  /** Arrival timestamp with timezone */
+  /** Departure timezone (IANA) */
+  departure_timezone?: string;
+  
+  /** Arrival timestamp (UTC) */
   arrival_time?: string;
+  
+  /** Arrival timezone (IANA) */
+  arrival_timezone?: string;
   
   /** Departure airport/city */
   departure_location?: string;

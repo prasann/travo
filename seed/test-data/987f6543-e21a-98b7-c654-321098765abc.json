@@ -13,8 +13,8 @@
       "updated_at": "2025-10-11T10:00:00.000Z",
       "airline": "Delta",
       "flight_number": "DL125",
-      "departure_time": "2025-06-15T20:00:00-04:00",
-      "arrival_time": "2025-06-16T14:30:00+02:00",
+      "departure_time": null,
+      "arrival_time": null,
       "departure_location": "New York (JFK)",
       "arrival_location": "Paris Charles de Gaulle (CDG)",
       "confirmation_number": "DL8765ABC",
@@ -43,7 +43,9 @@
           "arrival_location": "Paris Charles de Gaulle (CDG)",
           "duration_minutes": 90
         }
-      ]
+      ],
+      "departure_timezone": null,
+      "arrival_timezone": null
     },
     {
       "id": "flight-euro-002",
@@ -51,11 +53,13 @@
       "updated_at": "2025-10-11T10:00:00.000Z",
       "airline": "Air France",
       "flight_number": "AF1104",
-      "departure_time": "2025-06-22T10:15:00+02:00",
-      "arrival_time": "2025-06-22T12:00:00+02:00",
+      "departure_time": null,
+      "arrival_time": null,
       "departure_location": "Paris Charles de Gaulle (CDG)",
       "arrival_location": "Rome Fiumicino (FCO)",
-      "confirmation_number": "AF9876XYZ"
+      "confirmation_number": "AF9876XYZ",
+      "departure_timezone": null,
+      "arrival_timezone": null
     },
     {
       "id": "flight-euro-003",
@@ -63,11 +67,13 @@
       "updated_at": "2025-10-11T10:00:00.000Z",
       "airline": "ITA Airways",
       "flight_number": "AZ608",
-      "departure_time": "2025-06-29T11:00:00+02:00",
-      "arrival_time": "2025-06-29T14:15:00-04:00",
+      "departure_time": null,
+      "arrival_time": null,
       "departure_location": "Rome Fiumicino (FCO)",
       "arrival_location": "New York (JFK)",
-      "confirmation_number": "AZ5432DEF"
+      "confirmation_number": "AZ5432DEF",
+      "departure_timezone": null,
+      "arrival_timezone": null
     }
   ],
   "hotels": [
@@ -78,10 +84,12 @@
       "name": "Hotel Le Marais",
       "address": "15 Rue des Archives, 75004 Paris, France",
       "city": "Paris",
-      "check_in_time": "2025-06-16T15:00:00+02:00",
-      "check_out_time": "2025-06-22T11:00:00+02:00",
+      "check_in_time": null,
+      "check_out_time": null,
       "confirmation_number": "PAR123456",
-      "phone": "+33 1 48 87 77 00"
+      "phone": "+33 1 48 87 77 00",
+      "check_in_timezone": null,
+      "check_out_timezone": null
     },
     {
       "id": "hotel-rome-001",
@@ -90,11 +98,13 @@
       "name": "Hotel Colosseo",
       "address": "Via Capo d'Africa, 00184 Rome, Italy",
       "city": "Rome",
-      "check_in_time": "2025-06-22T14:00:00+02:00",
-      "check_out_time": "2025-06-29T10:00:00+02:00",
+      "check_in_time": null,
+      "check_out_time": null,
       "confirmation_number": "ROM789012",
       "phone": "+39 06 772 9200",
-      "notes": "Walking distance to Colosseum"
+      "notes": "Walking distance to Colosseum",
+      "check_in_timezone": null,
+      "check_out_timezone": null
     }
   ],
   "activities": [

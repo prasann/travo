@@ -31,8 +31,10 @@ export interface Flight {
   updated_at: string;
   airline?: string;
   flight_number?: string;
-  departure_time?: string;
-  arrival_time?: string;
+  departure_time?: string; // ISO 8601 UTC format: "2025-11-03T12:30:00Z"
+  departure_timezone?: string; // IANA timezone: "Asia/Bangkok"
+  arrival_time?: string; // ISO 8601 UTC format: "2025-11-03T13:55:00Z"
+  arrival_timezone?: string; // IANA timezone: "Asia/Bangkok"
   departure_location?: string;
   arrival_location?: string;
   confirmation_number?: string;
@@ -64,8 +66,10 @@ export interface Hotel {
   google_maps_url?: string;
   latitude?: number;
   longitude?: number;
-  check_in_time?: string;
-  check_out_time?: string;
+  check_in_time?: string; // ISO 8601 UTC format: "2025-10-31T08:00:00Z"
+  check_in_timezone?: string; // IANA timezone: "Asia/Bangkok"
+  check_out_time?: string; // ISO 8601 UTC format: "2025-11-01T04:00:00Z"
+  check_out_timezone?: string; // IANA timezone: "Asia/Bangkok"
   confirmation_number?: string;
   phone?: string;
   notes?: string;

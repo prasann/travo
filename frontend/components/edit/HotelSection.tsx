@@ -3,7 +3,7 @@
  * 
  * Feature: 006-edit-mode-for
  * Purpose: Manage hotels in edit mode with Plus Code lookup
- * Updated: 2025-10-21 - Added timezone preservation support
+ * Updated: 2025-10-24 - Migrated to UTC + IANA timezone system
  */
 
 'use client';
@@ -14,11 +14,10 @@ import type { TripEditFormData, HotelEditFormData } from '@/types/editMode';
 import MapsLinkInput from './MapsLinkInput';
 import { Lock } from 'lucide-react';
 import { 
-  toDateTimeLocalValue, 
-  toIsoWithOriginalTimezone,
-  getTimezoneAbbreviation,
-  getCommonTimezones,
-  extractTimezoneInfo
+  utcToLocal,
+  localToUTC,
+  COMMON_TIMEZONES,
+  getDefaultTimezone
 } from '@/lib/timezoneUtils';
 
 interface HotelSectionProps {
@@ -32,8 +31,8 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
   const [newHotel, setNewHotel] = useState<Partial<HotelEditFormData>>({});
   const [plusCode, setPlusCode] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newHotelCheckInTz, setNewHotelCheckInTz] = useState('+05:30'); // Default to IST
-  const [newHotelCheckOutTz, setNewHotelCheckOutTz] = useState('+05:30');
+  const [newHotelCheckInTz, setNewHotelCheckInTz] = useState(getDefaultTimezone());
+  const [newHotelCheckOutTz, setNewHotelCheckOutTz] = useState(getDefaultTimezone());
   
   const handlePlusCodeSuccess = (result: { 
     name: string; 
@@ -179,23 +178,19 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                         <div className="form-control w-full lg:col-span-2">
                           <label className="label">
                             <span className="label-text text-sm">Check-in</span>
-                            {watch(`hotels.${index}.check_in_time`) && (
-                              <span className="label-text-alt badge badge-ghost badge-sm">
-                                {getTimezoneAbbreviation(watch(`hotels.${index}.check_in_time`)!)}
-                              </span>
-                            )}
                           </label>
                           <input
                             type="datetime-local"
-                            value={toDateTimeLocalValue(watch(`hotels.${index}.check_in_time`))}
+                            value={utcToLocal(
+                              watch(`hotels.${index}.check_in_time`),
+                              watch(`hotels.${index}.check_in_timezone`) || getDefaultTimezone()
+                            )}
                             className="input input-bordered w-full"
                             onChange={(e) => {
                               if (e.target.value) {
-                                const newValue = toIsoWithOriginalTimezone(
-                                  e.target.value,
-                                  watch(`hotels.${index}.check_in_time`)
-                                );
-                                setValue(`hotels.${index}.check_in_time`, newValue);
+                                const timezone = watch(`hotels.${index}.check_in_timezone`) || getDefaultTimezone();
+                                const utcValue = localToUTC(e.target.value, timezone);
+                                setValue(`hotels.${index}.check_in_time`, utcValue);
                               } else {
                                 setValue(`hotels.${index}.check_in_time`, undefined);
                               }
@@ -208,38 +203,15 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                             <span className="label-text text-sm">Timezone</span>
                           </label>
                           <select
-                            className="select select-bordered w-full"
-                            value={(() => {
-                              const checkInTime = watch(`hotels.${index}.check_in_time`);
-                              if (!checkInTime) return '+05:30'; // Default to IST
-                              const { offset } = extractTimezoneInfo(checkInTime);
-                              const exists = getCommonTimezones().some(tz => tz.offset === offset);
-                              return exists ? offset : '+05:30';
-                            })()}
+                            className="select select-bordered w-full text-sm"
+                            value={watch(`hotels.${index}.check_in_timezone`) || getDefaultTimezone()}
                             onChange={(e) => {
-                              const selectedOffset = e.target.value;
-                              
-                              const currentTime = watch(`hotels.${index}.check_in_time`);
-                              if (currentTime) {
-                                const localValue = toDateTimeLocalValue(currentTime);
-                                const newValue = toIsoWithOriginalTimezone(
-                                  localValue,
-                                  `2025-01-01T00:00:00${selectedOffset}`
-                                );
-                                setValue(`hotels.${index}.check_in_time`, newValue);
-                              } else {
-                                const now = new Date();
-                                const year = now.getFullYear();
-                                const month = String(now.getMonth() + 1).padStart(2, '0');
-                                const day = String(now.getDate()).padStart(2, '0');
-                                const defaultTime = `${year}-${month}-${day}T15:00`;
-                                const newValue = toIsoWithOriginalTimezone(defaultTime, `2025-01-01T00:00:00${selectedOffset}`);
-                                setValue(`hotels.${index}.check_in_time`, newValue);
-                              }
+                              const newTimezone = e.target.value;
+                              setValue(`hotels.${index}.check_in_timezone`, newTimezone);
                             }}
                           >
-                            {getCommonTimezones().map((tz) => (
-                              <option key={tz.offset} value={tz.offset}>
+                            {COMMON_TIMEZONES.map((tz) => (
+                              <option key={tz.value} value={tz.value}>
                                 {tz.label}
                               </option>
                             ))}
@@ -252,23 +224,19 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                         <div className="form-control w-full lg:col-span-2">
                           <label className="label">
                             <span className="label-text text-sm">Check-out</span>
-                            {watch(`hotels.${index}.check_out_time`) && (
-                              <span className="label-text-alt badge badge-ghost badge-sm">
-                                {getTimezoneAbbreviation(watch(`hotels.${index}.check_out_time`)!)}
-                              </span>
-                            )}
                           </label>
                           <input
                             type="datetime-local"
-                            value={toDateTimeLocalValue(watch(`hotels.${index}.check_out_time`))}
+                            value={utcToLocal(
+                              watch(`hotels.${index}.check_out_time`),
+                              watch(`hotels.${index}.check_out_timezone`) || getDefaultTimezone()
+                            )}
                             className="input input-bordered w-full"
                             onChange={(e) => {
                               if (e.target.value) {
-                                const newValue = toIsoWithOriginalTimezone(
-                                  e.target.value,
-                                  watch(`hotels.${index}.check_out_time`)
-                                );
-                                setValue(`hotels.${index}.check_out_time`, newValue);
+                                const timezone = watch(`hotels.${index}.check_out_timezone`) || getDefaultTimezone();
+                                const utcValue = localToUTC(e.target.value, timezone);
+                                setValue(`hotels.${index}.check_out_time`, utcValue);
                               } else {
                                 setValue(`hotels.${index}.check_out_time`, undefined);
                               }
@@ -281,38 +249,15 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                             <span className="label-text text-sm">Timezone</span>
                           </label>
                           <select
-                            className="select select-bordered w-full"
-                            value={(() => {
-                              const checkOutTime = watch(`hotels.${index}.check_out_time`);
-                              if (!checkOutTime) return '+05:30'; // Default to IST
-                              const { offset } = extractTimezoneInfo(checkOutTime);
-                              const exists = getCommonTimezones().some(tz => tz.offset === offset);
-                              return exists ? offset : '+05:30';
-                            })()}
+                            className="select select-bordered w-full text-sm"
+                            value={watch(`hotels.${index}.check_out_timezone`) || getDefaultTimezone()}
                             onChange={(e) => {
-                              const selectedOffset = e.target.value;
-                              
-                              const currentTime = watch(`hotels.${index}.check_out_time`);
-                              if (currentTime) {
-                                const localValue = toDateTimeLocalValue(currentTime);
-                                const newValue = toIsoWithOriginalTimezone(
-                                  localValue,
-                                  `2025-01-01T00:00:00${selectedOffset}`
-                                );
-                                setValue(`hotels.${index}.check_out_time`, newValue);
-                              } else {
-                                const now = new Date();
-                                const year = now.getFullYear();
-                                const month = String(now.getMonth() + 1).padStart(2, '0');
-                                const day = String(now.getDate()).padStart(2, '0');
-                                const defaultTime = `${year}-${month}-${day}T11:00`;
-                                const newValue = toIsoWithOriginalTimezone(defaultTime, `2025-01-01T00:00:00${selectedOffset}`);
-                                setValue(`hotels.${index}.check_out_time`, newValue);
-                              }
+                              const newTimezone = e.target.value;
+                              setValue(`hotels.${index}.check_out_timezone`, newTimezone);
                             }}
                           >
-                            {getCommonTimezones().map((tz) => (
-                              <option key={tz.offset} value={tz.offset}>
+                            {COMMON_TIMEZONES.map((tz) => (
+                              <option key={tz.value} value={tz.value}>
                                 {tz.label}
                               </option>
                             ))}
@@ -429,16 +374,11 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                           </label>
                           <input
                             type="datetime-local"
-                            value={newHotel.check_in_time 
-                              ? toDateTimeLocalValue(newHotel.check_in_time) 
-                              : ''}
+                            value={utcToLocal(newHotel.check_in_time, newHotelCheckInTz)}
                             onChange={(e) => {
                               if (e.target.value) {
-                                const isoValue = toIsoWithOriginalTimezone(
-                                  e.target.value,
-                                  `2025-01-01T00:00:00${newHotelCheckInTz}`
-                                );
-                                setNewHotel(prev => ({ ...prev, check_in_time: isoValue }));
+                                const utcValue = localToUTC(e.target.value, newHotelCheckInTz);
+                                setNewHotel(prev => ({ ...prev, check_in_time: utcValue }));
                               } else {
                                 setNewHotel(prev => ({ ...prev, check_in_time: undefined }));
                               }
@@ -452,29 +392,15 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                             <span className="label-text">Timezone</span>
                           </label>
                           <select
-                            className="select select-bordered w-full"
-                            value={(() => {
-                              if (newHotel.check_in_time) {
-                                const { offset } = extractTimezoneInfo(newHotel.check_in_time);
-                                return offset;
-                              }
-                              return newHotelCheckInTz;
-                            })()}
+                            className="select select-bordered w-full text-sm"
+                            value={newHotelCheckInTz}
                             onChange={(e) => {
-                              const selectedOffset = e.target.value;
-                              setNewHotelCheckInTz(selectedOffset);
-                              if (newHotel.check_in_time) {
-                                const localValue = toDateTimeLocalValue(newHotel.check_in_time);
-                                const newValue = toIsoWithOriginalTimezone(
-                                  localValue,
-                                  `2025-01-01T00:00:00${selectedOffset}`
-                                );
-                                setNewHotel(prev => ({ ...prev, check_in_time: newValue }));
-                              }
+                              setNewHotelCheckInTz(e.target.value);
+                              setNewHotel(prev => ({ ...prev, check_in_timezone: e.target.value }));
                             }}
                           >
-                            {getCommonTimezones().map((tz) => (
-                              <option key={tz.offset} value={tz.offset}>
+                            {COMMON_TIMEZONES.map((tz) => (
+                              <option key={tz.value} value={tz.value}>
                                 {tz.label}
                               </option>
                             ))}
@@ -490,16 +416,11 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                           </label>
                           <input
                             type="datetime-local"
-                            value={newHotel.check_out_time 
-                              ? toDateTimeLocalValue(newHotel.check_out_time) 
-                              : ''}
+                            value={utcToLocal(newHotel.check_out_time, newHotelCheckOutTz)}
                             onChange={(e) => {
                               if (e.target.value) {
-                                const isoValue = toIsoWithOriginalTimezone(
-                                  e.target.value,
-                                  `2025-01-01T00:00:00${newHotelCheckOutTz}`
-                                );
-                                setNewHotel(prev => ({ ...prev, check_out_time: isoValue }));
+                                const utcValue = localToUTC(e.target.value, newHotelCheckOutTz);
+                                setNewHotel(prev => ({ ...prev, check_out_time: utcValue }));
                               } else {
                                 setNewHotel(prev => ({ ...prev, check_out_time: undefined }));
                               }
@@ -513,29 +434,15 @@ export default function HotelSection({ register, setValue, watch }: HotelSection
                             <span className="label-text">Timezone</span>
                           </label>
                           <select
-                            className="select select-bordered w-full"
-                            value={(() => {
-                              if (newHotel.check_out_time) {
-                                const { offset } = extractTimezoneInfo(newHotel.check_out_time);
-                                return offset;
-                              }
-                              return newHotelCheckOutTz;
-                            })()}
+                            className="select select-bordered w-full text-sm"
+                            value={newHotelCheckOutTz}
                             onChange={(e) => {
-                              const selectedOffset = e.target.value;
-                              setNewHotelCheckOutTz(selectedOffset);
-                              if (newHotel.check_out_time) {
-                                const localValue = toDateTimeLocalValue(newHotel.check_out_time);
-                                const newValue = toIsoWithOriginalTimezone(
-                                  localValue,
-                                  `2025-01-01T00:00:00${selectedOffset}`
-                                );
-                                setNewHotel(prev => ({ ...prev, check_out_time: newValue }));
-                              }
+                              setNewHotelCheckOutTz(e.target.value);
+                              setNewHotel(prev => ({ ...prev, check_out_timezone: e.target.value }));
                             }}
                           >
-                            {getCommonTimezones().map((tz) => (
-                              <option key={tz.offset} value={tz.offset}>
+                            {COMMON_TIMEZONES.map((tz) => (
+                              <option key={tz.value} value={tz.value}>
                                 {tz.label}
                               </option>
                             ))}

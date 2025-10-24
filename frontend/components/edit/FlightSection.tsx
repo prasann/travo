@@ -3,7 +3,7 @@
  * 
  * Feature: 006-edit-mode-for (Phase 6 - US4)
  * Purpose: Display and manage flight notes in edit mode
- * Updated: 2025-10-21 - Added timezone preservation support
+ * Updated: 2025-10-24 - Migrated to UTC + IANA timezone system
  */
 
 'use client';
@@ -11,11 +11,10 @@
 import { UseFormRegister, UseFormWatch, UseFormSetValue } from 'react-hook-form';
 import type { TripEditFormData } from '@/types/editMode';
 import { 
-  toDateTimeLocalValue, 
-  toIsoWithOriginalTimezone,
-  getTimezoneAbbreviation,
-  getCommonTimezones,
-  extractTimezoneInfo
+  utcToLocal,
+  localToUTC,
+  COMMON_TIMEZONES,
+  getDefaultTimezone
 } from '@/lib/timezoneUtils';
 
 interface FlightSectionProps {
@@ -104,23 +103,19 @@ export default function FlightSection({ register, watch, setValue }: FlightSecti
                       <div className="form-control w-full lg:col-span-2">
                         <label className="label">
                           <span className="label-text">Departure Time</span>
-                          {watch(`flights.${index}.departure_time`) && (
-                            <span className="label-text-alt badge badge-ghost badge-sm">
-                              {getTimezoneAbbreviation(watch(`flights.${index}.departure_time`)!)}
-                            </span>
-                          )}
                         </label>
                         <input
                           type="datetime-local"
-                          value={toDateTimeLocalValue(watch(`flights.${index}.departure_time`))}
+                          value={utcToLocal(
+                            watch(`flights.${index}.departure_time`),
+                            watch(`flights.${index}.departure_timezone`) || getDefaultTimezone()
+                          )}
                           className="input input-bordered w-full"
                           onChange={(e) => {
                             if (e.target.value) {
-                              const newValue = toIsoWithOriginalTimezone(
-                                e.target.value,
-                                watch(`flights.${index}.departure_time`)
-                              );
-                              setValue(`flights.${index}.departure_time`, newValue);
+                              const timezone = watch(`flights.${index}.departure_timezone`) || getDefaultTimezone();
+                              const utcValue = localToUTC(e.target.value, timezone);
+                              setValue(`flights.${index}.departure_time`, utcValue);
                             } else {
                               setValue(`flights.${index}.departure_time`, undefined);
                             }
@@ -133,41 +128,14 @@ export default function FlightSection({ register, watch, setValue }: FlightSecti
                           <span className="label-text">Timezone</span>
                         </label>
                         <select
-                          className="select select-bordered w-full"
-                          value={(() => {
-                            const departureTime = watch(`flights.${index}.departure_time`);
-                            if (!departureTime) return '+05:30'; // Default to IST
-                            const { offset } = extractTimezoneInfo(departureTime);
-                            // Check if this offset exists in our list
-                            const exists = getCommonTimezones().some(tz => tz.offset === offset);
-                            return exists ? offset : '+05:30';
-                          })()}
+                          className="select select-bordered w-full text-sm"
+                          value={watch(`flights.${index}.departure_timezone`) || getDefaultTimezone()}
                           onChange={(e) => {
-                            const selectedOffset = e.target.value;
-                            
-                            const currentTime = watch(`flights.${index}.departure_time`);
-                            if (currentTime) {
-                              // Update existing time with new timezone
-                              const localValue = toDateTimeLocalValue(currentTime);
-                              const newValue = toIsoWithOriginalTimezone(
-                                localValue,
-                                `2025-01-01T00:00:00${selectedOffset}`
-                              );
-                              setValue(`flights.${index}.departure_time`, newValue);
-                            } else {
-                              // If no time set yet, set a default time with the selected timezone
-                              const now = new Date();
-                              const year = now.getFullYear();
-                              const month = String(now.getMonth() + 1).padStart(2, '0');
-                              const day = String(now.getDate()).padStart(2, '0');
-                              const defaultTime = `${year}-${month}-${day}T09:00`;
-                              const newValue = toIsoWithOriginalTimezone(defaultTime, `2025-01-01T00:00:00${selectedOffset}`);
-                              setValue(`flights.${index}.departure_time`, newValue);
-                            }
+                            setValue(`flights.${index}.departure_timezone`, e.target.value);
                           }}
                         >
-                          {getCommonTimezones().map((tz) => (
-                            <option key={tz.offset} value={tz.offset}>
+                          {COMMON_TIMEZONES.map((tz) => (
+                            <option key={tz.value} value={tz.value}>
                               {tz.label}
                             </option>
                           ))}
@@ -180,23 +148,19 @@ export default function FlightSection({ register, watch, setValue }: FlightSecti
                       <div className="form-control w-full lg:col-span-2">
                         <label className="label">
                           <span className="label-text">Arrival Time</span>
-                          {watch(`flights.${index}.arrival_time`) && (
-                            <span className="label-text-alt badge badge-ghost badge-sm">
-                              {getTimezoneAbbreviation(watch(`flights.${index}.arrival_time`)!)}
-                            </span>
-                          )}
                         </label>
                         <input
                           type="datetime-local"
-                          value={toDateTimeLocalValue(watch(`flights.${index}.arrival_time`))}
+                          value={utcToLocal(
+                            watch(`flights.${index}.arrival_time`),
+                            watch(`flights.${index}.arrival_timezone`) || getDefaultTimezone()
+                          )}
                           className="input input-bordered w-full"
                           onChange={(e) => {
                             if (e.target.value) {
-                              const newValue = toIsoWithOriginalTimezone(
-                                e.target.value,
-                                watch(`flights.${index}.arrival_time`)
-                              );
-                              setValue(`flights.${index}.arrival_time`, newValue);
+                              const timezone = watch(`flights.${index}.arrival_timezone`) || getDefaultTimezone();
+                              const utcValue = localToUTC(e.target.value, timezone);
+                              setValue(`flights.${index}.arrival_time`, utcValue);
                             } else {
                               setValue(`flights.${index}.arrival_time`, undefined);
                             }
@@ -209,41 +173,14 @@ export default function FlightSection({ register, watch, setValue }: FlightSecti
                           <span className="label-text">Timezone</span>
                         </label>
                         <select
-                          className="select select-bordered w-full"
-                          value={(() => {
-                            const arrivalTime = watch(`flights.${index}.arrival_time`);
-                            if (!arrivalTime) return '+05:30'; // Default to IST for arrivals
-                            const { offset } = extractTimezoneInfo(arrivalTime);
-                            // Check if this offset exists in our list
-                            const exists = getCommonTimezones().some(tz => tz.offset === offset);
-                            return exists ? offset : '+05:30';
-                          })()}
+                          className="select select-bordered w-full text-sm"
+                          value={watch(`flights.${index}.arrival_timezone`) || getDefaultTimezone()}
                           onChange={(e) => {
-                            const selectedOffset = e.target.value;
-                            
-                            const currentTime = watch(`flights.${index}.arrival_time`);
-                            if (currentTime) {
-                              // Update existing time with new timezone
-                              const localValue = toDateTimeLocalValue(currentTime);
-                              const newValue = toIsoWithOriginalTimezone(
-                                localValue,
-                                `2025-01-01T00:00:00${selectedOffset}`
-                              );
-                              setValue(`flights.${index}.arrival_time`, newValue);
-                            } else {
-                              // If no time set yet, set a default time with the selected timezone
-                              const now = new Date();
-                              const year = now.getFullYear();
-                              const month = String(now.getMonth() + 1).padStart(2, '0');
-                              const day = String(now.getDate()).padStart(2, '0');
-                              const defaultTime = `${year}-${month}-${day}T18:00`;
-                              const newValue = toIsoWithOriginalTimezone(defaultTime, `2025-01-01T00:00:00${selectedOffset}`);
-                              setValue(`flights.${index}.arrival_time`, newValue);
-                            }
+                            setValue(`flights.${index}.arrival_timezone`, e.target.value);
                           }}
                         >
-                          {getCommonTimezones().map((tz) => (
-                            <option key={tz.offset} value={tz.offset}>
+                          {COMMON_TIMEZONES.map((tz) => (
+                            <option key={tz.value} value={tz.value}>
                               {tz.label}
                             </option>
                           ))}

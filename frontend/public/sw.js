@@ -3,7 +3,7 @@
 
 // IMPORTANT: Change this version number when deploying updates
 // This forces the service worker to update and clear old caches
-const CACHE_VERSION = '2025-10-24-02'; // Format: YYYY-MM-DD-XX
+const CACHE_VERSION = '2025-10-24-03'; // Format: YYYY-MM-DD-XX
 const CACHE_NAME = `travo-v${CACHE_VERSION}`;
 const OFFLINE_URL = '/';
 

@@ -241,9 +241,6 @@ export default function QuickAddModal({ trip, isOpen, onClose, onSuccess }: Quic
 
           {/* Google Maps Link */}
           <div className="form-control">
-            <label className="label">
-              <span className="label-text font-semibold">Google Maps Link *</span>
-            </label>
             <MapsLinkInput
               value={mapsUrl}
               onChange={setMapsUrl}

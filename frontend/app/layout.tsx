@@ -6,6 +6,7 @@ import { SyncProvider } from "@/components/SyncProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { RefineProvider } from "@/lib/refine/RefineProvider";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { PWANavigationReset } from "@/components/PWANavigationReset";
 
 export const metadata: Metadata = {
   title: "Travo - Trip Planner",
@@ -38,6 +39,7 @@ export default function RootLayout({
     <html lang="en" data-theme={DEFAULT_THEME} suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
         <ServiceWorkerRegistration />
+        <PWANavigationReset />
         <AuthProvider>
           <DatabaseProvider>
             <RefineProvider>

@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import type { Trip, TimelineItem, Flight, Hotel, DailyActivity } from '@/types';
 import { isFlight, isHotel, isActivity } from '@/types';
 import { sortChronologically, getItemDate } from '@/lib/utils';
@@ -64,8 +64,9 @@ function getDaysBetween(start: string, end: string): string[] {
 /**
  * TimelineDot - Small colored dot indicator for timeline items
  */
+// TimelineDot: smaller size for cleaner visual hierarchy where line is the primary connector
 const TimelineDot = ({ color }: { color: string }) => (
-  <div className={`absolute -left-[26px] md:-left-[34px] top-4 w-4 h-4 rounded-full ${color} shadow-sm`} />
+  <div className={`w-3 h-3 rounded-full ${color} ring-2 ring-base-100`} />
 );
 
 export function TripTimeline({ trip }: TripTimelineProps) {
@@ -220,72 +221,79 @@ export function TripTimeline({ trip }: TripTimelineProps) {
           <div key={day.dayNumber} id={`day-${day.dayNumber}`} className="scroll-mt-32">
             {/* Day Header */}
             <div className="flex items-center gap-3 mb-4">
-              <div className={`flex items-center justify-center w-12 h-12 rounded-full ${day.color.bg} ${day.color.border} border-2`}>
-                <span className={`text-lg font-bold ${day.color.text}`}>
-                  {day.dayNumber}
-                </span>
-              </div>
               <div>
                 <h3 className="text-xl font-bold">
-                  Day {day.dayNumber}
-                </h3>
-                <p className="text-sm text-base-content/60">
                   {new Date(day.date).toLocaleDateString('en-US', { 
                     weekday: 'long',
                     month: 'long', 
-                    day: 'numeric',
-                    year: 'numeric'
+                    day: 'numeric'
                   })}
-                </p>
+                </h3>
               </div>
             </div>
 
-            {/* Timeline Items */}
-            <div className="relative pl-6 md:pl-8 min-h-[80px]">
-              {/* Vertical timeline line connector */}
-              <div className="absolute left-0 md:left-2 top-0 bottom-0 w-0.5 bg-base-300" />
-              <div className="space-y-4 pb-4">
-                {/* Hotel check-in or continuation */}
-                {day.hotelStay && (
-                  day.isCheckInDay ? (
-                    <div className="relative">
-                      <TimelineDot color={day.color.dot} />
-                      <HotelCard hotel={day.hotelStay} />
-                    </div>
-                  ) : (
-                    <div className="relative">
-                      <TimelineDot color={day.color.dot} />
-                      <div className="card bg-base-100/50 shadow-lg border border-secondary/30">
-                        <div className="card-body p-3 sm:p-4">
-                          <div className="flex items-center gap-3">
-                            <HotelIcon className="w-5 h-5 text-secondary" />
-                            <span className="text-sm">
-                              Staying at <span className="font-semibold">{day.hotelStay.name}</span>
-                            </span>
+            {/* Timeline Items (Simple dots on left with connecting lines) */}
+            <div className="relative pl-8 py-2 space-y-5">
+              {(() => {
+                const displayItems: { key: string; content: ReactNode }[] = [];
+
+                if (day.hotelStay) {
+                  if (day.isCheckInDay) {
+                    displayItems.push({
+                      key: `hotel-checkin-${day.hotelStay.id}`,
+                      content: <HotelCard hotel={day.hotelStay} />,
+                    });
+                  } else {
+                    displayItems.push({
+                      key: `hotel-cont-${day.hotelStay.id}`,
+                      content: (
+                        <div className="card bg-base-100/50 shadow-lg border border-secondary/30">
+                          <div className="card-body p-3 sm:p-4">
+                            <div className="flex items-center gap-3">
+                              <HotelIcon className="w-5 h-5 text-secondary" />
+                              <span className="text-sm">
+                                Staying at <span className="font-semibold">{day.hotelStay.name}</span>
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  )
-                )}
+                      ),
+                    });
+                  }
+                }
 
-                {/* Day's activities and flights */}
-                {day.items
-                  .filter(item => {
-                    // Filter out hotels that are already shown as hotelStay to avoid duplicate dots
-                    if (isHotel(item) && day.hotelStay && item.id === day.hotelStay.id) {
-                      return false;
-                    }
-                    return true;
-                  })
-                  .map((item) => (
-                  <div key={item.id} className="relative">
-                    <TimelineDot color={day.color.dot} />
-                    {isFlight(item) && <FlightCard flight={item} />}
-                    {isActivity(item) && <ActivityCard activity={item} tripId={trip.id} />}
-                  </div>
-                ))}
-              </div>
+                day.items.forEach(item => {
+                  if (isHotel(item) && day.hotelStay && item.id === day.hotelStay.id) return;
+                  displayItems.push({
+                    key: item.id,
+                    content: (
+                      <>
+                        {isFlight(item) && <FlightCard flight={item as Flight} />}
+                        {isActivity(item) && <ActivityCard activity={item as DailyActivity} tripId={trip.id} />}
+                        {isHotel(item) && <HotelCard hotel={item as Hotel} />}
+                      </>
+                    ),
+                  });
+                });
+
+                return displayItems.map((block, idx) => {
+                  const isLast = idx === displayItems.length - 1;
+                  return (
+                    <div key={block.key} className="relative">
+                      {/* Simple dot at fixed position on left */}
+                      <div className={`absolute -left-[26px] top-4 w-3 h-3 rounded-full ${day.color.dot} ring-2 ring-base-100`}></div>
+                      
+                      {/* Dashed connecting line from dot center to next dot center */}
+                      {!isLast && displayItems.length > 1 && (
+                        <div className={`absolute -left-[21px] top-[22px] w-px h-[calc(100%+1.25rem)] border-l-2 border-dashed ${day.color.border} opacity-50`}></div>
+                      )}
+                      
+                      {/* Card content */}
+                      {block.content}
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
         ))}
